@@ -689,7 +689,7 @@ function tableroPeriodoHtml(c) {
       ${c.filas.length ? c.filas.map(f => `
         <div class="flex items-center justify-between gap-3 border-b border-line py-2">
           <div class="flex items-center gap-3 min-w-0"><span class="w-6 text-center shrink-0">${icono[f.estado] || ''}</span>
-            <div class="min-w-0"><p class="text-sm text-zinc-200 truncate">${esc(f.nombre)}</p><p class="text-[11px] text-zinc-500">${esc(f.area || '')}${f.fecha ? ' · ' + esc(f.fecha) : ''}</p></div></div>
+            <div class="min-w-0"><p class="text-sm text-zinc-200 truncate">${f.onNombre ? `<button onclick="${f.onNombre}" class="hover:underline text-left">${esc(f.nombre)}</button>` : esc(f.nombre)}</p><p class="text-[11px] text-zinc-500">${esc(f.area || '')}${f.fecha ? ' · ' + esc(f.fecha) : ''}</p></div></div>
           <div class="shrink-0 text-xs">${f.acciones || ''}</div>
         </div>`).join('') : '<p class="text-sm text-zinc-500 py-4">No hay personas para mostrar.</p>'}
     </div>`;
@@ -1811,7 +1811,7 @@ function renderRetainResultados() {
   `;
 }
 
-function openEmpresa(id) { STATE.retainView.empresaId = id; STATE.retainTab = 'hoy'; STATE.retainCkFiltro = ''; STATE.retainArea = ''; STATE.retainPeriodo = null; renderRetain(); }
+function openEmpresa(id) { STATE.retainView.empresaId = id; STATE.retainTab = 'hoy'; STATE.retainCkFiltro = ''; STATE.retainArea = ''; STATE.retainPeriodo = null; STATE.retainPersona = null; renderRetain(); }
 function backToRetain() { STATE.retainView.empresaId = null; renderRetain(); }
 
 // Resumen de "que hay que hacer" para una empresa, en base a las mismas cadencias
@@ -2235,6 +2235,7 @@ function renderMetricasRiesgo(empleados, checkins) {
 const RETAIN_TABS = [['hoy', 'Hoy'], ['equipo', 'Equipo'], ['checkins', 'Check-ins'], ['pulso', 'Pulso'], ['clima', 'Clima'], ['informes', 'Informes'], ['ajustes', 'Ajustes']];
 function irTab(tab, filtro) {
   STATE.retainTab = tab;
+  STATE.retainPersona = null;
   if (filtro !== undefined) STATE.retainCkFiltro = filtro;
   renderRetainDetail(STATE.retainView.empresaId);
   window.scrollTo(0, 0);
@@ -2400,7 +2401,7 @@ function equipoTabHtml(id, emp, empleados) {
         <div class="card rounded-xl p-3.5">
           <div class="flex justify-between items-start gap-3 flex-wrap">
             <div class="min-w-0">
-              <p class="text-sm font-medium">${e.key_talent === 'si' ? '⭐ ' : ''}${e.rol_critico === 'si' ? '🔑 ' : ''}${bajando.has(e.id) ? '⚠️ ' : ''}${esc(e.nombre_empleado)}</p>
+              <p class="text-sm font-medium"><button onclick="abrirFicha('${e.id}')" class="hover:underline text-left">${e.key_talent === 'si' ? '⭐ ' : ''}${e.rol_critico === 'si' ? '🔑 ' : ''}${bajando.has(e.id) ? '⚠️ ' : ''}${esc(e.nombre_empleado)}</button></p>
               <p class="text-xs text-zinc-500 mb-1.5">${esc([e.puesto, e.seniority, e.area].filter(Boolean).join(' · '))}</p>
               <div class="flex flex-wrap gap-1.5">
                 ${chipRiesgo(u ? u.riesgo_salida : '')}
@@ -2410,7 +2411,7 @@ function equipoTabHtml(id, emp, empleados) {
               </div>
             </div>
             <div class="flex gap-3 text-xs shrink-0 items-center">
-              <button onclick="verHistorialEmpleado('${e.id}')" class="text-sky-400 hover:text-sky-300">🕓 Historial</button>
+              <button onclick="abrirFicha('${e.id}')" class="text-sky-400 hover:text-sky-300">📁 Ficha</button>
               <button onclick="registrarReunionAhora('${emp.id}','${e.id}')" class="text-gold-400 hover:text-gold-300">📝 Registrar reunión</button>
               <details class="relative"><summary class="cursor-pointer text-zinc-400 hover:text-white list-none">⋯</summary>
                 <div class="absolute right-0 z-10 mt-1 card rounded-lg p-2 space-y-1 whitespace-nowrap">
@@ -2447,7 +2448,7 @@ function checkinsTabHtml(id, emp, empleados, checkins) {
       pend: btn('Registrar', `marcarCheckinRealizado('${c && c.id}')`) + btn('Cambiar fecha', `editarCheckinForm('${c && c.id}')`, 'text-zinc-400 hover:text-white'),
       venc: btn('Registrar', `marcarCheckinRealizado('${c && c.id}')`, 'text-red-400 hover:text-red-300') + btn('Reprogramar', `editarCheckinForm('${c && c.id}')`, 'text-zinc-400 hover:text-white'),
       sin: btn('Programar', `openCheckinForm('${id}','${e.id}')`) }[f.estado];
-    return { nombre: e.nombre_empleado, area: e.area, estado: f.estado === 'nota' ? 'nota' : f.estado === 'pend' ? 'pend' : f.estado, fecha: detalle, acciones };
+    return { nombre: e.nombre_empleado, area: e.area, estado: f.estado, fecha: detalle, acciones, onNombre: `abrirFicha('${e.id}')` };
   });
   return `
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -2627,6 +2628,9 @@ function renderRetainDetail(id) {
   else if (tab === 'clima') contenido = partesPulsoClima(id).clima;
   else if (tab === 'informes') contenido = informesTabHtml(id, empleados, checkins, informes);
   else contenido = ajustesTabHtml(id, emp);
+  const personaFicha = STATE.retainPersona ? empleados.find(e => e.id === STATE.retainPersona) : null;
+  if (personaFicha) contenido = fichaPersonaHtml(id, emp, personaFicha);
+  else STATE.retainPersona = null;
 
   document.getElementById('tab-retain').innerHTML = `
     <button onclick="backToRetain()" class="text-xs text-zinc-400 hover:text-white mb-3">← Volver a empresas</button>
@@ -2641,6 +2645,184 @@ function renderRetainDetail(id) {
     </div>
     <div id="retain-tab-contenido">${contenido}</div>
   `;
+}
+
+
+// ── FICHA DE PERSONA: una sola página con todo lo de esa persona ──
+function abrirFicha(empleadoId) {
+  STATE.retainVolver = STATE.retainTab || 'equipo';
+  STATE.retainPersona = empleadoId;
+  renderRetainDetail(STATE.retainView.empresaId);
+  window.scrollTo(0, 0);
+}
+function cerrarFicha() {
+  STATE.retainPersona = null;
+  STATE.retainTab = STATE.retainVolver || 'equipo';
+  renderRetainDetail(STATE.retainView.empresaId);
+}
+// Pulso corto de una persona, mes a mes (los ultimos 4 con respuestas de la empresa).
+function pulsoDePersona(empresaId, empleadoId) {
+  const resp = STATE.data.Retain_Pulso_Mensual_Respuestas.filter(r => r.empresa_id === empresaId && r.modo === 'corto');
+  const meses = [...new Set(resp.map(r => claveMes(r.mes)))].sort().slice(-4);
+  const porMes = {};
+  resp.filter(r => r.empleado_id === empleadoId).forEach(r => { porMes[claveMes(r.mes)] = { o: valoresPulsoDe([r], 'PC_OFERTA')[0], c: valoresPulsoDe([r], 'PC_CARGA')[0], t: ((JSON.parse(r.respuestas_json || '[]').find(x => x.id === 'PC_ABIERTA')) || {}).texto || '' }; });
+  return { meses, porMes };
+}
+function resumenDeCheckin(ch, largo) {
+  const informe = STATE.data.Retain_Informes.find(inf => inf.checkin_id === ch.id && inf.eliminado !== 'si');
+  let r = informe ? parrafoDeSeccion(buscarSeccionInforme(parsearSeccionesInforme(informe.contenido), 'RESUMEN')) : '';
+  if (!r) { const n = String(ch.notas_raw || '').replace(/\s+/g, ' ').trim(); r = n.length > largo ? n.slice(0, largo).replace(/\s+\S*$/, '') + '…' : n; }
+  return r;
+}
+function fichaPersonaHtml(id, emp, e) {
+  const volverTab = STATE.retainVolver || 'equipo';
+  const nombreVolver = (RETAIN_TABS.find(t => t[0] === volverTab) || ['', 'Equipo'])[1];
+  const todos = STATE.data.Retain_Checkins.filter(c => c.empleado_id === e.id && c.eliminado !== 'si');
+  const hechos = todos.filter(c => c.estado === 'realizado').sort((a, b) => String(a.fecha_realizada || a.fecha_programada || '').localeCompare(String(b.fecha_realizada || b.fecha_programada || '')));
+  const u = hechos.length ? hechos[hechos.length - 1] : null;
+  const pCk = periodoSeleccionado(id);
+  const filaPer = checkinsPorPersonaEnPeriodo(id, { tipo: pCk.tipo, clave: periodoDeHoy(pCk.tipo) }).find(f => f.empleado.id === e.id);
+  const estPer = filaPer ? filaPer.estado : 'sin', ckPer = filaPer ? filaPer.checkin : null;
+  const bajando = personasConPulsoBajando(id).some(x => x.id === e.id);
+  const anios = e.fecha_ingreso_empresa ? Math.floor((Date.now() - new Date(e.fecha_ingreso_empresa).getTime()) / (365.25 * 86400000) * 10) / 10 : null;
+  const btn = (txt, on, col) => `<button onclick="${on}" class="text-xs ${col || 'text-sky-400 hover:text-sky-300'} mr-3">${txt}</button>`;
+  const accionPer = { ok: ckPer ? btn('Ver notas', `verNotasCheckin('${ckPer.id}')`) : '', nota: ckPer ? btn('Cargar notas', `marcarCheckinRealizado('${ckPer.id}')`, 'text-amber-400 hover:text-amber-300') : '',
+    pend: ckPer ? btn('Registrar', `marcarCheckinRealizado('${ckPer.id}')`) + btn('Cambiar fecha', `editarCheckinForm('${ckPer.id}')`, 'text-zinc-400 hover:text-white') : '',
+    venc: ckPer ? btn('Registrar', `marcarCheckinRealizado('${ckPer.id}')`, 'text-red-400 hover:text-red-300') + btn('Reprogramar', `editarCheckinForm('${ckPer.id}')`, 'text-zinc-400 hover:text-white') : '',
+    sin: btn('Programar', `openCheckinForm('${id}','${e.id}')`) }[estPer];
+
+  // Ultimo check-in (lo primero que hay que repasar antes de cargar el siguiente)
+  const b = hechos.length ? obtenerBriefingCompleto(e.id, null) : null;
+  const infU = u ? STATE.data.Retain_Informes.find(inf => inf.checkin_id === u.id && inf.eliminado !== 'si') : null;
+  const bloqueUltimo = u ? `
+    <div class="card rounded-xl p-4 mb-5 border-l-4 border-l-sky-500/50">
+      <p class="text-xs uppercase tracking-wide text-sky-400 mb-1">Último check-in · ${fmtDate(u.fecha_realizada || u.fecha_programada)}</p>
+      <div class="flex flex-wrap items-center gap-2 mb-2 text-xs">${chipRiesgo(u.riesgo_salida)}${u.satisfaccion ? `<span class="text-zinc-400">Satisfacción ${esc(u.satisfaccion)}/10</span>` : ''}</div>
+      ${resumenDeCheckin(u, 360) ? `<p class="text-sm text-zinc-300 mb-2">${esc(resumenDeCheckin(u, 360))}</p>` : '<p class="text-xs text-zinc-500 mb-2">Todavía no hay notas cargadas de este check-in.</p>'}
+      ${b && b.cambios.length ? `<p class="text-xs text-amber-300 mb-1.5">${b.cambios.map(c => esc(c)).join(' ')}</p>` : ''}
+      ${b && b.acuerdos.length ? `<p class="text-xs text-zinc-400 mb-1">Habían quedado en:</p><ul class="list-disc pl-4 text-xs text-zinc-400 space-y-0.5 mb-2">${b.acuerdos.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
+      <div>${btn('Ver notas', `verNotasCheckin('${u.id}')`)}${infU ? btn('Ver informe →', `verInforme('${infU.id}')`, 'text-gold-400 hover:text-gold-300') : ''}</div>
+    </div>` : `<div class="card rounded-xl p-4 mb-5"><p class="text-sm text-zinc-500">Todavía no tiene check-ins realizados.</p></div>`;
+
+  // Informe de evolucion (se arma a mano a partir de los ultimos N check-ins)
+  const evoluciones = STATE.data.Retain_Informes.filter(inf => inf.empleado_id === e.id && inf.tipo_informe === 'evolucion' && inf.eliminado !== 'si').sort((a, b2) => String(b2.fecha_generacion).localeCompare(String(a.fecha_generacion)));
+  const maxN = Math.min(hechos.length, 6);
+  const bloqueEvolucion = `
+    <div class="card rounded-xl p-4 mb-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500 mb-1">Informe de evolución</p>
+      <p class="text-xs text-zinc-500 mb-3">Junta los últimos check-ins en un solo documento para la dirección de la empresa. Lo revisás y lo editás antes de guardarlo.</p>
+      ${hechos.length >= 2 ? `<div class="flex items-center gap-2 flex-wrap text-xs">
+        <span class="text-zinc-400">Con los últimos</span>
+        <select id="evo-n" class="rounded-lg px-2 py-1.5 text-xs">${Array.from({ length: maxN - 1 }, (_, i) => i + 2).map(n => `<option value="${n}" ${n === Math.min(3, maxN) ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        <span class="text-zinc-400">check-ins</span>
+        <button onclick="armarInformeEvolucion('${e.id}', Number(document.getElementById('evo-n').value))" class="px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">Armar informe</button>
+      </div>` : '<p class="text-xs text-zinc-500">Hace falta tener al menos 2 check-ins realizados.</p>'}
+      ${evoluciones.length ? `<div class="mt-3 space-y-1">${evoluciones.map(inf => `<button onclick="verInforme('${inf.id}')" class="block text-xs text-gold-400 hover:text-gold-300 text-left">📋 Informe del ${fmtDate(inf.fecha_generacion)} →</button>`).join('')}</div>` : ''}
+    </div>`;
+
+  // Historial completo, el mas reciente arriba
+  const ordenados = todos.filter(c => c !== u).sort((a, b2) => String(b2.fecha_realizada || b2.fecha_programada || '').localeCompare(String(a.fecha_realizada || a.fecha_programada || '')));
+  const ico = { ok: '✅', nota: '🟡', pend: '⏳', venc: '⚠️' };
+  const tarjetas = ordenados.map(ch => {
+    const est = estadoCheckin(ch);
+    const i = hechos.indexOf(ch), ant = i > 0 ? hechos[i - 1] : null;
+    const fR = ant ? flechaTendencia(ORDEN_RIESGO[ch.riesgo_salida] || null, ORDEN_RIESGO[ant.riesgo_salida] || null, false) : '';
+    const fS = ant ? flechaTendencia(Number(ch.satisfaccion) || null, Number(ant.satisfaccion) || null, true) : '';
+    const inf = STATE.data.Retain_Informes.find(x => x.checkin_id === ch.id && x.eliminado !== 'si');
+    const res = ch.estado === 'realizado' ? resumenDeCheckin(ch, 200) : '';
+    const acc = est === 'ok' || est === 'nota'
+      ? btn(est === 'nota' ? 'Cargar notas' : 'Ver notas', est === 'nota' ? `marcarCheckinRealizado('${ch.id}')` : `verNotasCheckin('${ch.id}')`, est === 'nota' ? 'text-amber-400 hover:text-amber-300' : '') + (inf ? btn('Ver informe →', `verInforme('${inf.id}')`, 'text-gold-400 hover:text-gold-300') : '')
+      : btn('Registrar', `marcarCheckinRealizado('${ch.id}')`, est === 'venc' ? 'text-red-400 hover:text-red-300' : '') + btn(est === 'venc' ? 'Reprogramar' : 'Cambiar fecha', `editarCheckinForm('${ch.id}')`, 'text-zinc-400 hover:text-white');
+    const fechaTxt = est === 'ok' || est === 'nota' ? 'hecho el ' + fmtDate(ch.fecha_realizada || ch.fecha_programada) : est === 'venc' ? 'estaba para el ' + fmtDate(ch.fecha_programada) + ' · no se cargó nada' : 'programado para el ' + fmtDate(ch.fecha_programada);
+    return `<div class="card rounded-xl p-3.5">
+      <div class="flex justify-between items-start gap-2 mb-1"><p class="text-sm font-medium">${ico[est]} ${esc(CHECKIN_TIPOS[ch.tipo] || ch.tipo)}${ch.periodo ? ' — ' + esc(fmtPeriodo(ch.periodo)) : ''} <span class="text-xs text-zinc-500 font-normal">· ${esc(fechaTxt)}</span></p></div>
+      ${ch.estado === 'realizado' ? `<div class="flex flex-wrap items-center gap-2 mb-1.5 text-xs">${chipRiesgo(ch.riesgo_salida)}${fR ? `<span>${fR}</span>` : ''}${ch.satisfaccion ? `<span class="text-zinc-400">Satisfacción ${esc(ch.satisfaccion)}/10</span>` : ''}${fS ? `<span>${fS}</span>` : ''}</div>` : ''}
+      ${res ? `<p class="text-xs text-zinc-400 mb-1.5">${esc(res)}</p>` : ''}
+      <div>${acc}</div></div>`;
+  }).join('');
+
+  // Pulso
+  let bloquePulso = '';
+  if (pulsoModo(id) === 'corto') {
+    const pp = pulsoDePersona(id, e.id);
+    const celda = d => d ? `<span style="color:${colorValorPulso(d.o)};font-weight:600">${d.o}</span><span class="text-zinc-500"> / </span><span style="color:${colorValorPulso(d.c)};font-weight:600">${d.c}</span>${d.t ? ` <span title="${esc(d.t)}">💬</span>` : ''}` : '<span class="text-zinc-600">—</span>';
+    bloquePulso = `<p class="text-xs uppercase tracking-wide text-zinc-500 mb-2 mt-6">Pulso</p>
+      <div class="card rounded-xl p-3.5"><div class="flex flex-wrap gap-x-6 gap-y-2">${pp.meses.length ? pp.meses.map(m => `<div class="text-center"><p class="text-[11px] text-zinc-500 mb-0.5">${esc(fmtPeriodo(m))}</p><p class="text-sm">${celda(pp.porMes[m])}</p></div>`).join('') : '<span class="text-xs text-zinc-500">Todavía no hay respuestas del pulso.</span>'}</div>
+      <p class="text-[11px] text-zinc-500 mt-2">Cada mes: quedarse con la misma oferta / carga manejable (0-10). Solo lo ves vos.</p></div>`;
+  }
+
+  return `
+    <div class="text-xs text-zinc-500 mb-3"><button onclick="cerrarFicha()" class="hover:text-white">← ${esc(nombreVolver)}</button>${e.area ? ' › ' + esc(e.area) : ''} › <span class="text-zinc-300">${esc(e.nombre_empleado)}</span></div>
+    <div class="flex justify-between items-start gap-3 flex-wrap mb-4">
+      <div>
+        <h3 class="font-display text-2xl">${e.key_talent === 'si' ? '⭐ ' : ''}${e.rol_critico === 'si' ? '🔑 ' : ''}${esc(e.nombre_empleado)}</h3>
+        <p class="text-sm text-zinc-500">${esc([e.puesto, e.seniority, e.area].filter(Boolean).join(' · '))}${anios != null ? ' · ' + anios + ' años en la empresa' : ''}</p>
+      </div>
+      <div class="flex gap-3 text-xs items-center">
+        <button onclick="registrarReunionAhora('${emp.id}','${e.id}')" class="text-gold-400 hover:text-gold-300">📝 Registrar reunión</button>
+        <button onclick="openCheckinForm('${emp.id}','${e.id}')" class="text-zinc-300 hover:text-white">Programar check-in</button>
+        <button onclick="openEmpleadoForm('${emp.id}','${e.id}')" class="text-zinc-300 hover:text-white">Editar</button>
+      </div>
+    </div>
+    <div class="card rounded-xl p-3.5 mb-5 flex justify-between items-center gap-3 flex-wrap">
+      <div class="flex items-center gap-2 flex-wrap"><span class="text-xs text-zinc-500">${esc(etiquetaPeriodo(pCk))}</span>${chipEstadoCk(estPer)}${bajando ? '<span class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-500/15 text-red-400">⚠ pulso bajando</span>' : ''}</div>
+      <div>${accionPer}</div>
+    </div>
+    ${bloqueUltimo}
+    ${bloqueEvolucion}
+    <p class="text-xs uppercase tracking-wide text-zinc-500 mb-2">${u ? 'Otros check-ins' : 'Check-ins'} (${ordenados.length})</p>
+    <div class="space-y-2">${tarjetas || '<p class="text-sm text-zinc-500">Sin check-ins todavía.</p>'}</div>
+    ${bloquePulso}`;
+}
+
+// Borrador del informe de evolución: se arma con datos y notas, sin IA; la persona lo revisa antes de guardar.
+function textoEvolucion(e, n) {
+  const hs = STATE.data.Retain_Checkins.filter(c => c.empleado_id === e.id && c.estado === 'realizado' && c.eliminado !== 'si')
+    .sort((a, b) => String(a.fecha_realizada || a.fecha_programada || '').localeCompare(String(b.fecha_realizada || b.fecha_programada || ''))).slice(-n);
+  const pri = hs[0], ult = hs[hs.length - 1];
+  const fecha = c => fmtDate(c.fecha_realizada || c.fecha_programada);
+  const lineas = [];
+  lineas.push('PANORAMA');
+  lineas.push(e.nombre_empleado + (e.puesto || e.area ? ' (' + [e.puesto, e.area].filter(Boolean).join(', ') + ')' : '') + '. Evolución entre el ' + fecha(pri) + ' y el ' + fecha(ult) + ', con ' + hs.length + ' check-ins.');
+  const rP = pri.riesgo_salida, rU = ult.riesgo_salida;
+  if (rP && rU) lineas.push('- Riesgo de salida: ' + rP + ' → ' + rU + (ORDEN_RIESGO[rU] < ORDEN_RIESGO[rP] ? ' (mejoró).' : ORDEN_RIESGO[rU] > ORDEN_RIESGO[rP] ? ' (empeoró).' : ' (sin cambios).'));
+  const sP = Number(pri.satisfaccion), sU = Number(ult.satisfaccion);
+  if (pri.satisfaccion && ult.satisfaccion) lineas.push('- Satisfacción: ' + sP + ' → ' + sU + (sU > sP ? ' (subió).' : sU < sP ? ' (bajó).' : ' (sin cambios).'));
+  lineas.push('');
+  lineas.push('POR CHECK-IN');
+  hs.forEach(c => {
+    const datos = [c.riesgo_salida ? 'riesgo ' + c.riesgo_salida : '', c.satisfaccion ? 'satisfacción ' + c.satisfaccion + '/10' : ''].filter(Boolean).join(', ');
+    lineas.push('- ' + fecha(c) + (datos ? ' (' + datos + ')' : '') + ': ' + (resumenDeCheckin(c, 260) || 'Sin notas cargadas.'));
+  });
+  const b = obtenerBriefingCompleto(e.id, null);
+  lineas.push('');
+  lineas.push('QUÉ QUEDÓ ACORDADO');
+  if (b && b.acuerdos.length) b.acuerdos.forEach(a => lineas.push('- ' + a)); else lineas.push('No identificado en la conversación.');
+  lineas.push('');
+  lineas.push('PRÓXIMOS PASOS');
+  lineas.push('- (Completar)');
+  return lineas.join('\n');
+}
+function armarInformeEvolucion(empleadoId, n) {
+  const e = STATE.data.Retain_Empleados.find(x => x.id === empleadoId);
+  if (!e) return;
+  openModal(`
+    <h3 class="font-display text-xl mb-1">Informe de evolución — ${esc(e.nombre_empleado)}</h3>
+    <p class="text-xs text-zinc-500 mb-3">Es un borrador armado con tus notas. Revisalo y sacá lo que no quieras que lea la empresa antes de guardarlo.</p>
+    <form id="f-evolucion" class="space-y-3">
+      <textarea name="contenido" rows="18" required class="w-full rounded-lg px-3 py-2 text-sm">${esc(textoEvolucion(e, n))}</textarea>
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
+        <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar informe</button>
+      </div>
+    </form>`);
+  document.getElementById('f-evolucion').onsubmit = async (ev) => {
+    ev.preventDefault();
+    const btn = bloquearBoton(ev.target);
+    const r = await api('crear', { sheet: 'Retain_Informes', data: { empleado_id: e.id, empresa_id: e.empresa_id, tipo_informe: 'evolucion', periodo: '', fecha_generacion: new Date().toISOString(), contenido: new FormData(ev.target).get('contenido'), estado: 'final' } });
+    if (r.ok) { closeModal(); toast('Informe guardado'); await refreshAndRender(); }
+    else { desbloquearBoton(btn); toast(r.message || 'Error', true); }
+  };
 }
 
 // Orden para comparar riesgo de salida entre check-ins consecutivos de la
@@ -3732,7 +3914,8 @@ const TITULOS_INFORME = {
   salidas_consolidado: 'Motivos de salida — consolidado',
   consolidado_empresa: 'Informe consolidado',
   consejos: 'Consejos',
-  clima_comentarios: 'Análisis de comentarios'
+  clima_comentarios: 'Análisis de comentarios',
+  evolucion: 'Evolución de la persona'
 };
 
 // Vista "documento" del informe — lo que se le manda al cliente. Reusa el mismo
@@ -3789,7 +3972,7 @@ function verInforme(id) {
       <button onclick="editarInformeTexto('${id}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">✏️ Editar</button>
       <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
     </div>
-    <button onclick="abrirInformeCliente('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Exportar PDF para cliente</button>
+    ${inf.tipo_informe === 'evolucion' ? '' : `<button onclick="abrirInformeCliente('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Exportar PDF para cliente</button>`}
     <button onclick="eliminarInforme('${id}')" class="w-full mt-3 text-xs text-red-400 hover:text-red-300 no-print">Eliminar informe</button>
     ${inf.checkin_id ? `<p class="text-[11px] text-zinc-500 mt-3 text-center no-print">¿Necesitás otra versión? <a href="#" onclick="generarInforme('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Regenerar con IA</a> · <a href="#" onclick="pegarInformeManual('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Pegar otra versión</a></p>` : ''}
   `);
