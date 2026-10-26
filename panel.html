@@ -83,7 +83,7 @@
   .btn-secondary { background: transparent !important; border: 2px solid #4d9fff !important; color: #4d9fff !important; border-radius: 2px !important; }
   .btn-secondary:hover { background: rgba(77,159,255,0.1) !important; }
   /* Barra "firma" de marca, siempre visible en el borde superior de la pagina. */
-  .signature-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; background: linear-gradient(90deg, #00d4ff, #2791ef, #1e50cc); pointer-events: none; }
+  .signature-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; background: linear-gradient(90deg, #A9C29E, #6F8F63, #4F6F45); pointer-events: none; }
   .noscroll { overflow: hidden; }
   input, textarea, select { background: #0d1a3f; border: 1px solid #1e3a5f; color: #ffffff; }
   input:focus, textarea:focus, select:focus { outline: none; border-color: #4d9fff; box-shadow: 0 0 0 3px rgba(77,159,255,0.15); }
@@ -715,7 +715,7 @@ function preguntasDeCampanaPanel(campana) {
 }
 
 let STATE = {
-  user: JSON.parse(localStorage.getItem('kbgb_user') || 'null'),
+  user: (() => { try { localStorage.removeItem('kbgb_user'); return JSON.parse(sessionStorage.getItem('kbgb_user') || 'null'); } catch (e) { return null; } })(),
   pinBuffer: '',
   tab: 'dashboard',
   data: { Leads: [], Busquedas: [], Candidatos: [], Retain_Empresas: [], Retain_Empleados: [], Retain_Checkins: [], Retain_Informes: [], Retain_Pulso_Campanas: [], Retain_Pulso_Respuestas: [], Retain_Pulso_Preguntas: [], Retain_Pulso_Mensual_Respuestas: [], Retain_Clima_Preguntas: [], Retain_Clima_Cuestionarios: [], Retain_Pulso_Rondas: [] },
@@ -826,7 +826,7 @@ async function tryLogin() {
   const r = await api('login', { pin });
   if (r.ok) {
     STATE.user = Object.assign({}, r.user, { pin });
-    localStorage.setItem('kbgb_user', JSON.stringify(STATE.user));
+    try { sessionStorage.setItem('kbgb_user', JSON.stringify(STATE.user)); } catch (e) { /* sin almacenamiento: pide PIN al recargar */ }
     closeLogin();
     enterPanel();
   } else {
@@ -859,7 +859,7 @@ function closeLogin() {
   m.classList.add('hidden'); m.classList.remove('flex');
 }
 function logout() {
-  localStorage.removeItem('kbgb_user');
+  try { sessionStorage.removeItem('kbgb_user'); localStorage.removeItem('kbgb_user'); } catch (e) { /* nada que borrar */ }
   STATE.user = null;
   // Antes volvia a la landing vieja de KBGB (view-public), que ya no tiene
   // sentido mostrar aca -- la landing real para clientes es retain-site.
@@ -2086,7 +2086,7 @@ function renderRondaActual(empresaId) {
         <p class="text-xs uppercase text-zinc-500">Ronda actual (${r.trimestre.replace('-T', ' · Trimestre ')})</p>
         <p class="text-sm text-zinc-300">${r.hechos.length} / ${r.total} completados <span class="text-zinc-500">(${pct}%)</span></p>
       </div>
-      <div class="h-2 rounded-full mb-3" style="background:var(--r-line, #13284f)">
+      <div class="h-2 rounded-full mb-3" style="background:var(--r-line, #dfe5da)">
         <div class="h-2 rounded-full bg-emerald-500" style="width:${pct}%"></div>
       </div>
       ${r.sinNada.length ? `
@@ -2284,8 +2284,10 @@ function rangoPeriodo(p) {
 // ── Estado de cada persona en un periodo ──
 // ok = hecho y con notas · nota = hecho pero faltan las notas · pend = programado, en tiempo
 // venc = ya debería haberse hecho y no se cargó nada · sin = sin check-in en el periodo
+// Un check-in "esta cargado" si tiene tus notas o la transcripcion de la reunion.
+function tieneContenidoCk(ch) { return !!(String(ch.notas_raw || '').trim() || String(ch.transcripcion || '').trim()); }
 function estadoCheckin(ch) {
-  if (ch.estado === 'realizado') return String(ch.notas_raw || '').trim() ? 'ok' : 'nota';
+  if (ch.estado === 'realizado') return tieneContenidoCk(ch) ? 'ok' : 'nota';
   return daysSince(ch.fecha_programada) > 0 ? 'venc' : 'pend';
 }
 const PRIORIDAD_ESTADO_CK = { ok: 0, nota: 1, venc: 2, pend: 3 };
@@ -2326,12 +2328,14 @@ function paraHacerEmpresa(empresaId) {
   const todos = STATE.data.Retain_Checkins.filter(c => c.empresa_id === empresaId && c.eliminado !== 'si');
   const venc = todos.filter(c => c.estado !== 'realizado' && daysSince(c.fecha_programada) > 0).length;
   if (venc) items.push({ nivel: 'alerta', icono: '⚠️', texto: venc + ' check-in' + pl(venc, '', 's') + ' vencido' + pl(venc, '', 's') + ' (ya tendrías que haberlos hecho)', cta: 'Ver', on: "irTab('checkins','venc')" });
-  const sinNotas = todos.filter(c => c.estado === 'realizado' && !String(c.notas_raw || '').trim()).length;
+  const sinNotas = todos.filter(c => c.estado === 'realizado' && !tieneContenidoCk(c)).length;
   if (sinNotas) items.push({ nivel: 'aviso', icono: '🟡', texto: sinNotas + ' check-in' + pl(sinNotas, '', 's') + ' hecho' + pl(sinNotas, '', 's') + ' sin notas cargadas', cta: 'Cargar', on: "irTab('checkins','nota')" });
   const p = periodoSeleccionado(empresaId), pHoy = { tipo: p.tipo, clave: periodoDeHoy(p.tipo) };
   const sin = checkinsPorPersonaEnPeriodo(empresaId, pHoy).filter(f => f.estado === 'sin').length;
   if (sin) items.push({ nivel: 'aviso', icono: '📅', texto: sin + ' persona' + pl(sin, '', 's') + ' sin check-in programado en ' + etiquetaPeriodo(pHoy), cta: 'Programar', on: "STATE.retainPeriodo=null;irTab('checkins','sin')" });
-  const sinInforme = todos.filter(c => c.estado === 'realizado' && String(c.notas_raw || '').trim() && !STATE.data.Retain_Informes.some(i => i.checkin_id === c.id)).length;
+  const accV = accionesPendientes(empresaId).filter(x => x.venc);
+  if (accV.length) { const ids = [...new Set(accV.map(x => x.ch.empleado_id))]; items.push({ nivel: 'alerta', icono: '⏰', texto: accV.length + ' acción' + pl(accV.length, '', 'es') + ' acordada' + pl(accV.length, '', 's') + ' con fecha vencida', cta: 'Ver', on: ids.length === 1 ? "abrirFicha('" + ids[0] + "')" : "irTab('equipo')" }); }
+  const sinInforme = todos.filter(c => c.estado === 'realizado' && tieneContenidoCk(c) && !STATE.data.Retain_Informes.some(i => i.checkin_id === c.id)).length;
   if (sinInforme) items.push({ nivel: 'info', icono: '📄', texto: sinInforme + ' check-in' + pl(sinInforme, '', 's') + ' sin informe generado', cta: 'Ver', on: "irTab('checkins','')" });
   if (pulsoModo(empresaId) === 'corto') {
     const hoy = periodoDeHoy('mes'), rondas = rondasDe(empresaId), deMes = rondas.find(r => claveMes(r.periodo) === hoy);
@@ -2357,8 +2361,26 @@ function hoyTabHtml(id, empleados, checkins) {
       <div class="card rounded-xl p-3.5 border-l-4 border-l-red-500/70 mb-6 flex justify-between items-center gap-3"><span class="text-sm text-zinc-200">⚠️ Su pulso viene bajando: ${bajando.map(e => esc(e.nombre_empleado)).join(', ')}</span><button onclick="verPulsoPorPersona('${id}')" class="text-xs text-sky-400 hover:text-sky-300 shrink-0">Ver →</button></div>` : ''}
     <p class="text-xs uppercase tracking-wide text-zinc-500 mb-2">Panorama</p>
     ${renderMetricasRiesgo(empleados, checkins)}
+    ${encajeHoyHtml(id)}
     ${renderTendenciaRiesgo(id)}
     ${renderRotacion(id)}`;
+}
+
+// Encaje con el rol de todo el equipo (ultimo check-in de cada persona): ¿tenemos a la gente adecuada?
+function encajeHoyHtml(id) {
+  const filas = empleadosActivosDe(id).map(e => ({ e, u: ultimoCheckinDe(e.id) })).filter(f => f.u && Object.keys(estructuraDe(f.u).gwc).length);
+  if (!filas.length) return '';
+  const cuenta = k => { const c = { si: 0, parcial: 0, no: 0 }; filas.forEach(f => { const v = estructuraDe(f.u).gwc[k]; if (c[v] !== undefined) c[v]++; }); return c; };
+  const mirar = filas.filter(f => { const g = estructuraDe(f.u).gwc; const vals = ENCAJE.map(([k]) => g[k]); return vals.includes('no') || vals.filter(v => v === 'parcial').length >= 2; });
+  return `
+    <div class="card rounded-2xl p-5 mb-6">
+      <p class="text-xs uppercase text-zinc-500 mb-1">Encaje con el rol — último check-in</p>
+      <p class="text-[11px] text-zinc-500 mb-3">¿La persona sabe qué tiene que hacer, quiere hacerlo y puede hacerlo? (${filas.length} personas con dato)</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-1">
+        ${ENCAJE.map(([k, et]) => { const c = cuenta(k); return `<div><p class="text-xs text-zinc-300 mb-1">${et}</p><p class="text-sm"><span class="text-emerald-400">${c.si} sí</span> · <span class="text-amber-400">${c.parcial} en parte</span> · <span class="${c.no ? 'text-red-400' : 'text-zinc-500'}">${c.no} no</span></p></div>`; }).join('')}
+      </div>
+      ${mirar.length ? `<div class="mt-3 pt-3 border-t border-line"><p class="text-xs text-zinc-500 mb-1.5">Para mirar:</p>${mirar.map(f => `<p class="text-sm text-zinc-200"><button onclick="abrirFicha('${f.e.id}')" class="hover:underline text-left">${esc(f.e.nombre_empleado)}</button> <span class="text-xs text-zinc-500">· ${faltasEncaje(f.u).map(x => x.k + ': ' + ETQ_ENCAJE[x.valor]).join(', ')}</span></p>`).join('')}</div>` : '<p class="text-xs text-emerald-400 mt-2">Nadie con algo para mirar en el encaje.</p>'}
+    </div>`;
 }
 
 // ── Pestaña EQUIPO: una sola lista de personas ──
@@ -2389,6 +2411,7 @@ function equipoTabHtml(id, emp, empleados) {
     <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
       <h3 class="font-medium">Equipo <span class="text-zinc-500 font-normal">· ${lista.length} persona${lista.length === 1 ? '' : 's'}${areaSel ? ' · ' + esc(areaSel) : ''}</span></h3>
       <div class="flex gap-2">
+        <button onclick="abrirArmarInforme('${emp.id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">📊 Armar informe</button>
         <button onclick="abrirImportarNomina('${emp.id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">📋 Cargar nómina</button>
         <button onclick="openEmpleadoForm('${emp.id}')" class="text-xs px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">+ Empleado</button>
       </div>
@@ -2406,6 +2429,8 @@ function equipoTabHtml(id, emp, empleados) {
               <div class="flex flex-wrap gap-1.5">
                 ${chipRiesgo(u ? u.riesgo_salida : '')}
                 ${chipEstadoCk(enPeriodo[e.id] || 'sin')}
+                ${(u && faltasEncaje(u).length) ? `<span class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${faltasEncaje(u).some(f => f.valor === 'no') ? 'bg-red-500/15 text-red-400' : 'bg-amber-500/15 text-amber-400'}" title="Encaje con el rol">encaje: ${faltasEncaje(u).map(f => f.k + ' ' + ETQ_ENCAJE[f.valor]).join(', ')}</span>` : ''}
+                ${accionesPendientes(emp.id, e.id).some(x => x.venc) ? '<span class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-500/15 text-red-400">acción vencida</span>' : ''}
                 ${hechoPulso ? `<span class="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${hechoPulso.has(e.id) ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-500/15 text-zinc-400'}">pulso ${hechoPulso.has(e.id) ? 'respondido' : 'pendiente'}</span>` : ''}
                 ${u ? `<span class="text-[11px] text-zinc-500 self-center">último check-in ${fmtDate(u.fecha_realizada || u.fecha_programada)}${u.satisfaccion ? ' · ' + esc(u.satisfaccion) + '/10' : ''}</span>` : ''}
               </div>
@@ -2504,7 +2529,7 @@ function checkinsListaHtml(id, empleados, checkins) {
             // Etapa dentro del procesamiento del check-in — se deriva de datos que ya
             // existen (no es un campo nuevo), para saber de un vistazo que falta hacer.
             const etapa = ch.estado!=='realizado' ? null
-              : !ch.notas_raw ? { label: 'Falta cargar notas', color: 'amber' }
+              : !tieneContenidoCk(ch) ? { label: 'Falta cargar notas', color: 'amber' }
               : !informesCheckin.length ? { label: 'Falta generar informe', color: 'amber' }
               : { label: 'Informe generado', color: 'emerald' };
             return `
@@ -2524,7 +2549,7 @@ function checkinsListaHtml(id, empleados, checkins) {
                   <button onclick="verNotasCheckin('${ch.id}')" class="text-xs text-zinc-400 hover:text-white">Ver notas</button>
                   ${informesCheckin.length
                     ? `<button onclick="verInformesCheckin('${ch.id}')" class="text-xs text-gold-400 hover:text-gold-300">Ver informe${informesCheckin.length>1?'s ('+informesCheckin.length+')':''} →</button>`
-                    : ch.notas_raw ? `
+                    : tieneContenidoCk(ch) ? `
                       <button onclick="generarInforme('${ch.id}')" class="text-xs text-gold-400 hover:text-gold-300">Generar con IA</button>
                       <button onclick="pegarInformeManual('${ch.id}')" class="text-xs text-zinc-400 hover:text-white">Pegar informe</button>
                     ` : ''}
@@ -2540,6 +2565,7 @@ function informesTabHtml(id, empleados, checkins, informes) {
                 <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
           <h3 class="font-medium">📋 Informes (${informes.length})</h3>
           <div class="flex flex-wrap gap-2">
+            <button onclick="abrirArmarInforme('${id}')" class="text-xs px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">＋ Armar informe</button>
             ${checkins.some(c => String(c.notas_raw||'').trim()) ? `<button onclick="abrirInformeConsolidado('${id}')" class="text-xs text-gold-400 hover:text-gold-300">📋 Informe consolidado →</button>` : ''}
             ${checkins.some(c => c.tipo === 'salida' && String(c.notas_raw||'').trim()) ? `<button onclick="generarInformeSalidas('${id}')" class="text-xs text-gold-400 hover:text-gold-300">📋 Motivos de salida</button>` : ''}
           </div>
@@ -2550,7 +2576,7 @@ function informesTabHtml(id, empleados, checkins, informes) {
             // quién pertenece — con varios informes en la lista era imposible
             // distinguirlos de un vistazo sin abrir cada uno.
             const empleadoInf = inf.empleado_id ? empleados.find(e => e.id === inf.empleado_id) : null;
-            const tituloInf = TITULOS_INFORME[String(inf.tipo_informe || '').split(':')[0]] || inf.tipo_informe;
+            const tituloInf = tituloTipoInforme(inf);
             const encabezadoInf = empleadoInf ? esc(empleadoInf.nombre_empleado) + ' · ' + esc(tituloInf) : esc(tituloInf);
             return `
             <div class="card rounded-xl p-4 cursor-pointer border-l-4 border-l-gold-500/30" onclick="verInforme('${inf.id}')">
@@ -2604,7 +2630,7 @@ function ajustesTabHtml(id, emp) {
         <button onclick="openEmpresaForm('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">Editar empresa</button>
         <button onclick="prepararReunion('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">🗓️ Preparar reunión</button>
         <button onclick="abrirImportarNomina('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">📋 Cargar nómina</button>
-        ${modo !== 'off' ? `<button onclick="abrirLinksPersonalesPulso('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">🔗 Links personales del pulso</button>` : ''}
+        ${modo !== 'off' ? `<button onclick="abrirLinksPersonalesPulso('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">🔗 Links personales del pulso</button><button onclick="abrirPulsoDemoDe('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">👁 Demo del pulso</button>` : ''}
       </div>
     </div>`;
 }
@@ -2618,7 +2644,7 @@ function renderRetainDetail(id) {
   const tab = RETAIN_TABS.some(t => t[0] === STATE.retainTab) ? STATE.retainTab : 'hoy';
   const cuentaHoy = paraHacerEmpresa(id).filter(i => i.nivel === 'alerta' || i.nivel === 'aviso').length;
   const venc = checkins.filter(c => c.estado !== 'realizado' && daysSince(c.fecha_programada) > 0).length;
-  const sinNotas = checkins.filter(c => c.estado === 'realizado' && !String(c.notas_raw || '').trim()).length;
+  const sinNotas = checkins.filter(c => c.estado === 'realizado' && !tieneContenidoCk(c)).length;
   const aviso = { hoy: cuentaHoy, checkins: venc + sinNotas };
   let contenido = '';
   if (tab === 'hoy') contenido = hoyTabHtml(id, empleados, checkins);
@@ -2699,24 +2725,32 @@ function fichaPersonaHtml(id, emp, e) {
       <p class="text-xs uppercase tracking-wide text-sky-400 mb-1">Último check-in · ${fmtDate(u.fecha_realizada || u.fecha_programada)}</p>
       <div class="flex flex-wrap items-center gap-2 mb-2 text-xs">${chipRiesgo(u.riesgo_salida)}${u.satisfaccion ? `<span class="text-zinc-400">Satisfacción ${esc(u.satisfaccion)}/10</span>` : ''}</div>
       ${resumenDeCheckin(u, 360) ? `<p class="text-sm text-zinc-300 mb-2">${esc(resumenDeCheckin(u, 360))}</p>` : '<p class="text-xs text-zinc-500 mb-2">Todavía no hay notas cargadas de este check-in.</p>'}
+      ${Object.keys(estructuraDe(u).gwc).length ? `<div class="mb-2"><div class="flex flex-wrap gap-1.5">${ENCAJE.map(([k, et]) => { const v = estructuraDe(u).gwc[k]; return v ? `<span class="text-[11px] px-2 py-0.5 rounded-full ${v === 'si' ? 'bg-emerald-500/15 text-emerald-400' : v === 'parcial' ? 'bg-amber-500/15 text-amber-400' : 'bg-red-500/15 text-red-400'}">${et}: ${ETQ_ENCAJE[v]}</span>` : ''; }).join('')}</div>${faltasEncaje(u).length ? `<p class="text-[11px] text-zinc-500 mt-1.5">Para mirar: ${faltasEncaje(u).map(f => esc(f.que)).join(' ')}</p>` : ''}</div>` : ''}
+      ${estructuraDe(u).temas.length ? `<div class="flex flex-wrap gap-1.5 mb-2">${estructuraDe(u).temas.map(t => `<span class="text-[11px] px-2 py-0.5 rounded-full ${t.tendencia === 'foco de atención' ? 'bg-amber-500/15 text-amber-400' : t.tendencia === 'a favor' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-500/15 text-zinc-400'}">${esc(t.tema)} · ${esc(t.tendencia)}</span>`).join('')}</div>` : ''}
       ${b && b.cambios.length ? `<p class="text-xs text-amber-300 mb-1.5">${b.cambios.map(c => esc(c)).join(' ')}</p>` : ''}
-      ${b && b.acuerdos.length ? `<p class="text-xs text-zinc-400 mb-1">Habían quedado en:</p><ul class="list-disc pl-4 text-xs text-zinc-400 space-y-0.5 mb-2">${b.acuerdos.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
+      ${(() => { const qs = estructuraDe(u).acciones.map(a => a.que), ac = b ? b.acuerdos.filter(x => !qs.some(q => x.startsWith(q))) : []; return ac.length ? `<p class="text-xs text-zinc-400 mb-1">Habían quedado en:</p><ul class="list-disc pl-4 text-xs text-zinc-400 space-y-0.5 mb-2">${ac.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''; })()}
       <div>${btn('Ver notas', `verNotasCheckin('${u.id}')`)}${infU ? btn('Ver informe →', `verInforme('${infU.id}')`, 'text-gold-400 hover:text-gold-300') : ''}</div>
     </div>` : `<div class="card rounded-xl p-4 mb-5"><p class="text-sm text-zinc-500">Todavía no tiene check-ins realizados.</p></div>`;
 
+  // Acciones acordadas que siguen abiertas
+  const accP = accionesPendientes(id, e.id);
+  const bloqueAcciones = accP.length ? `
+    <div class="card rounded-xl p-4 mb-5">
+      <p class="text-xs uppercase tracking-wide text-zinc-500 mb-2">Acciones acordadas</p>
+      <div class="space-y-1.5">${accP.map(x => `<div class="flex justify-between items-center gap-3 text-sm"><span class="text-zinc-200">${x.venc ? '⏰ ' : ''}${esc(x.a.que)}<span class="text-xs text-zinc-500">${x.a.quien ? ' · ' + esc(x.a.quien) : ''}${x.a.fecha ? ' · para el ' + fmtDate(x.a.fecha) : ''}${x.venc ? ' · vencida' : ''}</span></span><button onclick="marcarAccionHecha('${x.ch.id}',${x.idx})" class="text-xs text-sky-400 hover:text-sky-300 shrink-0">Marcar hecha</button></div>`).join('')}</div>
+    </div>` : '';
   // Informe de evolucion (se arma a mano a partir de los ultimos N check-ins)
   const evoluciones = STATE.data.Retain_Informes.filter(inf => inf.empleado_id === e.id && inf.tipo_informe === 'evolucion' && inf.eliminado !== 'si').sort((a, b2) => String(b2.fecha_generacion).localeCompare(String(a.fecha_generacion)));
   const maxN = Math.min(hechos.length, 6);
   const bloqueEvolucion = `
     <div class="card rounded-xl p-4 mb-5">
       <p class="text-xs uppercase tracking-wide text-zinc-500 mb-1">Informe de evolución</p>
-      <p class="text-xs text-zinc-500 mb-3">Junta los últimos check-ins en un solo documento para la dirección de la empresa. Lo revisás y lo editás antes de guardarlo.</p>
-      ${hechos.length >= 2 ? `<div class="flex items-center gap-2 flex-wrap text-xs">
-        <span class="text-zinc-400">Con los últimos</span>
-        <select id="evo-n" class="rounded-lg px-2 py-1.5 text-xs">${Array.from({ length: maxN - 1 }, (_, i) => i + 2).map(n => `<option value="${n}" ${n === Math.min(3, maxN) ? 'selected' : ''}>${n}</option>`).join('')}</select>
-        <span class="text-zinc-400">check-ins</span>
-        <button onclick="armarInformeEvolucion('${e.id}', Number(document.getElementById('evo-n').value))" class="px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">Armar informe</button>
-      </div>` : '<p class="text-xs text-zinc-500">Hace falta tener al menos 2 check-ins realizados.</p>'}
+      <p class="text-xs text-zinc-500 mb-3">Junta sus check-ins de un período (trimestre, semestre, año) en un solo documento para la dirección de la empresa. Lo revisás y lo editás antes de guardarlo.</p>
+      ${hechos.length >= 1 ? `<div class="flex items-center gap-2 flex-wrap text-xs">
+        <select id="evo-p" class="rounded-lg px-2 py-1.5 text-xs">${Object.keys(PERIODOS_INFORME).map(k => `<option value="${k}" ${k === 'trimestre' ? 'selected' : ''}>${PERIODOS_INFORME[k][0]}</option>`).join('')}${maxN >= 3 ? '<option value="n3">Últimos 3 check-ins</option>' : ''}</select>
+        <button onclick="armarInformeEvolucion('${e.id}', document.getElementById('evo-p').value)" class="px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">Armar informe</button>
+        <button onclick="abrirArmarInforme('${id}','${e.id}','personas')" class="text-sky-400 hover:text-sky-300">Compararla con otras personas →</button>
+      </div>` : '<p class="text-xs text-zinc-500">Hace falta tener al menos 1 check-in realizado.</p>'}
       ${evoluciones.length ? `<div class="mt-3 space-y-1">${evoluciones.map(inf => `<button onclick="verInforme('${inf.id}')" class="block text-xs text-gold-400 hover:text-gold-300 text-left">📋 Informe del ${fmtDate(inf.fecha_generacion)} →</button>`).join('')}</div>` : ''}
     </div>`;
 
@@ -2769,48 +2803,174 @@ function fichaPersonaHtml(id, emp, e) {
       <div>${accionPer}</div>
     </div>
     ${bloqueUltimo}
+    ${bloqueAcciones}
     ${bloqueEvolucion}
     <p class="text-xs uppercase tracking-wide text-zinc-500 mb-2">${u ? 'Otros check-ins' : 'Check-ins'} (${ordenados.length})</p>
     <div class="space-y-2">${tarjetas || '<p class="text-sm text-zinc-500">Sin check-ins todavía.</p>'}</div>
     ${bloquePulso}`;
 }
 
-// Borrador del informe de evolución: se arma con datos y notas, sin IA; la persona lo revisa antes de guardar.
-function textoEvolucion(e, n) {
-  const hs = STATE.data.Retain_Checkins.filter(c => c.empleado_id === e.id && c.estado === 'realizado' && c.eliminado !== 'si')
-    .sort((a, b) => String(a.fecha_realizada || a.fecha_programada || '').localeCompare(String(b.fecha_realizada || b.fecha_programada || ''))).slice(-n);
+// ── INFORMES DE PERÍODO: una persona, varias personas, un área, varias áreas o toda la empresa ──
+// Son borradores armados con los datos que ya cargaste (sin IA). Cortos a propósito: lo que le sirve a quien presenta al dueño o al líder de la empresa.
+const PERIODOS_INFORME = { trimestre: ['Último trimestre', 3], semestre: ['Último semestre', 6], anio: ['Último año', 12], todo: ['Todo el historial', null] };
+function isoDe(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function ventanaInforme(clave) {
+  const hoy = new Date(), def = PERIODOS_INFORME[clave] || PERIODOS_INFORME.trimestre, meses = def[1];
+  if (meses === null) return { clave, etiqueta: def[0], desde: '0000-01-01', hasta: isoDe(hoy), antes: null };
+  const d = new Date(hoy); d.setMonth(d.getMonth() - meses);
+  const a = new Date(d); a.setMonth(a.getMonth() - meses);
+  return { clave, etiqueta: def[0], desde: isoDe(d), hasta: isoDe(hoy), antes: { desde: isoDe(a), hasta: isoDe(d) } };
+}
+function rangoTxt(v) { return v.clave === 'todo' ? 'todo el historial' : 'del ' + fmtDate(v.desde) + ' al ' + fmtDate(v.hasta); }
+function fechaCk(c) { return String(c.fecha_realizada || c.fecha_programada || '').slice(0, 10); }
+function realizadosDe(empleadoId) {
+  return STATE.data.Retain_Checkins.filter(c => c.empleado_id === empleadoId && c.estado === 'realizado' && c.eliminado !== 'si').sort((a, b) => fechaCk(a).localeCompare(fechaCk(b)));
+}
+function enRango(cks, r) { return r ? cks.filter(c => fechaCk(c) >= r.desde && fechaCk(c) <= r.hasta) : []; }
+const flechaTxt = (a, b, masEsMejor) => (a == null || b == null || a === b) ? '' : ((a > b) === masEsMejor ? ' (mejoró)' : ' (empeoró)');
+function cuentaRiesgo(cks) { const c = { alto: 0, medio: 0, bajo: 0 }; cks.forEach(k => { if (c[k.riesgo_salida] !== undefined) c[k.riesgo_salida]++; }); return c; }
+function txtRiesgo(c) { return ['alto', 'medio', 'bajo'].filter(k => c[k]).map(k => c[k] + ' ' + k).join(', ') || 'sin datos'; }
+function satProm(cks) { const n = cks.map(k => Number(k.satisfaccion)).filter(x => !isNaN(x) && x > 0); return n.length ? Math.round(n.reduce((a, b) => a + b, 0) / n.length * 10) / 10 : null; }
+function frasesCompartibles(ck) { return estructuraDe(ck).temas.filter(t => t.compartir && t.frase).map(t => t.frase); }
+function txtEncajeCk(ck) { const g = estructuraDe(ck).gwc; return ENCAJE.filter(([k]) => g[k]).map(([k]) => k + ' ' + ETQ_ENCAJE[g[k]]).join(', '); }
+
+// Estadisticas de un grupo de personas en una ventana (y en la ventana anterior, para comparar).
+function statsGrupo(personas, v) {
+  const filas = personas.map(e => { const todos = realizadosDe(e.id), en = enRango(todos, v), ant = v.antes ? enRango(todos, v.antes) : []; return { e, en, u: en[en.length - 1] || null, up: ant[ant.length - 1] || null }; });
+  const con = filas.filter(f => f.u), conAnt = filas.filter(f => f.up);
+  const focos = {};
+  con.forEach(f => estructuraDe(f.u).temas.forEach(t => { if (t.tendencia === 'foco de atención') focos[t.tema] = (focos[t.tema] || 0) + 1; }));
+  const gwc = {}; ENCAJE.forEach(([k]) => { gwc[k] = { si: 0, parcial: 0, no: 0 }; con.forEach(f => { const val = estructuraDe(f.u).gwc[k]; if (gwc[k][val] !== undefined) gwc[k][val]++; }); });
+  const completos = con.filter(f => { const g = estructuraDe(f.u).gwc; return ENCAJE.every(([k]) => g[k] === 'si'); }).length;
+  const acc = { abiertas: 0, vencidas: 0, hechas: 0 };
+  filas.forEach(f => f.en.forEach(c => estructuraDe(c).acciones.forEach(a => { if (a.hecha) acc.hechas++; else { acc.abiertas++; if (a.fecha && daysSince(a.fecha) > 0) acc.vencidas++; } })));
+  const enFoco = con.filter(f => f.u.riesgo_salida === 'alto' || (f.u.riesgo_salida === 'medio' && (f.e.key_talent === 'si' || f.e.rol_critico === 'si')));
+  const mirar = con.filter(f => { const g = estructuraDe(f.u).gwc; const vals = ENCAJE.map(([k]) => g[k]); return vals.includes('no') || vals.filter(x => x === 'parcial').length >= 2; });
+  return { filas, con, total: personas.length, riesgo: cuentaRiesgo(con.map(f => f.u)), riesgoAnt: cuentaRiesgo(conAnt.map(f => f.up)), sat: satProm(con.map(f => f.u)), satAnt: satProm(conAnt.map(f => f.up)), nAnt: conAnt.length, focos, gwc, completos, acc, enFoco, mirar };
+}
+
+// Borrador del informe de una persona: sus check-ins del periodo (o los ultimos n).
+function textoEvolucion(e, n, v) {
+  const todos = realizadosDe(e.id);
+  const hs = v ? enRango(todos, v) : todos.slice(-n);
   const pri = hs[0], ult = hs[hs.length - 1];
   const fecha = c => fmtDate(c.fecha_realizada || c.fecha_programada);
   const lineas = [];
   lineas.push('PANORAMA');
-  lineas.push(e.nombre_empleado + (e.puesto || e.area ? ' (' + [e.puesto, e.area].filter(Boolean).join(', ') + ')' : '') + '. Evolución entre el ' + fecha(pri) + ' y el ' + fecha(ult) + ', con ' + hs.length + ' check-ins.');
+  lineas.push(e.nombre_empleado + (e.puesto || e.area ? ' (' + [e.puesto, e.area].filter(Boolean).join(', ') + ')' : '') + '. ' + (v ? 'Período: ' + rangoTxt(v) + '. ' : '') + (hs.length > 1 ? 'Evolución entre el ' + fecha(pri) + ' y el ' + fecha(ult) + ', con ' + hs.length + ' check-ins.' : 'Un check-in, el ' + fecha(ult) + '.'));
   const rP = pri.riesgo_salida, rU = ult.riesgo_salida;
-  if (rP && rU) lineas.push('- Riesgo de salida: ' + rP + ' → ' + rU + (ORDEN_RIESGO[rU] < ORDEN_RIESGO[rP] ? ' (mejoró).' : ORDEN_RIESGO[rU] > ORDEN_RIESGO[rP] ? ' (empeoró).' : ' (sin cambios).'));
+  if (hs.length > 1 && rP && rU) lineas.push('- Riesgo de salida: ' + rP + ' → ' + rU + (ORDEN_RIESGO[rU] < ORDEN_RIESGO[rP] ? ' (mejoró).' : ORDEN_RIESGO[rU] > ORDEN_RIESGO[rP] ? ' (empeoró).' : ' (sin cambios).'));
+  else if (rU) lineas.push('- Riesgo de salida: ' + rU + '.');
   const sP = Number(pri.satisfaccion), sU = Number(ult.satisfaccion);
-  if (pri.satisfaccion && ult.satisfaccion) lineas.push('- Satisfacción: ' + sP + ' → ' + sU + (sU > sP ? ' (subió).' : sU < sP ? ' (bajó).' : ' (sin cambios).'));
+  if (hs.length > 1 && pri.satisfaccion && ult.satisfaccion) lineas.push('- Satisfacción: ' + sP + ' → ' + sU + (sU > sP ? ' (subió).' : sU < sP ? ' (bajó).' : ' (sin cambios).'));
+  else if (ult.satisfaccion) lineas.push('- Satisfacción: ' + sU + '/10.');
+  if (txtEncajeCk(ult)) lineas.push('- Encaje con el rol (último check-in): ' + txtEncajeCk(ult) + '.');
   lineas.push('');
   lineas.push('POR CHECK-IN');
   hs.forEach(c => {
     const datos = [c.riesgo_salida ? 'riesgo ' + c.riesgo_salida : '', c.satisfaccion ? 'satisfacción ' + c.satisfaccion + '/10' : ''].filter(Boolean).join(', ');
-    lineas.push('- ' + fecha(c) + (datos ? ' (' + datos + ')' : '') + ': ' + (resumenDeCheckin(c, 260) || 'Sin notas cargadas.'));
+    const frases = frasesCompartibles(c);
+    lineas.push('- ' + fecha(c) + (datos ? ' (' + datos + ')' : '') + ': ' + (frases.length ? frases.join(' ') : (resumenDeCheckin(c, 260) || 'Sin notas cargadas.')));
   });
+  const focos = {};
+  hs.forEach(c => estructuraDe(c).temas.forEach(t => { if (t.tendencia === 'foco de atención') focos[t.tema] = (focos[t.tema] || 0) + 1; }));
+  const focosTxt = Object.keys(focos).sort((a, b) => focos[b] - focos[a]).map(k => k + ' (' + focos[k] + ' de ' + hs.length + ')');
+  if (focosTxt.length) { lineas.push(''); lineas.push('TEMAS EN FOCO'); lineas.push(focosTxt.join(', ') + '.'); }
+  const acs = []; hs.forEach(c => estructuraDe(c).acciones.forEach(a => acs.push(a)));
+  const hechas = acs.filter(a => a.hecha), abiertas = acs.filter(a => !a.hecha);
   const b = obtenerBriefingCompleto(e.id, null);
   lineas.push('');
   lineas.push('QUÉ QUEDÓ ACORDADO');
-  if (b && b.acuerdos.length) b.acuerdos.forEach(a => lineas.push('- ' + a)); else lineas.push('No identificado en la conversación.');
+  if (hechas.length || abiertas.length) { hechas.forEach(a => lineas.push('- Cumplido: ' + a.que + '.')); abiertas.forEach(a => lineas.push('- Pendiente: ' + a.que + (a.quien ? ' (' + a.quien + ')' : '') + (a.fecha ? ', para el ' + fmtDate(a.fecha) : '') + '.')); }
+  else if (b && b.acuerdos.length) b.acuerdos.forEach(a => lineas.push('- ' + a)); else lineas.push('No identificado en la conversación.');
   lineas.push('');
   lineas.push('PRÓXIMOS PASOS');
-  lineas.push('- (Completar)');
+  const abAll = accionesPendientes(e.empresa_id, e.id);
+  if (abAll.length) abAll.forEach(x => lineas.push('- ' + x.a.que + (x.a.quien ? ' (' + x.a.quien + ')' : '') + (x.a.fecha ? ', para el ' + fmtDate(x.a.fecha) : '') + '.')); else lineas.push('- (Completar)');
   return lineas.join('\n');
 }
-function armarInformeEvolucion(empleadoId, n) {
-  const e = STATE.data.Retain_Empleados.find(x => x.id === empleadoId);
-  if (!e) return;
+
+// Borrador de un area o de toda la empresa.
+function textoInformeGrupo(nombre, personas, v, porArea) {
+  const st = statsGrupo(personas, v), L = [];
+  L.push('PANORAMA');
+  L.push(nombre + ' · ' + rangoTxt(v) + '. ' + st.con.length + ' de ' + st.total + ' personas con check-in en el período.');
+  L.push('- Riesgo de salida: ' + txtRiesgo(st.riesgo) + (st.nAnt ? ' (antes: ' + txtRiesgo(st.riesgoAnt) + ')' : '') + '.');
+  if (st.sat !== null) L.push('- Satisfacción promedio: ' + st.sat + (st.satAnt !== null ? ' (antes ' + st.satAnt + ')' + flechaTxt(st.sat, st.satAnt, true) : '') + '.');
+  if (st.con.some(f => Object.keys(estructuraDe(f.u).gwc).length)) L.push('- Encaje con el rol: ' + st.completos + ' de ' + st.con.length + ' con las tres en sí (sabe, quiere, puede).');
+  if (porArea) {
+    L.push(''); L.push('POR ÁREA');
+    [...new Set(personas.map(e => e.area).filter(Boolean))].sort().forEach(ar => {
+      const sa = statsGrupo(personas.filter(e => e.area === ar), v);
+      L.push('- ' + ar + ': ' + (sa.con.length ? 'riesgo ' + txtRiesgo(sa.riesgo) + (sa.sat !== null ? ' · satisfacción ' + sa.sat + (sa.satAnt !== null ? ' (antes ' + sa.satAnt + ')' : '') : '') + (sa.mirar.length ? ' · encaje para mirar: ' + sa.mirar.length : '') : 'sin check-ins en el período') + '.');
+    });
+  }
+  L.push(''); L.push('PATRONES');
+  const rep = Object.keys(st.focos).filter(k => st.focos[k] >= 2).sort((a, b) => st.focos[b] - st.focos[a]);
+  if (rep.length) rep.forEach(k => L.push('- ' + k + ': foco de atención en ' + st.focos[k] + ' de ' + st.con.length + ' personas.')); else L.push('- Ningún tema se repite en 2 o más personas.');
+  if (st.con.some(f => Object.keys(estructuraDe(f.u).gwc).length)) {
+    L.push(''); L.push('ENCAJE CON EL ROL');
+    ENCAJE.forEach(([k, et]) => L.push('- ' + et + ': ' + st.gwc[k].si + ' sí, ' + st.gwc[k].parcial + ' en parte, ' + st.gwc[k].no + ' no.'));
+    if (st.mirar.length) L.push('- Para mirar: ' + st.mirar.map(f => f.e.nombre_empleado + ' (' + faltasEncaje(f.u).map(x => x.k + ': ' + ETQ_ENCAJE[x.valor]).join(', ') + ')').join('; ') + '.');
+  }
+  L.push(''); L.push('PERSONAS EN FOCO');
+  if (st.enFoco.length) st.enFoco.forEach(f => { const fr = frasesCompartibles(f.u); L.push('- ' + f.e.nombre_empleado + (f.e.key_talent === 'si' || f.e.rol_critico === 'si' ? ' (' + [f.e.key_talent === 'si' ? 'key talent' : '', f.e.rol_critico === 'si' ? 'rol crítico' : ''].filter(Boolean).join(', ') + ')' : '') + ': riesgo ' + f.u.riesgo_salida + (fr.length ? '. ' + fr.join(' ') : '.')); });
+  else L.push('- Nadie con riesgo alto, ni con riesgo medio en un rol clave.');
+  L.push(''); L.push('ACCIONES ACORDADAS');
+  L.push('- ' + st.acc.abiertas + ' abiertas' + (st.acc.vencidas ? ' (' + st.acc.vencidas + ' vencidas)' : '') + ' y ' + st.acc.hechas + ' cumplidas.');
+  L.push(''); L.push('PRÓXIMOS PASOS'); L.push('- (Completar)');
+  return L.join('\n');
+}
+
+// Comparar personas: el check-in mas reciente del periodo contra el anterior de cada una.
+function textoComparativoPersonas(personas, v) {
+  const filas = personas.map(e => { const todos = realizadosDe(e.id), en = enRango(todos, v), u = en[en.length - 1] || null, i = u ? todos.indexOf(u) : -1; return { e, u, prev: i > 0 ? todos[i - 1] : null }; });
+  const con = filas.filter(f => f.u);
+  const L = ['PANORAMA', 'Comparación de ' + personas.length + ' personas · ' + rangoTxt(v) + '. ' + con.length + ' con check-in en el período.', '', 'POR PERSONA'];
+  filas.forEach(f => {
+    if (!f.u) { L.push('- ' + f.e.nombre_empleado + ': sin check-ins en el período.'); return; }
+    const foco = estructuraDe(f.u).temas.filter(t => t.tendencia === 'foco de atención').map(t => t.tema);
+    L.push('- ' + f.e.nombre_empleado + ' (' + [f.e.puesto, f.e.area].filter(Boolean).join(', ') + '): riesgo ' + (f.u.riesgo_salida || 'sin dato') + (f.prev && f.prev.riesgo_salida && f.prev.riesgo_salida !== f.u.riesgo_salida ? ' (antes ' + f.prev.riesgo_salida + ')' : '') +
+      ' · satisfacción ' + (f.u.satisfaccion || 's/d') + (f.prev && f.prev.satisfaccion && f.prev.satisfaccion !== f.u.satisfaccion ? ' (antes ' + f.prev.satisfaccion + ')' : '') + (txtEncajeCk(f.u) ? ' · ' + txtEncajeCk(f.u) : '') + (foco.length ? ' · foco: ' + foco.join(', ') : '') + '.');
+  });
+  L.push(''); L.push('DIFERENCIAS');
+  const sats = con.filter(f => Number(f.u.satisfaccion)).sort((a, b) => Number(b.u.satisfaccion) - Number(a.u.satisfaccion));
+  if (sats.length > 1) { L.push('- Mayor satisfacción: ' + sats[0].e.nombre_empleado + ' (' + sats[0].u.satisfaccion + '). Menor: ' + sats[sats.length - 1].e.nombre_empleado + ' (' + sats[sats.length - 1].u.satisfaccion + ').'); }
+  const altos = con.filter(f => ORDEN_RIESGO[f.u.riesgo_salida] === 3).map(f => f.e.nombre_empleado);
+  L.push('- Riesgo de salida más alto: ' + (altos.length ? altos.join(', ') : 'nadie con riesgo alto') + '.');
+  const mej = con.filter(f => f.prev && ORDEN_RIESGO[f.u.riesgo_salida] < ORDEN_RIESGO[f.prev.riesgo_salida]).map(f => f.e.nombre_empleado), emp = con.filter(f => f.prev && ORDEN_RIESGO[f.u.riesgo_salida] > ORDEN_RIESGO[f.prev.riesgo_salida]).map(f => f.e.nombre_empleado);
+  if (mej.length) L.push('- Mejoró el riesgo desde el check-in anterior: ' + mej.join(', ') + '.');
+  if (emp.length) L.push('- Empeoró el riesgo desde el check-in anterior: ' + emp.join(', ') + '.');
+  L.push(''); L.push('PRÓXIMOS PASOS'); L.push('- (Completar)');
+  return L.join('\n');
+}
+
+// Comparar areas.
+function textoComparativoAreas(empresaId, areas, v) {
+  const stats = areas.map(ar => ({ ar, st: statsGrupo(empleadosActivosDe(empresaId).filter(e => e.area === ar), v) }));
+  const L = ['PANORAMA', 'Comparación de ' + areas.length + ' áreas · ' + rangoTxt(v) + '.', '', 'POR ÁREA'];
+  stats.forEach(({ ar, st }) => {
+    const top = Object.keys(st.focos).sort((a, b) => st.focos[b] - st.focos[a]).slice(0, 2).map(k => k + ' (' + st.focos[k] + ')');
+    L.push('- ' + ar + ' (' + st.con.length + ' de ' + st.total + ' con check-in): riesgo ' + txtRiesgo(st.riesgo) + (st.sat !== null ? ' · satisfacción ' + st.sat + (st.satAnt !== null ? ' (antes ' + st.satAnt + ')' : '') : '') + ' · encaje completo en ' + st.completos + (top.length ? ' · temas en foco: ' + top.join(', ') : '') + '.');
+  });
+  L.push(''); L.push('DIFERENCIAS');
+  const conSat = stats.filter(x => x.st.sat !== null).sort((a, b) => b.st.sat - a.st.sat);
+  if (conSat.length > 1) L.push('- Mayor satisfacción: ' + conSat[0].ar + ' (' + conSat[0].st.sat + '). Menor: ' + conSat[conSat.length - 1].ar + ' (' + conSat[conSat.length - 1].st.sat + ').');
+  const mas = stats.slice().sort((a, b) => b.st.riesgo.alto - a.st.riesgo.alto)[0];
+  L.push('- Más personas en riesgo alto: ' + (mas && mas.st.riesgo.alto ? mas.ar + ' (' + mas.st.riesgo.alto + ')' : 'ninguna área tiene riesgo alto') + '.');
+  const bajan = stats.filter(x => x.st.sat !== null && x.st.satAnt !== null && x.st.sat < x.st.satAnt).map(x => x.ar);
+  if (bajan.length) L.push('- Bajó la satisfacción respecto del período anterior: ' + bajan.join(', ') + '.');
+  L.push(''); L.push('PRÓXIMOS PASOS'); L.push('- (Completar)');
+  return L.join('\n');
+}
+
+// Borrador editable: lo revisas y recien ahi se guarda como informe.
+function abrirBorradorInforme(o) {
   openModal(`
-    <h3 class="font-display text-xl mb-1">Informe de evolución — ${esc(e.nombre_empleado)}</h3>
-    <p class="text-xs text-zinc-500 mb-3">Es un borrador armado con tus notas. Revisalo y sacá lo que no quieras que lea la empresa antes de guardarlo.</p>
+    <h3 class="font-display text-xl mb-1">${esc(o.titulo)}</h3>
+    <p class="text-xs text-zinc-500 mb-3">Es un borrador armado con lo que cargaste. Revisalo y sacá lo que no quieras que lea la empresa antes de guardarlo.</p>
     <form id="f-evolucion" class="space-y-3">
-      <textarea name="contenido" rows="18" required class="w-full rounded-lg px-3 py-2 text-sm">${esc(textoEvolucion(e, n))}</textarea>
+      <textarea name="contenido" rows="18" required class="w-full rounded-lg px-3 py-2 text-sm">${esc(o.texto)}</textarea>
       <div class="flex gap-2 pt-1">
         <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
         <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar informe</button>
@@ -2819,10 +2979,214 @@ function armarInformeEvolucion(empleadoId, n) {
   document.getElementById('f-evolucion').onsubmit = async (ev) => {
     ev.preventDefault();
     const btn = bloquearBoton(ev.target);
-    const r = await api('crear', { sheet: 'Retain_Informes', data: { empleado_id: e.id, empresa_id: e.empresa_id, tipo_informe: 'evolucion', periodo: '', fecha_generacion: new Date().toISOString(), contenido: new FormData(ev.target).get('contenido'), estado: 'final' } });
+    const r = await api('crear', { sheet: 'Retain_Informes', data: { empleado_id: o.empleadoId || '', empresa_id: o.empresaId, tipo_informe: o.tipo, periodo: o.periodo || '', fecha_generacion: new Date().toISOString(), contenido: new FormData(ev.target).get('contenido'), estado: 'final' } });
     if (r.ok) { closeModal(); toast('Informe guardado'); await refreshAndRender(); }
     else { desbloquearBoton(btn); toast(r.message || 'Error', true); }
   };
+}
+// Desde la ficha de una persona: "modo" puede ser un periodo (trimestre / semestre / anio / todo), "n3" (ultimos 3) o un numero.
+function armarInformeEvolucion(empleadoId, modo) {
+  const e = STATE.data.Retain_Empleados.find(x => x.id === empleadoId);
+  if (!e) return;
+  const n = typeof modo === 'number' ? modo : (/^n\d+$/.test(String(modo)) ? Number(String(modo).slice(1)) : null);
+  const v = n ? null : ventanaInforme(modo || 'trimestre');
+  if (v && !enRango(realizadosDe(e.id), v).length) { toast('No hay check-ins realizados en ese período', true); return; }
+  abrirBorradorInforme({ titulo: 'Informe de evolución — ' + e.nombre_empleado, texto: textoEvolucion(e, n, v), tipo: 'evolucion', empleadoId: e.id, empresaId: e.empresa_id, periodo: v ? v.etiqueta : 'Últimos ' + n + ' check-ins' });
+}
+// Armador general (entra por Informes, Equipo o la ficha).
+function abrirArmarInforme(empresaId, empleadoId, que) {
+  window.__ib = { empresaId, empleadoId: empleadoId || '' };
+  openModal(`
+    <h3 class="font-display text-xl mb-1">Armar informe</h3>
+    <p class="text-xs text-zinc-500 mb-4">Junta lo que ya cargaste en un borrador corto para la dirección de la empresa. Lo revisás y lo editás antes de guardar.</p>
+    <div class="space-y-3">
+      <div><label class="block text-xs text-zinc-400 mb-1">¿De quién?</label>
+        <select id="ib-que" onchange="ibRender()" class="w-full rounded-lg px-3 py-2 text-sm">
+          <option value="persona">Una persona</option><option value="personas">Varias personas (compararlas)</option><option value="area">Un área</option><option value="areas">Varias áreas (compararlas)</option><option value="empresa">Toda la empresa</option>
+        </select></div>
+      <div id="ib-sel"></div>
+      <div><label class="block text-xs text-zinc-400 mb-1">Período</label>
+        <select id="ib-periodo" class="w-full rounded-lg px-3 py-2 text-sm">${Object.keys(PERIODOS_INFORME).map(k => `<option value="${k}" ${k === 'trimestre' ? 'selected' : ''}>${PERIODOS_INFORME[k][0]}</option>`).join('')}</select></div>
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
+        <button type="button" onclick="ibArmar()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Armar borrador</button>
+      </div>
+    </div>`);
+  document.getElementById('ib-que').value = que || (empleadoId ? 'persona' : 'empresa');
+  ibRender();
+}
+function ibRender() {
+  const ib = window.__ib, que = document.getElementById('ib-que').value;
+  const personas = empleadosActivosDe(ib.empresaId).slice().sort((a, b) => (a.area || '').localeCompare(b.area || '', 'es') || a.nombre_empleado.localeCompare(b.nombre_empleado, 'es'));
+  const areas = [...new Set(personas.map(e => e.area).filter(Boolean))].sort();
+  const cont = document.getElementById('ib-sel');
+  if (que === 'persona') cont.innerHTML = `<label class="block text-xs text-zinc-400 mb-1">Persona</label><select id="ib-persona" class="w-full rounded-lg px-3 py-2 text-sm">${personas.map(e => `<option value="${e.id}" ${e.id === ib.empleadoId ? 'selected' : ''}>${esc(e.nombre_empleado)} · ${esc(e.area || '')}</option>`).join('')}</select>`;
+  else if (que === 'personas') cont.innerHTML = `<label class="block text-xs text-zinc-400 mb-1">Elegí las personas (2 o más)</label><div class="card rounded-lg px-3 py-2 max-h-48 overflow-y-auto">${personas.map(e => `<label class="flex items-center gap-2 text-sm text-zinc-200 py-0.5"><input type="checkbox" class="ib-p" value="${e.id}" ${e.id === ib.empleadoId ? 'checked' : ''}> ${esc(e.nombre_empleado)} <span class="text-xs text-zinc-500">· ${esc(e.area || '')}</span></label>`).join('')}</div>`;
+  else if (que === 'area') cont.innerHTML = `<label class="block text-xs text-zinc-400 mb-1">Área</label><select id="ib-area" class="w-full rounded-lg px-3 py-2 text-sm">${areas.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('')}</select>`;
+  else if (que === 'areas') cont.innerHTML = `<label class="block text-xs text-zinc-400 mb-1">Elegí las áreas (2 o más)</label><div class="card rounded-lg px-3 py-2">${areas.map(a => `<label class="flex items-center gap-2 text-sm text-zinc-200 py-0.5"><input type="checkbox" class="ib-a" value="${esc(a)}"> ${esc(a)}</label>`).join('')}</div>`;
+  else cont.innerHTML = '';
+}
+function ibArmar() {
+  const ib = window.__ib, que = document.getElementById('ib-que').value, v = ventanaInforme(document.getElementById('ib-periodo').value);
+  const emp = STATE.data.Retain_Empresas.find(x => x.id === ib.empresaId), todos = empleadosActivosDe(ib.empresaId);
+  const hay = lista => lista.some(e => enRango(realizadosDe(e.id), v).length);
+  if (que === 'persona') { const id = document.getElementById('ib-persona').value; closeModal(); return armarInformeEvolucion(id, v.clave); }
+  if (que === 'personas') {
+    const ids = Array.from(document.querySelectorAll('.ib-p:checked')).map(c => c.value);
+    if (ids.length < 2) { toast('Elegí al menos 2 personas', true); return; }
+    const ps = todos.filter(e => ids.includes(e.id));
+    if (!hay(ps)) { toast('Ninguna tiene check-ins realizados en ese período', true); return; }
+    closeModal(); return abrirBorradorInforme({ titulo: 'Comparativo de personas', texto: textoComparativoPersonas(ps, v), tipo: 'comparativo', empresaId: ib.empresaId, periodo: v.etiqueta });
+  }
+  if (que === 'area') {
+    const ar = document.getElementById('ib-area').value, ps = todos.filter(e => e.area === ar);
+    if (!hay(ps)) { toast('No hay check-ins realizados en esa área en ese período', true); return; }
+    closeModal(); return abrirBorradorInforme({ titulo: 'Informe del área — ' + ar, texto: textoInformeGrupo(ar, ps, v, false), tipo: 'periodo_area:' + ar, empresaId: ib.empresaId, periodo: v.etiqueta });
+  }
+  if (que === 'areas') {
+    const ars = Array.from(document.querySelectorAll('.ib-a:checked')).map(c => c.value);
+    if (ars.length < 2) { toast('Elegí al menos 2 áreas', true); return; }
+    if (!hay(todos.filter(e => ars.includes(e.area)))) { toast('No hay check-ins realizados en esas áreas en ese período', true); return; }
+    closeModal(); return abrirBorradorInforme({ titulo: 'Comparativo de áreas', texto: textoComparativoAreas(ib.empresaId, ars, v), tipo: 'comparativo', empresaId: ib.empresaId, periodo: v.etiqueta });
+  }
+  if (!hay(todos)) { toast('No hay check-ins realizados en ese período', true); return; }
+  closeModal(); abrirBorradorInforme({ titulo: 'Informe de la empresa — ' + (emp ? emp.nombre_empresa : ''), texto: textoInformeGrupo(emp ? emp.nombre_empresa : 'Empresa', todos, v, true), tipo: 'periodo_empresa', empresaId: ib.empresaId, periodo: v.etiqueta });
+}
+
+
+
+// Los dos espacios del check-in: la transcripcion completa (lo grabado) y "mis notas" (lo que para vos es lo mas importante).
+function camposContenidoCk(ch) {
+  return `
+      <div><label class="block text-xs text-zinc-400 mb-1">Transcripción completa de la reunión <span class="text-zinc-500">(pegá acá lo que grabaste; opcional)</span></label><textarea name="transcripcion" rows="6" class="w-full rounded-lg px-3 py-2 text-sm" placeholder="Todo lo que se dijo en la reunión…">${esc(ch && ch.transcripcion)}</textarea></div>
+      <div><label class="block text-xs text-zinc-400 mb-1">Mis notas <span class="text-zinc-500">(lo que para vos es lo más importante)</span></label><textarea name="notas_raw" rows="6" class="w-full rounded-lg px-3 py-2 text-sm" placeholder="Lo que no te querés olvidar, tu lectura, lo que te llamó la atención…">${esc(ch && ch.notas_raw)}</textarea></div>
+      <p class="text-[11px] text-zinc-500 -mt-1">El informe se arma con las dos: tus notas mandan y la transcripción completa ayuda a no dejar nada afuera. Alcanza con cargar una de las dos.</p>`;
+}
+function faltaContenidoCk(form) {
+  const d = new FormData(form);
+  return !String(d.get('notas_raw') || '').trim() && !String(d.get('transcripcion') || '').trim();
+}
+function camposSatRiesgoHtml(ch) {
+  return `
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs text-zinc-400 mb-1">Satisfacción (1-10)</label>
+          <select name="satisfaccion" class="w-full rounded-lg px-3 py-2 text-sm"><option value="">Sin dato</option>${Array.from({ length: 10 }, (_, i) => i + 1).map(n => `<option value="${n}" ${ch && String(ch.satisfaccion) === String(n) ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+        <div><label class="block text-xs text-zinc-400 mb-1">Riesgo de salida</label>
+          <select name="riesgo_salida" class="w-full rounded-lg px-3 py-2 text-sm"><option value="">Sin dato</option>${['bajo', 'medio', 'alto'].map(r => `<option value="${r}" ${ch && ch.riesgo_salida === r ? 'selected' : ''}>${r[0].toUpperCase() + r.slice(1)}</option>`).join('')}</select></div>
+      </div>`;
+}
+
+// ── Check-ins estructurados: temas con tendencia, que se puede compartir (con frase tuya), acciones ──
+const TEMAS_CHECKIN = ['Motivación', 'Relación con el equipo', 'Liderazgo', 'Satisfacción con la empresa', 'Pertenencia', 'Carga de trabajo', 'Claridad', 'Feedback', 'Crecimiento', 'Reconocimiento', 'Compensación', 'Comunicación', 'Otros'];
+const TENDENCIAS_CHECKIN = ['a favor', 'neutro', 'foco de atención'];
+// Encaje con el rol (criterio GWC: Gets it, Wants it, Capacity to do it): ¿sabe que tiene que hacer, quiere hacerlo y puede hacerlo?
+const ENCAJE = [['sabe', 'Sabe qué tiene que hacer', 'Aclarar el rol y lo que se espera de la persona.'], ['quiere', 'Quiere hacerlo', 'Conversar motivación e intereses: ¿es el puesto que quiere?'], ['puede', 'Puede hacerlo', 'Revisar capacitación, apoyo, o si el rol es el adecuado.']];
+const ETQ_ENCAJE = { si: 'sí', parcial: 'en parte', no: 'no' };
+function estructuraDe(ch) {
+  let e = {}; try { e = JSON.parse((ch && ch.estructura_json) || '{}') || {}; } catch (x) { e = {}; }
+  return { temas: e.temas || [], obs: e.obs || '', autoriza: e.autoriza || { si: false, que: '' }, acciones: e.acciones || [], proximo: e.proximo || '', gwc: e.gwc || {} };
+}
+// Lo que falta en el encaje de un check-in: [{k, etiqueta, valor, que}] (solo lo que no es "sí" y tiene dato)
+function faltasEncaje(ch) {
+  const g = estructuraDe(ch).gwc;
+  return ENCAJE.filter(([k]) => g[k] && g[k] !== 'si').map(([k, et, que]) => ({ k, etiqueta: et, valor: g[k], que }));
+}
+function encajeCamposHtml(ch) {
+  const g = estructuraDe(ch).gwc;
+  return `
+  <div class="card rounded-lg px-3.5 py-3" id="encaje-bloque">
+    <p class="text-sm text-zinc-200">Encaje con el rol <span class="text-xs text-zinc-500">(¿es la persona adecuada para este puesto?)</span></p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
+      ${ENCAJE.map(([k, et]) => `<div><label class="block text-[11px] text-zinc-400 mb-1">${et}</label><select class="gwc-${k} w-full rounded-lg px-2 py-1.5 text-xs"><option value="">Sin dato</option>${Object.keys(ETQ_ENCAJE).map(v => `<option value="${v}" ${g[k] === v ? 'selected' : ''}>${v === 'si' ? 'Sí' : v === 'parcial' ? 'En parte' : 'No'}</option>`).join('')}</select></div>`).join('')}
+    </div>
+  </div>`;
+}
+function estructuraCamposHtml(ch, conProximo) {
+  return encajeCamposHtml(ch) + estructuraTemasHtml(ch, conProximo);
+}
+function estructuraTemasHtml(ch, conProximo) {
+  const e = estructuraDe(ch), porTema = {};
+  e.temas.forEach(t => { porTema[t.tema] = t; });
+  const nAcc = Math.max(3, e.acciones.length);
+  return `
+  <details class="card rounded-lg px-3.5 py-2.5" id="est-bloque" ${e.temas.length || e.acciones.length || e.obs ? 'open' : ''}>
+    <summary class="cursor-pointer text-sm text-zinc-200">🗂️ Datos estructurados <span class="text-xs text-zinc-500">(opcional: temas, qué se comparte, acciones)</span></summary>
+    <p class="text-[11px] text-zinc-500 mt-2 mb-3">Antes de empezar, contale a la persona qué se comparte y qué no. Hacia la empresa solo sale lo que marques para compartir, con tus palabras; las notas y las observaciones internas nunca salen.</p>
+    <p class="text-xs uppercase tracking-wide text-zinc-500 mb-1">Temas que salieron</p>
+    <div class="space-y-1.5 mb-4">
+      ${TEMAS_CHECKIN.map(t => { const x = porTema[t]; return `
+      <div class="est-tema" data-tema="${esc(t)}" style="${x ? '' : 'opacity:.55'}">
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="flex items-center gap-1.5 text-sm text-zinc-200 flex-1 min-w-[9rem]"><input type="checkbox" class="est-on" ${x ? 'checked' : ''} onchange="estToggleTema(this)"> ${esc(t)}</label>
+          <select class="est-tend rounded-lg px-2 py-1 text-xs" ${x ? '' : 'disabled'}>${TENDENCIAS_CHECKIN.map(n => `<option value="${n}" ${x && x.tendencia === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
+          <label class="flex items-center gap-1 text-xs text-zinc-400"><input type="checkbox" class="est-comp" ${x && x.compartir ? 'checked' : ''} ${x ? '' : 'disabled'} onchange="estToggleTema(this)"> compartir</label>
+        </div>
+        <input class="est-frase w-full rounded-lg px-2.5 py-1.5 text-xs mt-1" maxlength="240" placeholder="Tu frase para la empresa (sin nombres ni textuales)" value="${esc(x ? x.frase : '')}" style="${x && x.compartir ? '' : 'display:none'}">
+      </div>`; }).join('')}
+    </div>
+    <div class="mb-4"><label class="block text-xs text-zinc-400 mb-1">Por qué ese riesgo <span class="text-zinc-500">(interno)</span></label><textarea name="justificacion_riesgo" rows="2" class="w-full rounded-lg px-3 py-2 text-sm" placeholder="Ej: bajó la satisfacción porque siente que no tiene línea de carrera clara.">${esc(ch && ch.justificacion_riesgo)}</textarea></div>
+    <div class="mb-4"><label class="block text-xs text-zinc-400 mb-1">Observaciones internas <span class="text-zinc-500">(nunca salen de acá)</span></label><textarea class="est-obs w-full rounded-lg px-3 py-2 text-sm" rows="2">${esc(e.obs)}</textarea></div>
+    <div class="mb-4"><label class="block text-xs text-zinc-400 mb-1">¿La persona autorizó compartir algo textual?</label>
+      <div class="flex gap-2 flex-wrap"><select class="est-aut rounded-lg px-2 py-1.5 text-xs"><option value="no" ${e.autoriza.si ? '' : 'selected'}>No</option><option value="si" ${e.autoriza.si ? 'selected' : ''}>Sí</option></select><input class="est-aut-que flex-1 min-w-[12rem] rounded-lg px-2.5 py-1.5 text-xs" placeholder="¿Qué autorizó?" value="${esc(e.autoriza.que)}"></div></div>
+    <p class="text-xs uppercase tracking-wide text-zinc-500 mb-1">Acciones acordadas</p>
+    <div class="space-y-1.5 mb-4">
+      ${Array.from({ length: nAcc }, (_, i) => { const a = e.acciones[i] || {}; return `
+      <div class="est-acc grid grid-cols-12 gap-1.5 items-center">
+        <input class="a-que col-span-12 rounded-lg px-2.5 py-1.5 text-xs" placeholder="Qué" value="${esc(a.que)}">
+        <input class="a-quien col-span-5 rounded-lg px-2.5 py-1.5 text-xs" placeholder="Quién" value="${esc(a.quien)}">
+        <input type="date" class="a-fecha col-span-4 rounded-lg px-2 py-1.5 text-xs" value="${esc(a.fecha)}">
+        <label class="col-span-3 text-[11px] text-zinc-400 flex items-center gap-1"><input type="checkbox" class="a-hecha" ${a.hecha ? 'checked' : ''}> hecha</label>
+      </div>`; }).join('')}
+    </div>
+    ${conProximo ? `<div><label class="block text-xs text-zinc-400 mb-1">Próximo check-in <span class="text-zinc-500">(si lo dejás vacío, se programa solo)</span></label><input type="date" class="est-prox rounded-lg px-2.5 py-1.5 text-xs"></div>` : ''}
+  </details>`;
+}
+function estToggleTema(el) {
+  const row = el.closest('.est-tema');
+  const on = row.querySelector('.est-on').checked;
+  row.style.opacity = on ? '' : '.55';
+  row.querySelector('.est-tend').disabled = !on;
+  row.querySelector('.est-comp').disabled = !on;
+  if (!on) row.querySelector('.est-comp').checked = false;
+  row.querySelector('.est-frase').style.display = on && row.querySelector('.est-comp').checked ? '' : 'none';
+}
+function leerEstructura(raiz) {
+  const temas = Array.from(raiz.querySelectorAll('.est-tema')).filter(r => r.querySelector('.est-on').checked).map(r => {
+    const comp = r.querySelector('.est-comp').checked;
+    return { tema: r.dataset.tema, tendencia: r.querySelector('.est-tend').value, compartir: comp, frase: comp ? r.querySelector('.est-frase').value.trim() : '' };
+  });
+  const acciones = Array.from(raiz.querySelectorAll('.est-acc')).map(r => ({ que: r.querySelector('.a-que').value.trim(), quien: r.querySelector('.a-quien').value.trim(), fecha: r.querySelector('.a-fecha').value, hecha: r.querySelector('.a-hecha').checked })).filter(a => a.que);
+  const obs = (raiz.querySelector('.est-obs') || { value: '' }).value.trim();
+  const aut = (raiz.querySelector('.est-aut') || { value: 'no' }).value === 'si';
+  const autQue = (raiz.querySelector('.est-aut-que') || { value: '' }).value.trim();
+  const prox = (raiz.querySelector('.est-prox') || { value: '' }).value;
+  const gwc = {}; ENCAJE.forEach(([k]) => { const sel = raiz.querySelector('.gwc-' + k); if (sel && sel.value) gwc[k] = sel.value; });
+  const vacio = !temas.length && !acciones.length && !obs && !aut && !autQue && !Object.keys(gwc).length;
+  return { json: vacio ? '' : JSON.stringify({ temas, obs, autoriza: { si: aut, que: autQue }, acciones, proximo: prox, gwc }), proximo: prox };
+}
+// Acciones acordadas todavia sin hacer, de todos los check-ins realizados de una empresa (o de una persona).
+function accionesPendientes(empresaId, empleadoId) {
+  const out = [];
+  STATE.data.Retain_Checkins.filter(c => c.empresa_id === empresaId && c.estado === 'realizado' && c.eliminado !== 'si' && (!empleadoId || c.empleado_id === empleadoId)).forEach(c => {
+    estructuraDe(c).acciones.forEach((a, i) => { if (!a.hecha) out.push({ ch: c, idx: i, a, venc: !!a.fecha && daysSince(a.fecha) > 0 }); });
+  });
+  return out;
+}
+async function marcarAccionHecha(checkinId, idx) {
+  const ch = STATE.data.Retain_Checkins.find(c => c.id === checkinId); if (!ch) return;
+  const e = estructuraDe(ch); if (!e.acciones[idx]) return;
+  e.acciones[idx].hecha = true;
+  const r = await api('editar', { sheet: 'Retain_Checkins', id: checkinId, patch: { estructura_json: JSON.stringify(e) } });
+  if (r.ok) { toast('Acción marcada como hecha'); await refreshAndRender(); } else toast(r.message || 'Error', true);
+}
+// Cuantas personas tienen cada tema como foco de atencion en su ultimo check-in (solo se muestra de 3 en adelante).
+function focosDeCheckins(empresaId) {
+  const cuenta = {};
+  empleadosActivosDe(empresaId).forEach(e => {
+    const u = ultimoCheckinDe(e.id); if (!u) return;
+    estructuraDe(u).temas.forEach(t => { if (t.tendencia === 'foco de atención') cuenta[t.tema] = (cuenta[t.tema] || 0) + 1; });
+  });
+  return Object.keys(cuenta).filter(k => cuenta[k] >= 3).map(k => ({ tema: k, n: cuenta[k] })).sort((a, b) => b.n - a.n);
 }
 
 // Orden para comparar riesgo de salida entre check-ins consecutivos de la
@@ -3441,7 +3805,9 @@ function registrarReunionAhora(empresaId, empleadoId) {
         </select>
       </div>
       <div><label class="block text-xs text-zinc-400 mb-1">Etiqueta (opcional)</label><input name="periodo" class="w-full rounded-lg px-3 py-2 text-sm" placeholder="Ej: Agosto 2026"></div>
-      <div><label class="block text-xs text-zinc-400 mb-1">Notas de la conversación</label><textarea name="notas_raw" rows="8" class="w-full rounded-lg px-3 py-2 text-sm" required placeholder="Escribí o pegá las notas de la charla..."></textarea></div>
+      ${camposContenidoCk(null)}
+      ${camposSatRiesgoHtml(null)}
+      ${estructuraCamposHtml(null, false)}
       <div class="flex gap-2 pt-2">
         <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
         <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar</button>
@@ -3450,8 +3816,10 @@ function registrarReunionAhora(empresaId, empleadoId) {
   `);
   document.getElementById('f-reunion-ahora').onsubmit = async (ev) => {
     ev.preventDefault();
+    if (faltaContenidoCk(ev.target)) { toast('Cargá tus notas o la transcripción de la reunión', true); return; }
     const btn = bloquearBoton(ev.target);
     const data = Object.fromEntries(new FormData(ev.target));
+    data.estructura_json = leerEstructura(ev.target).json;
     const hoy = new Date().toISOString();
     data.empresa_id = empresaId;
     data.empleado_id = empleadoId;
@@ -3532,6 +3900,7 @@ function obtenerBriefingCompleto(empleadoId, checkinIdExcluir) {
   const informeUltimo = STATE.data.Retain_Informes.find(inf => inf.checkin_id === ultimo.id);
   let acuerdos = [];
   if (informeUltimo) acuerdos = bulletsDeSeccion(buscarSeccionInforme(parsearSeccionesInforme(informeUltimo.contenido), 'ACUERDOS', 'PROXIMOS PASOS'));
+  estructuraDe(ultimo).acciones.filter(a => !a.hecha).forEach(a => acuerdos.push(a.que + (a.quien ? ' (' + a.quien + (a.fecha ? ', para el ' + fmtDate(a.fecha) : '') + ')' : (a.fecha ? ' (para el ' + fmtDate(a.fecha) + ')' : ''))));
 
   // Qué cambió (solo si hay 2+ check-ins previos para comparar).
   const cambios = [];
@@ -3585,7 +3954,7 @@ function marcarCheckinRealizado(checkinId) {
           <ul class="list-disc pl-4 pt-2 space-y-1">${preguntas.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
         </details>
       ` : ''}
-      <div><label class="block text-xs text-zinc-400 mb-1">Notas de la entrevista / conversación</label><textarea name="notas_raw" rows="8" class="w-full rounded-lg px-3 py-2 text-sm" required placeholder="Escribí o pegá las notas crudas de la charla..."></textarea></div>
+      ${camposContenidoCk(ch)}
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs text-zinc-400 mb-1">Satisfacción (1-10)</label>
@@ -3604,6 +3973,7 @@ function marcarCheckinRealizado(checkinId) {
           </select>
         </div>
       </div>
+      ${estructuraCamposHtml(ch, true)}
       <p class="text-[11px] text-zinc-500">Esto es solo para uso interno — nunca se le muestra al empleado.</p>
       <div class="flex gap-2 pt-2">
         <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
@@ -3613,14 +3983,17 @@ function marcarCheckinRealizado(checkinId) {
   `);
   document.getElementById('f-notas-checkin').onsubmit = async (ev) => {
     ev.preventDefault();
+    if (faltaContenidoCk(ev.target)) { toast('Cargá tus notas o la transcripción de la reunión', true); return; }
     const btn = bloquearBoton(ev.target);
     const data = Object.fromEntries(new FormData(ev.target));
+    const est = leerEstructura(ev.target);
+    data.estructura_json = est.json;
     data.estado = 'realizado';
     data.fecha_realizada = new Date().toISOString();
     data.realizado_por = STATE.user.nombre;
     const r = await api('editar', { sheet: 'Retain_Checkins', id: checkinId, patch: data });
     if (r.ok) {
-      if (ch) await programarSiguienteCheckin(ch);
+      if (ch) await programarSiguienteCheckin(ch, est.proximo);
       closeModal(); toast('Check-in marcado como realizado'); await refreshAndRender();
     } else { desbloquearBoton(btn); toast(r.message || 'Error', true); }
   };
@@ -3629,14 +4002,14 @@ function marcarCheckinRealizado(checkinId) {
 // Programa solo el próximo check-in del ciclo regular (ver CHECKIN_SIGUIENTE)
 // para que el seguimiento no se corte apenas termina el onboarding — nadie
 // tiene que acordarse de crear el de siempre a mano cada vez.
-async function programarSiguienteCheckin(ch) {
-  const siguiente = CHECKIN_SIGUIENTE[ch.tipo];
+async function programarSiguienteCheckin(ch, fechaElegida) {
+  const siguiente = CHECKIN_SIGUIENTE[ch.tipo] || (fechaElegida ? { tipo: ch.tipo, dias: 0 } : null);
   if (!siguiente) return;
   const fecha = new Date();
   fecha.setDate(fecha.getDate() + siguiente.dias);
   await api('crear', { sheet: 'Retain_Checkins', data: {
     empresa_id: ch.empresa_id, empleado_id: ch.empleado_id, tipo: siguiente.tipo,
-    fecha_programada: fecha.toISOString().slice(0, 10), estado: 'pendiente', es_gratuito: false,
+    fecha_programada: fechaElegida || fecha.toISOString().slice(0, 10), estado: 'pendiente', es_gratuito: false,
     creado_por: STATE.user.nombre + ' (auto)'
   }});
 }
@@ -3652,7 +4025,7 @@ function verNotasCheckin(checkinId) {
     <h3 class="font-display text-xl mb-1">${CHECKIN_ICONOS[ch.tipo]||'🗓️'} ${esc(CHECKIN_TIPOS[ch.tipo]||ch.tipo)}${ch.periodo ? ' — ' + esc(fmtPeriodo(ch.periodo)) : ''}</h3>
     <p class="text-xs text-zinc-500 mb-4">${esc(emp2 ? emp2.nombre_empleado : '—')} · realizado ${fmtDate(ch.fecha_realizada)}${ch.realizado_por ? ' por ' + esc(ch.realizado_por) : ''}</p>
     <form id="f-ver-notas-checkin" class="space-y-3">
-      <div><label class="block text-xs text-zinc-400 mb-1">Notas</label><textarea name="notas_raw" rows="10" class="w-full rounded-lg px-3 py-2 text-sm">${esc(ch.notas_raw)}</textarea></div>
+      ${camposContenidoCk(ch)}
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs text-zinc-400 mb-1">Satisfacción (1-10)</label>
@@ -3671,6 +4044,7 @@ function verNotasCheckin(checkinId) {
           </select>
         </div>
       </div>
+      ${estructuraCamposHtml(ch, false)}
       <div class="flex gap-2 pt-2">
         <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cerrar</button>
         <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar cambios</button>
@@ -3681,6 +4055,7 @@ function verNotasCheckin(checkinId) {
     ev.preventDefault();
     const btn = bloquearBoton(ev.target);
     const data = Object.fromEntries(new FormData(ev.target));
+    data.estructura_json = leerEstructura(ev.target).json;
     const r = await api('editar', { sheet: 'Retain_Checkins', id: checkinId, patch: data });
     if (r.ok) { closeModal(); toast('Guardado'); await refreshAndRender(); }
     else { desbloquearBoton(btn); toast(r.message || 'Error', true); }
@@ -3812,7 +4187,7 @@ async function generarInforme(checkinId) {
 
   const tipo = ch.tipo === 'salida' ? 'salida' : 'individual';
   const detenerCarga = mostrarCargandoInforme();
-  const r = await api('retain_generar_informe', { checkin_id: checkinId, notas_raw: ch.notas_raw, tipo_informe: tipo });
+  const r = await api('retain_generar_informe', { checkin_id: checkinId, notas_raw: ch.notas_raw || '', tipo_informe: tipo });
   detenerCarga();
   if (!r.ok) {
     openModal(`
@@ -3915,8 +4290,17 @@ const TITULOS_INFORME = {
   consolidado_empresa: 'Informe consolidado',
   consejos: 'Consejos',
   clima_comentarios: 'Análisis de comentarios',
-  evolucion: 'Evolución de la persona'
+  evolucion: 'Evolución de la persona',
+  periodo_area: 'Informe del área',
+  periodo_empresa: 'Informe de la empresa',
+  comparativo: 'Comparativo'
 };
+// Informes armados por vos con los datos de los check-ins (no son los de 12 secciones ni salen como PDF para cliente).
+const INFORMES_LIBRES = ['evolucion', 'periodo_area', 'periodo_empresa', 'comparativo'];
+function tituloTipoInforme(inf) {
+  const base = String(inf.tipo_informe || '').split(':')[0];
+  return (TITULOS_INFORME[base] || inf.tipo_informe) + (base === 'periodo_area' ? ' ' + String(inf.tipo_informe).split(':').slice(1).join(':') : '');
+}
 
 // Vista "documento" del informe — lo que se le manda al cliente. Reusa el mismo
 // mecanismo de exportar a PDF que ya usan los resultados de Pulso (window.print
@@ -3940,7 +4324,7 @@ function bloqueAlertaUrgente(contenido) {
 // lo usan la Papelera y la confirmación de borrado.
 function tituloInformeLista(inf) {
   const emp = inf.empleado_id ? STATE.data.Retain_Empleados.find(e => e.id === inf.empleado_id) : null;
-  const tipo = TITULOS_INFORME[String(inf.tipo_informe || '').split(':')[0]] || inf.tipo_informe || 'Informe';
+  const tipo = tituloTipoInforme(inf) || 'Informe';
   return (emp ? emp.nombre_empleado + ' · ' : '') + tipo + (inf.periodo ? ' — ' + fmtPeriodo(inf.periodo) : '');
 }
 
@@ -3960,7 +4344,7 @@ function verInforme(id) {
     <div id="informe-print">
       <span class="retain-wordmark mb-2" style="display:inline-block;font-size:20px;">re<b>tain</b>.</span>
       ${bannerModelo(empresa, 'mb-2')}
-      <h3 class="font-display text-xl mb-1">${esc(TITULOS_INFORME[String(inf.tipo_informe || '').split(':')[0]] || inf.tipo_informe)}</h3>
+      <h3 class="font-display text-xl mb-1">${esc(tituloTipoInforme(inf))}</h3>
       ${empresa ? `<p class="text-sm text-zinc-300">${esc(empresa.nombre_empresa)}</p>` : ''}
       ${empleado ? `<p class="text-xs text-zinc-500">${esc(empleado.nombre_empleado)}${empleado.puesto ? ' · ' + esc(empleado.puesto) : ''}${empleado.area ? ' · ' + esc(empleado.area) : ''}</p>` : ''}
       <p class="text-xs text-zinc-500 mb-5">${fmtDate(inf.fecha_generacion)}</p>
@@ -3972,9 +4356,9 @@ function verInforme(id) {
       <button onclick="editarInformeTexto('${id}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">✏️ Editar</button>
       <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
     </div>
-    ${inf.tipo_informe === 'evolucion' ? '' : `<button onclick="abrirInformeCliente('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Exportar PDF para cliente</button>`}
+    ${INFORMES_LIBRES.includes(String(inf.tipo_informe || '').split(':')[0]) ? '' : `<button onclick="abrirInformeCliente('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Exportar PDF para cliente</button>`}
     <button onclick="eliminarInforme('${id}')" class="w-full mt-3 text-xs text-red-400 hover:text-red-300 no-print">Eliminar informe</button>
-    ${inf.checkin_id ? `<p class="text-[11px] text-zinc-500 mt-3 text-center no-print">¿Necesitás otra versión? <a href="#" onclick="generarInforme('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Regenerar con IA</a> · <a href="#" onclick="pegarInformeManual('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Pegar otra versión</a></p>` : ''}
+    ${(inf.checkin_id && !INFORMES_LIBRES.includes(String(inf.tipo_informe || '').split(':')[0])) ? `<p class="text-[11px] text-zinc-500 mt-3 text-center no-print">¿Necesitás otra versión? <a href="#" onclick="generarInforme('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Regenerar con IA</a> · <a href="#" onclick="pegarInformeManual('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Pegar otra versión</a></p>` : ''}
   `);
 }
 
@@ -4241,7 +4625,7 @@ function sparklineSVG(puntos, opciones) {
   opciones = opciones || {};
   const ancho = opciones.ancho || 320, alto = opciones.alto || 64, pad = 8;
   const padTop = opciones.valores ? 18 : pad;
-  const color = opciones.color || '#2791ef';
+  const color = opciones.color || '#6F8F63';
   const valores = puntos.map(p => p.valor);
   const max = opciones.max || Math.max(...valores, 1);
   const stepX = puntos.length > 1 ? (ancho - pad * 2) / (puntos.length - 1) : 0;
@@ -4303,8 +4687,8 @@ function donutRiesgoSVG(conteo) {
   return `<svg viewBox="0 0 120 120" width="128" height="128" style="display:block">
     <circle cx="60" cy="60" r="${R}" fill="none" stroke="#eef1f4" stroke-width="16"/>
     ${arcos}
-    <text x="60" y="63" text-anchor="middle" font-size="26" font-weight="800" fill="#022b61">${total}</text>
-    <text x="60" y="77" text-anchor="middle" font-size="8" fill="#4a6486">personas</text>
+    <text x="60" y="63" text-anchor="middle" font-size="26" font-weight="800" fill="#232A22">${total}</text>
+    <text x="60" y="77" text-anchor="middle" font-size="8" fill="#6b7468">personas</text>
   </svg>`;
 }
 
@@ -4363,7 +4747,7 @@ function graficoENPSBarras(dims, previo) {
   const barra = (x, v, col) => {
     const h = Math.max(2, Math.abs(y0 - y(v)));
     const yTop = v >= 0 ? y0 - h : y0;
-    return `<rect x="${x}" y="${yTop}" width="${bw}" height="${h}" rx="3" fill="${col}"/><text x="${x + bw / 2}" y="${v >= 0 ? yTop - 4 : yTop + h + 11}" text-anchor="middle" font-size="11" font-weight="800" fill="#022b61">${v}</text>`;
+    return `<rect x="${x}" y="${yTop}" width="${bw}" height="${h}" rx="3" fill="${col}"/><text x="${x + bw / 2}" y="${v >= 0 ? yTop - 4 : yTop + h + 11}" text-anchor="middle" font-size="11" font-weight="800" fill="#232A22">${v}</text>`;
   };
   const grupos = validas.map((d, i) => {
     const cx = 8 + grupoW * (i + 0.5);
@@ -4376,7 +4760,7 @@ function graficoENPSBarras(dims, previo) {
     } else {
       g += barra(cx - bw / 2, d.enps, colorENPSHex(d.enps));
     }
-    g += `<text x="${cx}" y="172" text-anchor="middle" font-size="10" font-weight="700" fill="#022b61">${esc(d.dim)}</text><text x="${cx}" y="184" text-anchor="middle" font-size="7.5" fill="#8a97a8">n=${d.n}${p ? ' · ant. n=' + p.n : ''}</text>`;
+    g += `<text x="${cx}" y="172" text-anchor="middle" font-size="10" font-weight="700" fill="#232A22">${esc(d.dim)}</text><text x="${cx}" y="184" text-anchor="middle" font-size="7.5" fill="#8a97a8">n=${d.n}${p ? ' · ant. n=' + p.n : ''}</text>`;
     return g;
   }).join('');
   const nota = hayPrev ? `<text x="${W - 8}" y="9" text-anchor="end" font-size="7.5" fill="#8a97a8">gris = período anterior · color = actual</text>` : '';
@@ -4393,7 +4777,7 @@ function graficoDistribucionENPS(dims) {
   const validas = dims.filter(d => d.n >= MIN_RESPUESTAS_ANONIMATO);
   if (!validas.length) return '';
   const filas = validas.map(d => `<div class="ic-hbar-row"><span class="ic-hbar-label">${esc(d.dim)}</span>${barraSegmentos([[d.pctDetr, '#f4b6ae'], [d.pctNeutro, '#f5e3a0'], [d.pctProm, '#a9dfc2']])}</div>`).join('');
-  const chip = (col, txt) => `<span class="ic-banda" style="background:${col};color:#022b61">${txt}</span>`;
+  const chip = (col, txt) => `<span class="ic-banda" style="background:${col};color:#232A22">${txt}</span>`;
   return filas + `<p class="ic-bandas">${chip('#f4b6ae', 'Detractores 1–6')}${chip('#f5e3a0', 'Neutros 7–8')}${chip('#a9dfc2', 'Promotores 9–10')}</p>`;
 }
 
@@ -4414,7 +4798,7 @@ function esMotivoRemuneracion(texto) { return /remunerac|salario|sueldo|paga\b|c
 
 function graficoMotivos(motivos) {
   const filas = motivos.map(m => `<div class="ic-hbar-row"><span class="ic-hbar-label ic-hbar-label-wide">${esc(nombreMotivo(m.texto))}</span>${barraSegmentos([[m.pctSi, '#a9dfc2'], [100 - m.pctSi, '#f4b6ae']])}</div>`).join('');
-  const chip = (col, txt) => `<span class="ic-banda" style="background:${col};color:#022b61">${txt}</span>`;
+  const chip = (col, txt) => `<span class="ic-banda" style="background:${col};color:#232A22">${txt}</span>`;
   const remuneracion = motivos.find(m => esMotivoRemuneracion(m.texto));
   const notaRemuneracion = (remuneracion && remuneracion.pctSi < 50)
     ? `<p class="ic-cobertura" style="margin-top:0.5rem">La remuneración suele ser el motivo de permanencia más bajo incluso en las empresas que mejor pagan del mercado — casi nadie dice quedarse "por el sueldo", aunque esté conforme. No es necesariamente una alerta puntual de este equipo, y no siempre subir el sueldo mueve este número.</p>`
@@ -4430,7 +4814,7 @@ function graficoMotivos(motivos) {
 // Barras apiladas favorable / neutral / desfavorable de los indicadores clave del Pulso.
 function graficoIndicadores(inds) {
   if (!inds || !inds.length) return '';
-  const fila = i => `<div style="margin-bottom:.8rem"><div style="display:flex;justify-content:space-between;gap:.8rem;font-size:.82rem"><span>${esc(i.texto)}</span><span style="white-space:nowrap;color:#4a6486">${i.pctFav}% favorable <span style="opacity:.7">(n=${i.n})</span></span></div>
+  const fila = i => `<div style="margin-bottom:.8rem"><div style="display:flex;justify-content:space-between;gap:.8rem;font-size:.82rem"><span>${esc(i.texto)}</span><span style="white-space:nowrap;color:#6b7468">${i.pctFav}% favorable <span style="opacity:.7">(n=${i.n})</span></span></div>
     <div style="display:flex;height:9px;border-radius:99px;overflow:hidden;margin-top:.3rem;background:#e9eef4"><span style="width:${i.pctFav}%;background:#a9dfc2"></span><span style="width:${i.pctNeutro}%;background:#f1dfa5"></span><span style="width:${i.pctDesf}%;background:#f4b6ae"></span></div></div>`;
   return inds.map(fila).join('') + '<p style="font-size:.7rem;color:#7b8aa0;margin:.2rem 0 0">Favorable 8-10 · neutral 7 · desfavorable hasta 6</p>';
 }
@@ -4469,12 +4853,12 @@ function bloquePulsoExplicativo(empresaId, area, totalRespuestas) {
     .concat((cfg.motivos_extra || []).map(m => nombreMotivo(m.nombre || m.texto)));
   if (!dims.length && !motivos.length) return { titulo: 'Pulso: qué dicen las encuestas', html: '' };
 
-  const filaDim = d => `<div class="ic-hbar-row"><span class="ic-hbar-label">${esc(d)}</span><span style="font-size:0.78rem;color:#4a6486">${esc(DESCRIPCION_DIM_ENPS[d] || '')}</span></div>`;
+  const filaDim = d => `<div class="ic-hbar-row"><span class="ic-hbar-label">${esc(d)}</span><span style="font-size:0.78rem;color:#6b7468">${esc(DESCRIPCION_DIM_ENPS[d] || '')}</span></div>`;
   const html = `
-    <p style="font-size:0.85rem;color:#4a6486;margin:0 0 1rem">Cada mes le pedimos a tu equipo, de forma anónima, que puntúe de 1 a 10 qué tan probable es que recomiende cada uno de estos aspectos, y que cuente por qué. Con eso calculamos el <strong style="color:#022b61">eNPS</strong> (employee Net Promoter Score) de cada dimensión: % de personas promotoras (puntúan 9-10) menos % de personas detractoras (puntúan 1-6). Da un número de -100 a 100.</p>
+    <p style="font-size:0.85rem;color:#6b7468;margin:0 0 1rem">Cada mes le pedimos a tu equipo, de forma anónima, que puntúe de 1 a 10 qué tan probable es que recomiende cada uno de estos aspectos, y que cuente por qué. Con eso calculamos el <strong style="color:#232A22">eNPS</strong> (employee Net Promoter Score) de cada dimensión: % de personas promotoras (puntúan 9-10) menos % de personas detractoras (puntúan 1-6). Da un número de -100 a 100.</p>
     ${dims.length ? `<p class="ic-chart-title">Qué eNPS medimos en ${esc(STATE.data.Retain_Empresas.find(e => e.id === empresaId).nombre_empresa)}</p>${dims.map(filaDim).join('')}` : ''}
     ${leyendaBandasENPS()}
-    ${motivos.length ? `<p class="ic-chart-title" style="margin-top:1.1rem">Motivos de permanencia que relevamos</p><p style="font-size:0.85rem;color:#4a6486;margin:0">Le preguntamos a cada persona, con Sí o No, si cada uno de estos es una razón por la que se queda: ${motivos.map(esc).join(' · ')}.</p>` : ''}
+    ${motivos.length ? `<p class="ic-chart-title" style="margin-top:1.1rem">Motivos de permanencia que relevamos</p><p style="font-size:0.85rem;color:#6b7468;margin:0">Le preguntamos a cada persona, con Sí o No, si cada uno de estos es una razón por la que se queda: ${motivos.map(esc).join(' · ')}.</p>` : ''}
     <div class="ic-alert-block" style="margin-top:1.1rem">
       <p style="margin:0">${totalRespuestas > 0
         ? `Recibimos <strong>${totalRespuestas} respuesta${totalRespuestas === 1 ? '' : 's'}</strong> hasta ahora — todavía no llega al mínimo de ${MIN_RESPUESTAS_ANONIMATO} por pregunta (${MIN_RESPUESTAS_ENPS} para el eNPS) que pedimos para poder mostrar resultados sin exponer a nadie.`
@@ -4551,7 +4935,7 @@ function bloqueMetricasConsolidado(empresaId, area, fechaGeneracion) {
     <div class="ic-section">
       <h2>En números</h2>
       <div class="ic-kpis">
-        ${kpi('#2791ef', actual.totalConDato, 'Personas evaluadas', `de ${equipo.length} en la nómina`)}
+        ${kpi('#6F8F63', actual.totalConDato, 'Personas evaluadas', `de ${equipo.length} en la nómina`)}
         ${kpi(colorRiesgo, enRiesgo, 'En riesgo alto o medio', `${pctRiesgo}% del equipo${delta(enRiesgo, anterior ? anterior.conteo.alto + anterior.conteo.medio : 0)}`)}
         ${actual.promedioSatisfaccion !== null ? kpi(colorSatisfaccion(actual.promedioSatisfaccion), actual.promedioSatisfaccion.toFixed(1), 'Satisfacción prom.', `sobre 10 ${barraSatisfaccionSVG(actual.promedioSatisfaccion, 60)}`) : ''}
         ${enpsEmpresa !== null && enpsEmpresa !== undefined ? kpi(colorENPS, (enpsEmpresa > 0 ? '+' : '') + enpsEmpresa, 'eNPS', etiquetaENPS(enpsEmpresa)) : ''}
@@ -4579,7 +4963,7 @@ function bloqueMetricasConsolidado(empresaId, area, fechaGeneracion) {
         const puntosSat = historial.filter(h => h.promedioSatisfaccion !== null).map(h => ({ valor: Math.round(h.promedioSatisfaccion * 10) / 10, etiqueta: fechaCorta(h.fecha) }));
         return `<div class="ic-trend-row">
           <div><p class="ic-chart-title">Personas en riesgo alto o medio</p>${sparklineSVG(puntosRiesgo, { color: '#c8930a', alto: 60, valores: true })}</div>
-          ${puntosSat.length >= 2 ? `<div><p class="ic-chart-title">Satisfacción promedio</p>${sparklineSVG(puntosSat, { color: '#2791ef', alto: 60, valores: true, max: 10 })}</div>` : ''}
+          ${puntosSat.length >= 2 ? `<div><p class="ic-chart-title">Satisfacción promedio</p>${sparklineSVG(puntosSat, { color: '#6F8F63', alto: 60, valores: true, max: 10 })}</div>` : ''}
         </div>`;
       })()}
       <p class="ic-cobertura">Cobertura de este trimestre: ${cobertura.cubiertos} de ${cobertura.total} persona${cobertura.total === 1 ? '' : 's'} (${cobertura.pct}%) con al menos un check-in realizado.</p>
@@ -4626,9 +5010,9 @@ function bloqueRiesgoIndividual(empleadoId, checkinIdActual, posicionOverride) {
       <h2>Riesgo de salida</h2>
       <div class="ic-gauge"><div class="ic-gauge-marker" style="left:${posicion}%"></div></div>
       <div class="ic-gauge-labels"><span>Bajo</span><span>Medio</span><span>Alto</span></div>
-      <p style="font-size:0.8rem;color:#4a6486;margin-top:0.4rem;">Nivel actual: <strong style="color:#022b61">${esc(actual.riesgo_salida)}</strong>${tendencia || (anterior ? '' : ' · primer check-in con este dato')}</p>
+      <p style="font-size:0.8rem;color:#6b7468;margin-top:0.4rem;">Nivel actual: <strong style="color:#232A22">${esc(actual.riesgo_salida)}</strong>${tendencia || (anterior ? '' : ' · primer check-in con este dato')}</p>
       ${sat !== null && !isNaN(sat) ? `<p class="ic-chart-title" style="margin-top:1rem">Satisfacción</p><p style="font-size:0.85rem;margin:0"><strong style="font-size:1.3rem;color:${colorSatisfaccion(sat)}">${sat}</strong> / 10 &nbsp;${barraSatisfaccionSVG(sat, 120)}</p>` : ''}
-      ${serie.length >= 2 ? `<p class="ic-chart-title" style="margin-top:1rem">Evolución de la satisfacción</p>${sparklineSVG(serie, { color: '#2791ef', alto: 60, valores: true, max: 10 })}` : ''}
+      ${serie.length >= 2 ? `<p class="ic-chart-title" style="margin-top:1rem">Evolución de la satisfacción</p>${sparklineSVG(serie, { color: '#6F8F63', alto: 60, valores: true, max: 10 })}` : ''}
     </div>
   `;
 }
@@ -4696,7 +5080,7 @@ function chipsEmpleado(emp, fechaCorte) {
   const partes = [];
   const colores = { alto: ['#fdecea', '#c0392b'], medio: ['#fdf3dc', '#a87508'], bajo: ['#e3f5ee', '#1a9e6f'] };
   if (ck && colores[ck.riesgo_salida]) partes.push(chip('Riesgo ' + esc(ck.riesgo_salida), colores[ck.riesgo_salida][0], colores[ck.riesgo_salida][1]));
-  if (ck && ck.satisfaccion) partes.push(chip('Satisf. ' + esc(ck.satisfaccion) + '/10', '#eaf4fe', '#1e50cc'));
+  if (ck && ck.satisfaccion) partes.push(chip('Satisf. ' + esc(ck.satisfaccion) + '/10', '#eef3ea', '#4F6F45'));
   if (emp.key_talent === 'si') partes.push(chip('Key player', '#eee9fb', '#5b3fc4'));
   if (emp.rol_critico === 'si') partes.push(chip('Rol crítico', '#fde9dc', '#b4531a'));
   return partes.join('');
@@ -4904,78 +5288,78 @@ function abrirInformeCliente(id) {
   openModal(`
     <style>
       .ic-page * { box-sizing: border-box; }
-      .ic-page { font-family: 'Montserrat', -apple-system, 'Segoe UI', sans-serif; background: #fff; color: #022b61; padding: 14mm; border-radius: 8px; }
+      .ic-page { font-family: 'Montserrat', -apple-system, 'Segoe UI', sans-serif; background: #fff; color: #232A22; padding: 14mm; border-radius: 8px; }
       .ic-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
       .ic-kbgb-mark { font-family:'Fraunces',Georgia,serif; font-weight: 600; letter-spacing: -0.01em; font-size: 1.1rem; color: #232A22; }
       .ic-kbgb-mark span { color: #6F8F63; }
-      .ic-client-mark { text-align: right; font-weight: 700; font-size: 1rem; color: #022b61; }
-      .ic-divider { height: 3px; border-radius: 2px; margin: 0.9rem 0 1.1rem; background: linear-gradient(90deg, #00d4ff, #2791ef, #1e50cc); }
-      .ic-meta-row { display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; font-size: 0.78rem; color: #4a6486; font-weight: 500; margin-bottom: 1.6rem; }
+      .ic-client-mark { text-align: right; font-weight: 700; font-size: 1rem; color: #232A22; }
+      .ic-divider { height: 3px; border-radius: 2px; margin: 0.9rem 0 1.1rem; background: linear-gradient(90deg, #A9C29E, #6F8F63, #4F6F45); }
+      .ic-meta-row { display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; font-size: 0.78rem; color: #6b7468; font-weight: 500; margin-bottom: 1.6rem; }
       .ic-meta-row span:not(:last-child)::after { content: "·"; margin-left: 0.9rem; color: #b9c6d6; }
       .ic-section { margin-bottom: 1.4rem; }
       .ic-section:last-child { margin-bottom: 0; }
-      .ic-section h2 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-variant-caps: small-caps; color: #2791ef; margin: 0 0 0.7rem; padding-bottom: 0.35rem; border-bottom: 1px solid #e3eaf3; }
-      .ic-section p { margin: 0; font-size: 0.92rem; line-height: 1.55; color: #022b61; font-weight: 400; }
+      .ic-section h2 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-variant-caps: small-caps; color: #6F8F63; margin: 0 0 0.7rem; padding-bottom: 0.35rem; border-bottom: 1px solid #e3eaf3; }
+      .ic-section p { margin: 0; font-size: 0.92rem; line-height: 1.55; color: #232A22; font-weight: 400; }
       .ic-section ul { margin: 0; padding-left: 1.15rem; list-style: disc; }
-      .ic-section li { font-size: 0.92rem; line-height: 1.55; color: #022b61; margin-bottom: 0.4rem; }
+      .ic-section li { font-size: 0.92rem; line-height: 1.55; color: #232A22; margin-bottom: 0.4rem; }
       .ic-section li:last-child { margin-bottom: 0; }
-      .ic-alert-block { background: #eaf4fe; border-left: 3px solid #2791ef; border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem; }
+      .ic-alert-block { background: #eef3ea; border-left: 3px solid #6F8F63; border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem; }
       .ic-alert-block ul { padding-left: 1.1rem; }
       .ic-stats-row { display: flex; flex-wrap: wrap; gap: 1.8rem; margin: 0.3rem 0 0.2rem; }
       .ic-stat { display: flex; flex-direction: column; }
       .ic-stat-num { font-size: 1.7rem; font-weight: 800; line-height: 1.1; }
-      .ic-stat-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: #4a6486; margin-top: 0.15rem; }
+      .ic-stat-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7468; margin-top: 0.15rem; }
       .ic-stat-delta { font-size: 0.68rem; margin-top: 0.15rem; }
       .ic-section .ic-nota-primer-informe { font-size: 0.74rem; color: #8a97a8; font-style: italic; margin: 0.7rem 0 0; }
       .ic-area-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.78rem; }
-      .ic-area-table th { text-align: left; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; color: #4a6486; padding: 0.35rem 0.5rem; border-bottom: 1px solid #d7dfe8; }
-      .ic-area-table td { padding: 0.35rem 0.5rem; border-bottom: 1px solid #eef1f4; color: #022b61; }
+      .ic-area-table th { text-align: left; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7468; padding: 0.35rem 0.5rem; border-bottom: 1px solid #d7dfe8; }
+      .ic-area-table td { padding: 0.35rem 0.5rem; border-bottom: 1px solid #eef1f4; color: #232A22; }
       .ic-gauge { position: relative; height: 10px; border-radius: 999px; margin-top: 0.3rem; background: linear-gradient(90deg, #1a9e6f 0%, #1a9e6f 33%, #c8930a 33%, #c8930a 66%, #c0392b 66%, #c0392b 100%); }
-      .ic-gauge-marker { position: absolute; top: -3px; width: 3px; height: 16px; background: #022b61; border-radius: 2px; transform: translateX(-1.5px); }
+      .ic-gauge-marker { position: absolute; top: -3px; width: 3px; height: 16px; background: #232A22; border-radius: 2px; transform: translateX(-1.5px); }
       .ic-page, .ic-page * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .ic-hero { margin-bottom: 1.5rem; }
-      .ic-hero-kicker { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: #2791ef; font-weight: 700; margin: 0 0 0.3rem; }
-      .ic-hero-title { font-size: 1.8rem; line-height: 1.12; font-weight: 800; color: #022b61; margin: 0 0 0.6rem; }
+      .ic-hero-kicker { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: #6F8F63; font-weight: 700; margin: 0 0 0.3rem; }
+      .ic-hero-title { font-size: 1.8rem; line-height: 1.12; font-weight: 800; color: #232A22; margin: 0 0 0.6rem; }
       .ic-hero .ic-meta-row { margin-bottom: 0; }
       .ic-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 0.7rem; margin: 0.2rem 0 1.1rem; }
-      .ic-kpi { display: flex; flex-direction: column; border: 1px solid #e3eaf3; border-top: 3px solid #2791ef; border-radius: 8px; padding: 0.65rem 0.8rem; background: #fafcff; }
+      .ic-kpi { display: flex; flex-direction: column; border: 1px solid #e3eaf3; border-top: 3px solid #6F8F63; border-radius: 8px; padding: 0.65rem 0.8rem; background: #fafcff; }
       .ic-kpi-num { font-size: 1.75rem; font-weight: 800; line-height: 1.1; }
-      .ic-kpi-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: #4a6486; margin-top: 0.2rem; font-weight: 700; }
+      .ic-kpi-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7468; margin-top: 0.2rem; font-weight: 700; }
       .ic-kpi-sub { font-size: 0.68rem; color: #8a97a8; margin-top: 0.3rem; line-height: 1.35; }
       .ic-charts { display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: center; margin-bottom: 0.6rem; }
       .ic-donut-wrap { display: flex; align-items: center; gap: 0.9rem; }
-      .ic-section .ic-chart-title { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.07em; color: #4a6486; font-weight: 700; margin: 0 0 0.4rem; }
+      .ic-section .ic-chart-title { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.07em; color: #6b7468; font-weight: 700; margin: 0 0 0.4rem; }
       .ic-section ul.ic-legend-list { list-style: none; margin: 0; padding: 0; }
       .ic-section .ic-legend-list li { display: flex; align-items: center; gap: 0.45rem; font-size: 0.8rem; margin-bottom: 0.25rem; }
       .ic-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
       .ic-trend-row { display: flex; flex-wrap: wrap; gap: 1.4rem; margin-top: 0.8rem; }
       .ic-trend-row > div { flex: 1 1 200px; }
-      .ic-mini { font-size: 0.7rem; color: #4a6486; }
+      .ic-mini { font-size: 0.7rem; color: #6b7468; }
       .ic-gauge-labels { display: flex; justify-content: space-between; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: #8a97a8; margin-top: 0.25rem; }
       .ic-gauge.ic-gauge-mini { width: 120px; height: 6px; margin: 0 0 0.6rem; }
       .ic-gauge-mini .ic-gauge-marker { top: -3px; height: 12px; }
       .ic-hbar-row { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.4rem; }
-      .ic-hbar-label { flex: 0 0 96px; font-size: 0.78rem; font-weight: 600; color: #022b61; line-height: 1.2; }
+      .ic-hbar-label { flex: 0 0 96px; font-size: 0.78rem; font-weight: 600; color: #232A22; line-height: 1.2; }
       .ic-hbar-label-wide { flex-basis: 170px; font-weight: 500; }
       .ic-hbar { flex: 1 1 auto; display: flex; height: 20px; border-radius: 4px; overflow: hidden; min-width: 0; }
-      .ic-hbar-seg { display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #022b61; min-width: 0; overflow: hidden; }
-      .ic-section .ic-bandas { font-size: 0.66rem; color: #4a6486; margin: 0.6rem 0 0; }
+      .ic-hbar-seg { display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #232A22; min-width: 0; overflow: hidden; }
+      .ic-section .ic-bandas { font-size: 0.66rem; color: #6b7468; margin: 0.6rem 0 0; }
       .ic-banda { display: inline-block; font-size: 0.64rem; font-weight: 700; padding: 0.12rem 0.55rem; border-radius: 999px; color: #fff; margin: 0 0.3rem 0.2rem 0; }
       .ic-chip { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 0.12rem 0.5rem; border-radius: 999px; margin: 0 0.3rem 0.2rem 0; white-space: nowrap; }
       .ic-ficha { border: 1px solid #e3eaf3; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; break-inside: avoid; page-break-inside: avoid; }
       .ic-ficha-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.3rem 0.8rem; margin-bottom: 0.45rem; }
-      .ic-ficha-nombre { font-size: 0.92rem; color: #022b61; }
+      .ic-ficha-nombre { font-size: 0.92rem; color: #232A22; }
       .ic-section .ic-ficha-resumen { margin: 0 0 0.5rem; }
-      .ic-section .ic-ficha-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: #4a6486; margin: 0.3rem 0 0.2rem; font-weight: 700; }
+      .ic-section .ic-ficha-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7468; margin: 0.3rem 0 0.2rem; font-weight: 700; }
       .ic-ficha ul { margin: 0 0 0.5rem; }
-      .ic-section .ic-ficha-reco { background: #eaf4fe; border-radius: 6px; padding: 0.5rem 0.7rem; margin: 0.3rem 0 0; }
+      .ic-section .ic-ficha-reco { background: #eef3ea; border-radius: 6px; padding: 0.5rem 0.7rem; margin: 0.3rem 0 0; }
       .ic-section ul.ic-roles, .ic-section ul.ic-reco { list-style: none; padding-left: 0; }
       .ic-roles li { padding: 0.5rem 0; border-bottom: 1px solid #eef1f4; break-inside: avoid; }
       .ic-roles li:last-child { border-bottom: 0; }
       .ic-reco li { break-inside: avoid; }
       .ic-good-block { background: #e9f7f1; border-left: 3px solid #1a9e6f; border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem; }
       .ic-good-block ul { padding-left: 1.1rem; }
-      .ic-section .ic-cobertura { font-size: 0.74rem; color: #4a6486; margin: 0.6rem 0 0; }
+      .ic-section .ic-cobertura { font-size: 0.74rem; color: #6b7468; margin: 0.6rem 0 0; }
       .ic-doc-footer { margin-top: 1.4rem; padding-top: 1.1rem; border-top: 1px solid #eef1f4; text-align: center; break-inside: avoid; page-break-inside: avoid; }
       .ic-doc-footer .ic-wordmark { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.12em; color: #a9b6c4; margin-bottom: 0.2rem; }
       .ic-doc-footer .ic-legend { font-size: 0.68rem; color: #b9c3cf; font-weight: 500; }
@@ -5433,7 +5817,7 @@ function promedioClima(scoresRaw) {
 }
 
 function bandaClima(promedio, objetivo) {
-  if (objetivo === null || objetivo === undefined) return { label: '', color: '#a8c5e8' };  // sin objetivo definido: color neutro, sin etiqueta
+  if (objetivo === null || objetivo === undefined) return { label: '', color: '#6F8F63' };  // sin objetivo definido: color neutro, sin etiqueta
   if (promedio >= objetivo) return { label: 'Objetivo alcanzado', color: '#34d399' };
   if (promedio >= objetivo - 1) return { label: 'Cerca del objetivo', color: '#fbbf24' };
   return { label: 'Necesita atención', color: '#f87171' };
@@ -5484,7 +5868,7 @@ function barraClima(promedio, objetivo) {
   const pctObjetivo = sinObjetivo ? 0 : Math.max(0, Math.min(100, (objetivo / 10) * 100));
   const color = bandaClima(promedio, objetivo).color;
   return `
-    <div class="relative h-2.5 rounded-full mt-1" style="background:var(--r-line, #13284f)">
+    <div class="relative h-2.5 rounded-full mt-1" style="background:var(--r-line, #dfe5da)">
       <div class="h-2.5 rounded-full" style="width:${pct}%; background:${color}"></div>
       ${sinObjetivo ? '' : `<div class="absolute top-[-3px] w-0.5 h-4 bg-white/60" style="left:${pctObjetivo}%" title="Objetivo: ${objetivo}"></div>`}
     </div>`;
@@ -5669,6 +6053,20 @@ async function abrirPulsoMensual(empresaId, token) {
 }
 
 // Pulso corto: pagina publica (con link personal). Confidencial: la respuesta queda con el nombre.
+// Demo: se ve igual que el pulso real, pero no pide link ni guarda nada. ?pulso_demo=1&e=Nombre de la empresa
+function demoPulsoUrl(nombre) { return location.origin + location.pathname + '?pulso_demo=1' + (nombre ? '&e=' + encodeURIComponent(nombre) : ''); }
+function abrirPulsoDemoDe(empresaId) { const e = STATE.data.Retain_Empresas.find(x => x.id === empresaId); window.open(demoPulsoUrl(e ? e.nombre_empresa : ''), '_blank'); }
+function copiarLinkDemoPulso(empresaId) {
+  const e = STATE.data.Retain_Empresas.find(x => x.id === empresaId), link = demoPulsoUrl(e ? e.nombre_empresa : '');
+  navigator.clipboard.writeText(link).then(() => toast('Link de demo copiado (no guarda nada)')).catch(() => toast('No se pudo copiar. Link: ' + link, true));
+}
+function abrirPulsoDemo(nombre) {
+  window.__demoNombre = nombre || '';
+  mostrarVistaExclusiva('view-pulso-mensual');
+  const emp = nombre || 'tu empresa';
+  document.getElementById('pulsom-empresa').textContent = nombre || 'Tu empresa';
+  renderPulsoCortoPublico({ demo: true, modo: 'corto', persona: '', empresa_nombre: emp, preguntas: PULSO_CORTO.map(p => Object.assign({}, p, { texto: p.texto.replace(/\[empresa\]/g, emp) })) }, '', '');
+}
 function renderPulsoCortoPublico(d, empresaId, token) {
   const main = document.getElementById('pulsom-main');
   const sub = document.getElementById('pulsom-sub');
@@ -5681,6 +6079,7 @@ function renderPulsoCortoPublico(d, empresaId, token) {
   if (sub) sub.textContent = 'Hola' + (d.persona ? ' ' + d.persona : '') + ', ¿cómo estás? Estas son las preguntas del pulso del mes: son ' + nPreg + ' y te llevan 1 minuto.';
   main.innerHTML = `
     <form id="f-pulso-corto" class="space-y-8">
+      ${d.demo ? '<div class="rounded-lg px-3.5 py-2.5 text-xs text-center" style="background:#fdf3d8;color:#7a5a05;border:1px solid #ecd89a">Esto es una demostración: lo que respondas acá no se guarda.</div>' : ''}
       ${d.preguntas.map(p => p.tipo === 'score' ? `
         <div class="pulso-enps-block" data-pregunta-id="${esc(p.id)}">
           <label class="block text-sm text-zinc-200 mb-3">${esc(p.texto)}</label>
@@ -5704,6 +6103,7 @@ function renderPulsoCortoPublico(d, empresaId, token) {
     const respuestas = bloques.map(b => ({ id: b.dataset.preguntaId, valor: b.dataset.score }))
       .concat(Array.from(form.querySelectorAll('.pulso-abierta-block')).map(b => ({ id: b.dataset.preguntaId, texto: b.querySelector('textarea').value.trim() })).filter(x => x.texto));
     btn.disabled = true; btn.textContent = 'Enviando…';
+    if (d.demo) { main.innerHTML = '<div class="text-center py-16"><p class="text-4xl mb-4">✅</p><p class="font-display text-xl mb-2">¡Gracias!</p><p class="text-sm text-zinc-400 mb-4">Así termina el pulso. Esta fue una demostración: no se guardó nada.</p><button onclick="abrirPulsoDemo(window.__demoNombre)" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">Probar de nuevo</button></div>'; return; }
     const r = await api('pulso_mensual_responder', { empresa_id: empresaId, token, respuestas });
     if (r.ok) {
       main.innerHTML = '<div class="text-center py-16"><p class="text-4xl mb-4">✅</p><p class="font-display text-xl mb-2">¡Gracias!</p><p class="text-sm text-zinc-400">Tu respuesta quedó registrada.</p></div>';
@@ -6184,7 +6584,8 @@ async function abrirLinksPersonalesPulso(empresaId) {
   window.__linksPulso = personas.map(p => ({ nombre: p.nombre_empleado, link: base + p.token }));
   cont.outerHTML = `
     <div id="links-pulso-cont">
-      <p class="text-xs text-zinc-500 mb-4">Cada persona tiene su propio link -- mandaselo una sola vez (por WhatsApp, mail, donde sea) y lo puede guardar para responder todos los meses. El sistema usa el link SOLO para saber que ya respondió; las respuestas en sí siguen siendo 100% anónimas, nunca quedan ligadas a quién las mandó.</p>
+      <p class="text-xs text-zinc-500 mb-4">Cada persona tiene su propio link -- mandaselo una sola vez (por WhatsApp, mail, donde sea) y lo puede guardar para responder todos los meses. ${pulsoModo(empresaId) === 'corto' ? 'Con este pulso vos sabés quién respondió qué; vos decidís qué le mostrás a la empresa.' : 'El sistema usa el link SOLO para saber que ya respondió; las respuestas en sí siguen siendo 100% anónimas, nunca quedan ligadas a quién las mandó.'}</p>
+      <div class="flex gap-2 mb-3"><button onclick="abrirPulsoDemoDe('${empresaId}')" class="flex-1 text-xs px-3 py-2 rounded-lg border border-line btn-secondary">👁 Ver cómo lo ve tu equipo (demo)</button><button onclick="copiarLinkDemoPulso('${empresaId}')" class="flex-1 text-xs px-3 py-2 rounded-lg border border-line btn-secondary">Copiar link de demo</button></div>
       <button onclick="copiarTodosLinksPulso()" class="w-full text-xs px-3 py-2 rounded-lg bg-sky-500/15 text-sky-400 hover:bg-sky-500/25 mb-3">Copiar todos (para pegar en WhatsApp / mail)</button>
       <div class="space-y-1.5 max-h-[45vh] overflow-y-auto">
         ${personas.length === 0 ? '<p class="text-sm text-zinc-500">No hay empleados activos en esta empresa todavía.</p>' : personas.map(p => `
@@ -6655,7 +7056,7 @@ function verResultadosPulso(campanaId, areaFiltro) {
     <div class="card rounded-xl p-4 mb-6 flex justify-between items-center">
       <div>
         <p class="text-xs text-zinc-500 mb-1">Puntaje general</p>
-        <p class="font-display text-3xl" style="color:${resultado.general !== null ? bandaClima(resultado.general, objetivo).color : '#a8c5e8'}">${resultado.general !== null ? resultado.general.toFixed(1) : '—'}<span class="text-sm text-zinc-500"> / 10</span></p>
+        <p class="font-display text-3xl" style="color:${resultado.general !== null ? bandaClima(resultado.general, objetivo).color : '#6F8F63'}">${resultado.general !== null ? resultado.general.toFixed(1) : '—'}<span class="text-sm text-zinc-500"> / 10</span></p>
       </div>
       ${bloqueObjetivo}
     </div>
@@ -6685,9 +7086,162 @@ function verResultadosPulso(campanaId, areaFiltro) {
     ${tieneComentarios ? `<button id="btn-resumen-ia" onclick="generarResumenPulso('${campanaId}')" class="w-full mt-4 text-sm py-2.5 rounded-lg border border-line hover:border-amber-500/50 no-print">✨ Generar análisis de comentarios con IA</button>` : ''}
     <div class="flex gap-2 mt-3 no-print">
       <button onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cerrar</button>
+      <button onclick="verInformeClima('${campanaId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">📄 Informe para la empresa</button>
       <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
     </div>
   `);
+}
+
+
+// ── Lectura e informe de la encuesta de clima, para la empresa ──
+// La lectura (lo que funciona, focos, comentarios, plan de accion) la escribe y la edita Palomo; cada seccion del informe se puede ocultar.
+const SECCIONES_INFORME_CLIMA = [['participacion', 'Participación'], ['general', 'Puntaje general'], ['dimensiones', 'Puntaje por dimensión'], ['comparacion', 'Comparación con la encuesta anterior'], ['areas', 'Resultado por área'], ['lectura', 'Lectura: lo que funciona, focos y comentarios'], ['plan', 'Plan de acción']];
+function lecturaClimaDe(c) {
+  let l = {}; try { l = JSON.parse((c && c.lectura_json) || '{}') || {}; } catch (e) { l = {}; }
+  const visible = { participacion: true, general: true, dimensiones: true, comparacion: true, areas: true, lectura: true, plan: true };
+  return { visible: Object.assign(visible, l.visible || {}), funciona: l.funciona || [], focos: l.focos || [], comentarios: l.comentarios || '', plan: l.plan || [] };
+}
+function climaAnteriorDe(campana) {
+  return STATE.data.Retain_Pulso_Campanas.filter(c => c.empresa_id === campana.empresa_id && c.estado === 'cerrada' && c.id !== campana.id && (c.fecha_creacion || '') < (campana.fecha_creacion || ''))
+    .sort((a, b) => (b.fecha_creacion || '').localeCompare(a.fecha_creacion || ''))[0] || null;
+}
+function resultadoClimaDe(campana, areasSel) {
+  const todas = STATE.data.Retain_Pulso_Respuestas.filter(r => r.campana_id === campana.id);
+  const resp = areasSel ? todas.filter(r => areasSel.indexOf(r.area) !== -1) : todas;
+  if (resp.length < MIN_RESPUESTAS_ANONIMATO) return null;
+  return { todas, resp, resultado: agruparResultadosClima(resp, preguntasDeCampanaPanel(campana).filter(p => (p.tipo || 'score') !== 'abierta')) };
+}
+function estadoPlanChip(est) {
+  const m = { 'hecho': ['#e3f1e8', '#1a7f55'], 'en curso': ['#fdf3d8', '#7a5a05'], 'pendiente': ['#eef0ec', '#6b7468'] }[est] || ['#eef0ec', '#6b7468'];
+  return `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:${m[0]};color:${m[1]};white-space:nowrap">${esc(est || 'pendiente')}</span>`;
+}
+function verInformeClima(campanaId) {
+  const c = STATE.data.Retain_Pulso_Campanas.find(x => x.id === campanaId); if (!c) return;
+  const empresa = STATE.data.Retain_Empresas.find(e => e.id === c.empresa_id);
+  const L = lecturaClimaDe(c), V = L.visible;
+  const base = resultadoClimaDe(c);
+  if (!base) { toast('Todavía hay menos de ' + MIN_RESPUESTAS_ANONIMATO + ' respuestas: el informe se arma a partir de ahí', true); return; }
+  const { todas, resultado } = base, objetivo = objetivoClima(empresa);
+  const anterior = climaAnteriorDe(c);
+  let deltas = null;
+  if (anterior) {
+    const rb = resultadoClimaDe(anterior);
+    if (rb) deltas = resultado.dimensiones.map(d => { const pv = rb.resultado.dimensiones.find(x => x.dimension === d.dimension); return (pv && pv.promedio !== null && d.promedio !== null) ? { dimension: d.dimension, delta: Math.round((d.promedio - pv.promedio) * 10) / 10 } : null; }).filter(Boolean);
+  }
+  const invitados = Number(c.invitados) || 0;
+  const conteos = {}; todas.forEach(r => { if (r.area && r.area !== AREA_NO_DECIR) conteos[r.area] = (conteos[r.area] || 0) + 1; });
+  const cortes = cortesPorArea(conteos);
+  const filasAreas = cortes.visibles.map(v => { const rr = resultadoClimaDe(c, [v.area]); return rr ? { area: v.area, n: v.n, g: rr.resultado.general } : null; }).filter(Boolean)
+    .concat(cortes.otras ? (() => { const rr = resultadoClimaDe(c, cortes.otras.areas); return rr ? [{ area: 'Otras áreas', n: cortes.otras.n, g: rr.resultado.general }] : []; })() : []);
+  const li = a => a.map(t => `<li>${esc(t)}</li>`).join('');
+  const sec = (titulo, html) => `<div class="cl-sec"><h2>${esc(titulo)}</h2>${html}</div>`;
+  const hayLectura = L.funciona.length || L.focos.length || L.comentarios.trim();
+  const planOk = L.plan.filter(x => x.accion);
+  const partes = [
+    V.participacion ? sec('Participación', `<p class="cl-big">${todas.length}${invitados ? ' de ' + invitados : ''} <span class="cl-sub">${invitados ? 'respondieron (' + Math.round(todas.length / invitados * 100) + '%)' : 'respuestas'}</span></p>`) : '',
+    V.general ? sec('Puntaje general', `<p class="cl-big">${resultado.general !== null ? resultado.general.toFixed(1) : '—'} <span class="cl-sub">/ 10</span></p>${objetivo !== null && resultado.general !== null ? `<p class="cl-sub" style="margin-top:4px">Objetivo de la empresa: ${objetivo.toFixed(1)} · <strong style="color:${bandaClima(resultado.general, objetivo).color}">${bandaClima(resultado.general, objetivo).label}</strong></p>` : ''}`) : '',
+    V.dimensiones ? sec('Puntaje por dimensión', resultado.dimensiones.map(d => { const dl = (V.comparacion && deltas) ? deltas.find(x => x.dimension === d.dimension) : null; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>${esc(d.dimension)}</span><span>${dl ? `<span style="color:${dl.delta >= 0 ? '#1a7f55' : '#c0392b'};font-size:11px;margin-right:8px">${dl.delta >= 0 ? '▲' : '▼'} ${Math.abs(dl.delta)} vs ${esc(fmtPeriodo(anterior.periodo))}</span>` : ''}<strong>${d.promedio !== null ? d.promedio.toFixed(1) : '—'}</strong></span></div>${d.promedio !== null ? barraClima(d.promedio, objetivo) : ''}</div>`; }).join('')) : '',
+    (V.areas && filasAreas.length) ? sec('Resultado por área', `<table class="cl-tabla"><thead><tr><th>Área</th><th>Respuestas</th><th>Puntaje general</th></tr></thead><tbody>${filasAreas.map(f => `<tr><td>${esc(f.area)}</td><td>${f.n}</td><td><strong>${f.g !== null ? f.g.toFixed(1) : '—'}</strong></td></tr>`).join('')}</tbody></table><p class="cl-nota">Se muestra cada área con al menos ${MIN_RESPUESTAS_ANONIMATO} respuestas.</p>`) : '',
+    (V.lectura && hayLectura) ? sec('Lectura', `${L.funciona.length ? `<div class="cl-bueno"><p class="cl-h3">Lo que funciona y hay que sostener</p><ul>${li(L.funciona)}</ul></div>` : ''}${L.focos.length ? `<div class="cl-foco"><p class="cl-h3">Focos de atención</p><ul>${li(L.focos)}</ul></div>` : ''}${L.comentarios.trim() ? `<p class="cl-h3" style="margin-top:12px">Qué dijeron en los comentarios</p><p style="font-size:14px;line-height:1.55">${esc(L.comentarios.trim())}</p>` : ''}`) : '',
+    (V.plan && planOk.length) ? sec('Plan de acción', `<table class="cl-tabla"><thead><tr><th>Acción</th><th>Responsable</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>${planOk.map(x => `<tr><td>${esc(x.accion)}</td><td>${esc(x.responsable || '')}</td><td>${x.fecha ? fmtDate(x.fecha) : ''}</td><td>${estadoPlanChip(x.estado)}</td></tr>`).join('')}</tbody></table>`) : ''
+  ].filter(Boolean).join('');
+  openModal(`
+    <style>
+      .cl-doc{background:#fff;color:#232A22;padding:10mm 8mm;border-radius:8px}
+      .cl-doc .cl-sec{margin-bottom:22px}
+      .cl-doc h2{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6F8F63;margin:0 0 10px;padding-bottom:5px;border-bottom:1px solid #e3e8df}
+      .cl-doc .cl-big{font-family:'Fraunces',Georgia,serif;font-size:32px;line-height:1.1;margin:0}
+      .cl-doc .cl-sub{font-family:inherit;font-size:13px;color:#6b7468}
+      .cl-doc .cl-h3{font-size:12px;font-weight:700;margin:0 0 6px}
+      .cl-doc ul{margin:0;padding-left:18px;list-style:disc;font-size:14px;line-height:1.55}
+      .cl-doc li{margin-bottom:4px}
+      .cl-doc .cl-bueno{background:#e9f4ec;border-left:3px solid #1a9e6f;border-radius:0 6px 6px 0;padding:10px 14px;margin-bottom:10px}
+      .cl-doc .cl-foco{background:#fdf3d8;border-left:3px solid #c8930a;border-radius:0 6px 6px 0;padding:10px 14px;margin-bottom:10px}
+      .cl-doc .cl-tabla{width:100%;border-collapse:collapse;font-size:13px}
+      .cl-doc .cl-tabla th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6b7468;padding:5px 8px;border-bottom:1px solid #d8ded3}
+      .cl-doc .cl-tabla td{padding:6px 8px;border-bottom:1px solid #eef1ea;vertical-align:top}
+      .cl-doc .cl-nota{font-size:11px;color:#8a9486;margin:8px 0 0}
+      .cl-doc, .cl-doc *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      @media print{#modal{background:#fff!important}.cl-doc{padding:2mm 0}.cl-doc h2{break-after:avoid}.cl-sec{break-inside:avoid}}
+    </style>
+    <div id="informe-print"><div class="cl-doc">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px"><span class="retain-wordmark" style="font-size:20px">re<b>tain</b>.</span><span style="font-weight:700;font-size:14px;text-align:right">${esc(empresa ? empresa.nombre_empresa : '')}</span></div>
+      ${bannerModelo(empresa, 'mb-2')}
+      <p style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#6F8F63;font-weight:700;margin:14px 0 2px">Encuesta de clima</p>
+      <h3 class="font-display" style="font-size:26px;margin:0 0 22px">${esc(fmtPeriodo(c.periodo))}</h3>
+      ${partes || '<p style="font-size:14px;color:#6b7468">Todas las secciones están ocultas.</p>'}
+    </div></div>
+    <div class="flex gap-2 mt-4 no-print">
+      <button onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cerrar</button>
+      <button onclick="editarLecturaClima('${campanaId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">✏️ Editar lectura y secciones</button>
+      <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
+    </div>`);
+}
+function editarLecturaClima(campanaId) {
+  const c = STATE.data.Retain_Pulso_Campanas.find(x => x.id === campanaId); if (!c) return;
+  const L = lecturaClimaDe(c);
+  const base = resultadoClimaDe(c);
+  const sug = [];
+  if (base) {
+    const dims = base.resultado.dimensiones.filter(d => d.promedio !== null).slice().sort((a, b) => b.promedio - a.promedio);
+    dims.slice(0, 3).forEach(d => sug.push({ campo: 'lc-funciona', texto: d.dimension + ' (' + d.promedio.toFixed(1) + ')', rotulo: '+ Funciona: ' + d.dimension + ' ' + d.promedio.toFixed(1) }));
+    dims.slice(-3).reverse().forEach(d => sug.push({ campo: 'lc-focos', texto: d.dimension + ' (' + d.promedio.toFixed(1) + ')', rotulo: '+ Foco: ' + d.dimension + ' ' + d.promedio.toFixed(1) }));
+  }
+  focosDeCheckins(c.empresa_id).forEach(f => sug.push({ campo: 'lc-focos', texto: f.tema + ' (aparece como foco en los check-ins de ' + f.n + ' personas)', rotulo: '+ Foco en check-ins: ' + f.tema + ' (' + f.n + ')' }));
+  window.__lcSug = sug;
+  const ant = climaAnteriorDe(c);
+  window.__lcPend = ant ? lecturaClimaDe(ant).plan.filter(x => x.accion && x.estado !== 'hecho') : [];
+  openModal(`
+    <h3 class="font-display text-xl mb-1">Lectura e informe — ${esc(fmtPeriodo(c.periodo))}</h3>
+    <p class="text-xs text-zinc-500 mb-4">Lo escribís vos, con tus palabras. Lo que dejes vacío o desmarcado no aparece en el informe para la empresa.</p>
+    <form id="f-lectura-clima" class="space-y-4">
+      <div class="card rounded-lg px-3.5 py-3"><p class="text-xs uppercase tracking-wide text-zinc-500 mb-2">Qué muestra el informe</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">${SECCIONES_INFORME_CLIMA.map(([k, l]) => `<label class="flex items-center gap-2 text-sm text-zinc-200"><input type="checkbox" class="lc-vis" data-k="${k}" ${L.visible[k] ? 'checked' : ''}> ${esc(l)}</label>`).join('')}</div></div>
+      ${sug.length ? `<div><p class="text-xs text-zinc-500 mb-1.5">Ideas del panel (tocá para sumar a la lista):</p><div class="flex flex-wrap gap-1.5">${sug.map((x, i) => `<button type="button" onclick="lcSug(${i})" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 text-zinc-300 hover:bg-white/10">${esc(x.rotulo)}</button>`).join('')}</div></div>` : ''}
+      <div><label class="block text-xs text-zinc-400 mb-1">Lo que funciona y hay que sostener <span class="text-zinc-500">(una idea por línea)</span></label><textarea id="lc-funciona" rows="3" class="w-full rounded-lg px-3 py-2 text-sm">${esc(L.funciona.join('\n'))}</textarea></div>
+      <div><label class="block text-xs text-zinc-400 mb-1">Focos de atención <span class="text-zinc-500">(una idea por línea)</span></label><textarea id="lc-focos" rows="3" class="w-full rounded-lg px-3 py-2 text-sm">${esc(L.focos.join('\n'))}</textarea></div>
+      <div><label class="block text-xs text-zinc-400 mb-1">Qué dijeron en los comentarios <span class="text-zinc-500">(síntesis tuya, sin textuales)</span></label><textarea id="lc-coment" rows="3" class="w-full rounded-lg px-3 py-2 text-sm">${esc(L.comentarios)}</textarea></div>
+      <div><div class="flex justify-between items-center mb-1.5"><p class="text-xs text-zinc-400">Plan de acción</p>
+        <span class="text-xs">${window.__lcPend.length ? `<button type="button" onclick="lcTraerPendientes()" class="text-amber-400 hover:text-amber-300 mr-3">Traer ${window.__lcPend.length} pendiente${window.__lcPend.length === 1 ? '' : 's'} del ciclo anterior</button>` : ''}<button type="button" onclick="lcAgregarFila()" class="text-sky-400 hover:text-sky-300">+ Agregar acción</button></span></div>
+        <div id="lc-plan" class="space-y-1.5"></div></div>
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="verInformeClima('${campanaId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
+        <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar y ver informe</button>
+      </div>
+    </form>`);
+  (L.plan.length ? L.plan : [{}, {}]).forEach(x => lcAgregarFila(x));
+  document.getElementById('f-lectura-clima').onsubmit = async (ev) => {
+    ev.preventDefault();
+    const btn = bloquearBoton(ev.target);
+    const lineas = id => document.getElementById(id).value.split('\n').map(t => t.trim()).filter(Boolean);
+    const visible = {}; document.querySelectorAll('.lc-vis').forEach(cb => { visible[cb.dataset.k] = cb.checked; });
+    const plan = Array.from(document.querySelectorAll('.lc-fila')).map(r => ({ accion: r.querySelector('.lc-accion').value.trim(), responsable: r.querySelector('.lc-resp').value.trim(), fecha: r.querySelector('.lc-fecha').value, estado: r.querySelector('.lc-estado').value })).filter(x => x.accion);
+    const lectura = { visible, funciona: lineas('lc-funciona'), focos: lineas('lc-focos'), comentarios: document.getElementById('lc-coment').value.trim(), plan };
+    const r = await api('editar', { sheet: 'Retain_Pulso_Campanas', id: campanaId, patch: { lectura_json: JSON.stringify(lectura) } });
+    if (r.ok) { c.lectura_json = JSON.stringify(lectura); toast('Guardado'); await refreshAndRender(); verInformeClima(campanaId); }
+    else { desbloquearBoton(btn); toast(r.message || 'Error', true); }
+  };
+}
+function lcAgregarFila(x) {
+  x = x || {};
+  document.getElementById('lc-plan').insertAdjacentHTML('beforeend', `
+    <div class="lc-fila grid grid-cols-12 gap-1.5 items-center">
+      <input class="lc-accion col-span-12 rounded-lg px-2.5 py-1.5 text-xs" placeholder="Acción" value="${esc(x.accion || '')}">
+      <input class="lc-resp col-span-5 rounded-lg px-2.5 py-1.5 text-xs" placeholder="Responsable" value="${esc(x.responsable || '')}">
+      <input type="date" class="lc-fecha col-span-4 rounded-lg px-2 py-1.5 text-xs" value="${esc(x.fecha || '')}">
+      <select class="lc-estado col-span-3 rounded-lg px-2 py-1.5 text-xs">${['pendiente', 'en curso', 'hecho'].map(e => `<option value="${e}" ${(x.estado || 'pendiente') === e ? 'selected' : ''}>${e}</option>`).join('')}</select>
+    </div>`);
+}
+function lcSug(i) {
+  const x = (window.__lcSug || [])[i]; if (!x) return;
+  const ta = document.getElementById(x.campo);
+  ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + x.texto;
+}
+function lcTraerPendientes() {
+  const ya = new Set(Array.from(document.querySelectorAll('.lc-accion')).map(i => i.value.trim()));
+  const vacias = Array.from(document.querySelectorAll('.lc-fila')).filter(r => !r.querySelector('.lc-accion').value.trim());
+  vacias.forEach(r => r.remove());
+  (window.__lcPend || []).filter(x => !ya.has(x.accion)).forEach(x => lcAgregarFila(x));
 }
 
 async function generarResumenPulso(campanaId) {
@@ -6808,6 +7362,7 @@ document.getElementById('modal').addEventListener('click', (e) => { if (e.target
   const pulsoMensualEmpresaId = params.get('pulso_mensual');
   const pulsoMensualToken = params.get('t');
   const demoInforme = params.get('demo_informe');
+  const pulsoDemo = params.get('pulso_demo');
   const loginDirecto = params.get('login');
   if (postularId) {
     precargarBusquedasPublicas().then(() => abrirPostulacion(postularId));
@@ -6821,6 +7376,7 @@ document.getElementById('modal').addEventListener('click', (e) => { if (e.target
     abrirPulsoMensual(pulsoMensualEmpresaId, pulsoMensualToken);
     return;
   }
+  if (pulsoDemo) { abrirPulsoDemo(params.get('e') || ''); return; }
   // Informe de muestra para reuniones comerciales — sin login, se puede
   // compartir directo el link .../?demo_informe=1 en una llamada de venta.
   if (demoInforme) {
