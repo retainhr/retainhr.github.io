@@ -2551,6 +2551,7 @@ function checkinsListaHtml(id, empleados, checkins) {
                     ? `<button onclick="verInformesCheckin('${ch.id}')" class="text-xs text-gold-400 hover:text-gold-300">Ver informe${informesCheckin.length>1?'s ('+informesCheckin.length+')':''} →</button>`
                     : tieneContenidoCk(ch) ? `
                       <button onclick="generarInforme('${ch.id}')" class="text-xs text-gold-400 hover:text-gold-300">Generar con IA</button>
+                      <button onclick="copiarParaClaude('${ch.id}')" class="text-xs text-zinc-400 hover:text-white">Copiar para Claude</button>
                       <button onclick="pegarInformeManual('${ch.id}')" class="text-xs text-zinc-400 hover:text-white">Pegar informe</button>
                     ` : ''}
                 `}
@@ -2729,7 +2730,7 @@ function fichaPersonaHtml(id, emp, e) {
       ${estructuraDe(u).temas.length ? `<div class="flex flex-wrap gap-1.5 mb-2">${estructuraDe(u).temas.map(t => `<span class="text-[11px] px-2 py-0.5 rounded-full ${t.tendencia === 'foco de atención' ? 'bg-amber-500/15 text-amber-400' : t.tendencia === 'a favor' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-500/15 text-zinc-400'}">${esc(t.tema)} · ${esc(t.tendencia)}</span>`).join('')}</div>` : ''}
       ${b && b.cambios.length ? `<p class="text-xs text-amber-300 mb-1.5">${b.cambios.map(c => esc(c)).join(' ')}</p>` : ''}
       ${(() => { const qs = estructuraDe(u).acciones.map(a => a.que), ac = b ? b.acuerdos.filter(x => !qs.some(q => x.startsWith(q))) : []; return ac.length ? `<p class="text-xs text-zinc-400 mb-1">Habían quedado en:</p><ul class="list-disc pl-4 text-xs text-zinc-400 space-y-0.5 mb-2">${ac.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''; })()}
-      <div>${btn('Ver notas', `verNotasCheckin('${u.id}')`)}${infU ? btn('Ver informe →', `verInforme('${infU.id}')`, 'text-gold-400 hover:text-gold-300') : ''}</div>
+      <div>${btn('Ver notas', `verNotasCheckin('${u.id}')`)}${infU ? btn('Ver informe →', `verInforme('${infU.id}')`, 'text-gold-400 hover:text-gold-300') : (tieneContenidoCk(u) ? btn('Copiar para Claude', `copiarParaClaude('${u.id}')`, 'text-zinc-400 hover:text-white') + btn('Pegar informe', `pegarInformeManual('${u.id}')`, 'text-zinc-400 hover:text-white') : '')}</div>
     </div>` : `<div class="card rounded-xl p-4 mb-5"><p class="text-sm text-zinc-500">Todavía no tiene check-ins realizados.</p></div>`;
 
   // Acciones acordadas que siguen abiertas
@@ -4045,6 +4046,7 @@ function verNotasCheckin(checkinId) {
         </div>
       </div>
       ${estructuraCamposHtml(ch, false)}
+      <button type="button" onclick="copiarParaClaude('${ch.id}')" class="w-full text-xs py-2 rounded-lg border border-line btn-secondary">📋 Copiar para llevar a mi proyecto de Claude</button>
       <div class="flex gap-2 pt-2">
         <button type="button" onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cerrar</button>
         <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar cambios</button>
@@ -4144,6 +4146,34 @@ function mostrarCargandoInforme() {
 // aparte) y guardarlo directo, sin pasar por "Generar informe con IA" — para
 // cuando esa función esta caida, o simplemente cuando Palomo ya lo escribió/
 // generó por su cuenta y solo quiere que quede guardado en el sistema.
+
+// Plan B (o plan A): llevar el check-in a un proyecto de Claude propio, que arma el informe, y despues pegarlo con "Pegar informe".
+function textoParaClaude(ch) {
+  const e = STATE.data.Retain_Empleados.find(x => x.id === ch.empleado_id) || {};
+  const emp = STATE.data.Retain_Empresas.find(x => x.id === ch.empresa_id) || {};
+  const antig = e.fecha_ingreso_empresa ? Math.floor((Date.now() - new Date(e.fecha_ingreso_empresa).getTime()) / (365.25 * 86400000) * 10) / 10 : null;
+  const est = estructuraDe(ch), enc = txtEncajeCk(ch);
+  const L = ['Check-in para armar el informe', ''];
+  L.push('Empleado: ' + (e.nombre_empleado || '—') + (e.puesto ? ' · Puesto: ' + e.puesto : '') + (e.area ? ' · Área: ' + e.area : '') + (emp.nombre_empresa ? ' · Empresa: ' + emp.nombre_empresa : ''));
+  L.push('HRBP: ' + (ch.realizado_por || '—') + ' · Fecha: ' + (fechaCk(ch) || '—') + (antig != null ? ' · Antigüedad: ' + antig + ' años' : '') + (e.key_talent === 'si' ? ' · Key talent' : '') + (e.rol_critico === 'si' ? ' · Rol crítico' : ''));
+  const datos = [ch.satisfaccion ? 'satisfacción ' + ch.satisfaccion + '/10' : '', ch.riesgo_salida ? 'riesgo de salida ' + ch.riesgo_salida : '', enc ? 'encaje con el rol: ' + enc : ''].filter(Boolean);
+  if (datos.length) L.push('Mi lectura: ' + datos.join(' · '));
+  if (est.temas.length) L.push('Temas: ' + est.temas.map(t => t.tema + ' (' + t.tendencia + ')').join(', '));
+  L.push('');
+  const notas = String(ch.notas_raw || '').trim(), trans = String(ch.transcripcion || '').trim();
+  if (notas) { L.push('NOTAS DEL HRBP (lo que considero más importante; priorizalas):'); L.push(notas); L.push(''); }
+  if (trans) { L.push('TRANSCRIPCIÓN COMPLETA DE LA REUNIÓN:'); L.push(trans); }
+  return L.join('\n').trim();
+}
+function copiarParaClaude(checkinId) {
+  const ch = STATE.data.Retain_Checkins.find(c => c.id === checkinId);
+  if (!ch || !tieneContenidoCk(ch)) { toast('Cargá primero tus notas o la transcripción', true); return; }
+  const txt = textoParaClaude(ch);
+  navigator.clipboard.writeText(txt)
+    .then(() => toast('Copiado. Pegalo en tu proyecto de Claude y después traé el informe con “Pegar informe”'))
+    .catch(() => toast('No se pudo copiar', true));
+}
+
 function pegarInformeManual(checkinId) {
   const ch = STATE.data.Retain_Checkins.find(x => x.id === checkinId);
   if (!ch) return;
@@ -4196,7 +4226,8 @@ async function generarInforme(checkinId) {
       <p class="text-sm text-zinc-500 mb-5">Detalle: ${esc(r.message || 'Error generando informe')}</p>
       <div class="flex gap-2">
         <button onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cerrar</button>
-        <button onclick="pegarInformeManual('${checkinId}')" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Pegar informe manualmente</button>
+        <button onclick="copiarParaClaude('${checkinId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Copiar para Claude</button>
+        <button onclick="pegarInformeManual('${checkinId}')" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Pegar informe</button>
       </div>
     `);
     return;
