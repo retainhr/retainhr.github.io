@@ -691,61 +691,120 @@ const VIDEO_URL = '';
 // El HTML queda en español. Para ver la pagina en ingles se reemplazan los textos por su traduccion (clave = texto exacto en español).
 // Se elige con los botones ES/EN, con ?lang=en en el link, y se recuerda en el navegador.
 const EN = {
-  'Retain, volver arriba': 'Retain, back to top', 'Secciones principales': 'Main sections', 'Idioma': 'Language', 'Abrir menú': 'Open menu', 'Cerrar menú': 'Close menu', 'Alianzas': 'Partners', 'Acceso interno': 'Internal access',
-  'Qué hacemos': 'What we do', 'Cómo trabajamos': 'How we work', 'Por qué Retain': 'Why Retain', 'Contacto': 'Contact', 'Agendá una llamada': 'Book a call',
-  'Quién soy': 'About me', 'Para quién es': "Who it's for", 'Por qué importa': 'Why it matters', 'Qué recibís': 'What you get',
-  'Gestión de personas para pymes y startups.': 'People management for SMEs and startups.',
-  'Sabé cómo está tu equipo y actuá a tiempo.': 'Know how your team is doing and act in time.',
-  'Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa.': 'We listen to your team and tell you what to do, so your people are doing well and grow inside your company.',
-  'Sumar a alguien de Recursos Humanos cuesta mucho más. Retain, desde USD 500 por mes.': 'Hiring someone in Human Resources costs a lot more. Retain, from USD 500 per month.',
-  'Ver video de presentación ↓': 'Watch the intro video ↓', 'Mirá en 2 minutos qué es Retain.': 'See in 2 minutes what Retain is.', 'Mirá en 2 minutos qué es Retain': 'See in 2 minutes what Retain is',
-  'Con quién vas a hablar': "Who you'll talk to", 'Fundador de Retain. Trabajo en Recursos Humanos hace 10 años.': "Founder of Retain. I've worked in Human Resources for 10 years.", 'Ver LinkedIn': 'View LinkedIn',
-  'Lo que escucho de dueños y líderes.': 'What I hear from owners and leaders.',
-  '“Ya no estoy en el día a día de mi gente.”': '“I’m no longer part of my people’s day to day.”', '“¿Cómo está mi gente, de verdad?”': '“How is my team really doing?”', '“¿Por qué se fue, si estaba todo bien?”': '“Why did they leave, if everything seemed fine?”',
-  'Armé Retain para eso.': 'I built Retain for that.',
-  'Pymes y startups.': 'SMEs and startups.', 'Si no tenés área de Recursos Humanos': "If you don't have a Human Resources team", 'Cuidamos el clima y el compromiso de tu equipo, sin que tengas que armar un área.': "We look after your team's climate and commitment, without you having to build a department.",
-  'Si ya tenés a alguien de Recursos Humanos': 'If you already have someone in Human Resources', 'Somos el refuerzo que necesita: sumamos tiempo, método y una mirada externa.': "We're the reinforcement they need: we add time, method and an outside perspective.",
-  'Un equipo que está bien empuja tu negocio. Una salida lo frena.': "A team that's doing well drives your business. A departure slows it down.",
-  'Cuando tu equipo está bien': 'When your team is doing well', 'Trabaja mejor y propone ideas.': 'They work better and come up with ideas.', 'Se pone la camiseta.': "They're committed to the company.", 'Contagia al resto.': 'They lift everyone around them.', 'Crece adentro, y no tenés que salir a buscar afuera.': "They grow from within, so you don't have to look outside.",
-  'Cuando alguien se va': 'When someone leaves', 'Se pierde tiempo y plata.': 'You lose time and money.', 'Se va un compañero, no solo un puesto.': 'You lose a teammate, not just a position.', 'El resto carga con su trabajo.': 'Everyone else picks up their work.', 'Lo que hacía se deja de hacer o se frena.': 'What they did stops getting done or slows down.',
-  'Muchas veces se podía ver venir. Pero nadie lo dijo.': 'Many times you could see it coming. But no one said it.',
-  '¿Qué hacemos?': 'What do we do?', 'Escuchamos a cada persona de tu equipo y miramos cinco cosas:': 'We listen to each person on your team and look at five things:',
-  'Motivación': 'Motivation', 'Relación con el equipo': 'Relationship with the team', 'Liderazgo': 'Leadership', 'Satisfacción con la empresa': 'Satisfaction with the company', 'Sentido de pertenencia': 'Sense of belonging',
-  'Vos, enfocado en el negocio': 'You, focused on the business', 'Nos ocupamos de escuchar a tu equipo y te traemos lo que necesitás saber para decidir.': 'We take care of listening to your team and bring you what you need to know to decide.',
-  'Un equipo que se siente escuchado': 'A team that feels heard', 'Tu gente tiene un espacio real para decir lo que le pasa. Vos sabés qué hace falta para mejorarlo.': "Your people have a real space to say what's going on. You know what it takes to improve it.",
-  'Personas que crecen adentro': 'People who grow from within', 'Vemos qué necesita cada persona para crecer, desde su motivación hasta su relación con el equipo, el líder y la empresa. Y te ayudamos a dárselo.': 'We see what each person needs to grow, from their motivation to their relationship with the team, the leader and the company. And we help you give it to them.',
-  'Tus personas clave, cuidadas': 'Your key people, looked after', 'Hay roles difíciles de reemplazar y personas que valen por lo que aportan. Las seguimos de cerca y, si vemos que algo cambió, te lo decimos.': "Some roles are hard to replace and some people are worth what they bring. We follow them closely and, if we see something change, we tell you.",
-  'Los nuevos ingresos, acompañados': 'New hires, supported', 'Los primeros meses son clave. Te ayudamos a ver temprano si algo no está funcionando.': "The first months are key. We help you see early if something isn't working.",
-  'Cómo trabajamos.': 'How we work.', 'Encuestas de clima y pulso': 'Climate and pulse surveys', 'Para ver tendencias del equipo.': 'To see team trends.',
-  'Check-ins individuales': 'One-on-one check-ins', 'Conversaciones uno a uno con cada persona.': 'One-to-one conversations with each person.',
-  'Devolución con vos': 'Debrief with you', 'Qué está pasando, quién necesita atención y qué hacer.': "What's happening, who needs attention and what to do.",
-  'Seguimiento cercano': 'Close follow-up', 'A las personas clave y los roles críticos.': 'Of key people and critical roles.',
-  'Un informe ejecutivo, claro y accionable.': 'An executive report, clear and actionable.', 'Por persona o consolidado de toda la empresa o de un área. Pensado para leerse en minutos y decidir.': 'Per person, or consolidated for the whole company or one area. Designed to be read in minutes and to decide.',
-  'Panorama general': 'Overall picture', 'Cómo está el equipo en su conjunto.': 'How the team is doing as a whole.', 'Patrones por área': 'Patterns by area', 'Lo que se repite y dónde.': 'What repeats and where.',
-  'Quién necesita atención': 'Who needs attention', 'Fichas puntuales, con el porqué.': 'Specific profiles, with the why.', 'Y lo repasamos juntos.': 'And we go over it together.',
-  'Un costo mensual mucho menor que sumar a alguien a tu equipo: desde USD 500 por mes, o su equivalente en pesos.': 'A monthly cost much lower than adding someone to your team: from USD 500 per month.',
-  'Experiencia desde el primer día: sabemos qué mirar y cómo hacerlo.': 'Experience from day one: we know what to look at and how.', 'Una mirada externa: la gente habla con más libertad.': 'An outside perspective: people speak more freely.',
-  'El valor final depende de la cantidad de personas y de lo que necesite tu empresa.': 'The final price depends on the number of people and what your company needs.',
-  'Primer paso: una llamada de 20 minutos. Te cuento qué es Retain y vemos juntos si es para tu empresa. Sin compromiso.': "First step: a 20-minute call. I'll tell you what Retain is and we'll see together if it's right for your company. No commitment.",
-  'Retain es partner de Humand. Si además de acompañar a tu equipo necesitás una plataforma para la comunicación interna y los procesos de Recursos Humanos, no solo te conectamos: también nos encargamos de la parte administrativa.': "Retain is a Humand partner. If, besides supporting your team, you need a platform for internal communication and Human Resources processes, we don't just connect you: we also take care of the administrative side.",
-  'No alcanza con que se queden. Importa que crezcan, estén motivados y les vaya bien.': "It's not enough for them to stay. What matters is that they grow, stay motivated and do well.",
-  'Escribime directo': 'Write to me directly', 'Lo que te resulte más cómodo: agendá una llamada, escribime por mail o WhatsApp.': 'Whatever is most convenient: book a call, or write to me by email or WhatsApp.',
-  '20 minutos, sin compromiso': '20 minutes, no commitment', 'Mandame un mail': 'Email me', 'Escribime por WhatsApp': 'Message me on WhatsApp',
-  '¿Conocés a alguien a quien le pase esto? Reenviale esta página.': 'Know someone going through this? Forward them this page.',
-  'retain · gestión de personas': 'retain · people management'
+  "Retain, volver arriba": "Retain, back to top",
+  "Secciones principales": "Main sections",
+  "Idioma": "Language",
+  "Abrir menú": "Open menu",
+  "Cerrar menú": "Close menu",
+  "Alianzas": "Partners",
+  "Acceso interno": "Internal access",
+  "Qué hacemos": "What we do",
+  "Cómo trabajamos": "How we work",
+  "Por qué Retain": "Why Retain",
+  "Contacto": "Contact",
+  "Agendá una llamada": "Book a call",
+  "Quién soy": "Who you'll talk to",
+  "Para quién es": "Who it's for",
+  "Por qué importa": "Why it matters",
+  "Qué recibís": "What you get",
+  "Gestión de personas para pymes y startups.": "People support for startups.",
+  "Sabé cómo está tu equipo y actuá a tiempo.": "Know how your team is really doing. Act in time.",
+  "Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa.": "We talk to your team and tell you what to do next, so your people stay engaged and grow with your company.",
+  "Sumar a alguien de Recursos Humanos cuesta mucho más. Retain, desde USD 500 por mes.": "A full-time HR hire costs far more. Retain starts at $500/month.",
+  "Ver video de presentación ↓": "Watch the intro video ↓",
+  "Mirá en 2 minutos qué es Retain.": "See in 2 minutes what Retain is.",
+  "Mirá en 2 minutos qué es Retain": "See in 2 minutes what Retain is",
+  "Con quién vas a hablar": "Who you'll talk to",
+  "Fundador de Retain. Trabajo en Recursos Humanos hace 10 años.": "Founder of Retain. I've been working in HR for 10 years.",
+  "Ver LinkedIn": "View LinkedIn",
+  "Lo que escucho de dueños y líderes.": "What I hear from founders and managers.",
+  "“Ya no estoy en el día a día de mi gente.”": "“I'm not in the day-to-day with my team anymore.”",
+  "“¿Cómo está mi gente, de verdad?”": "“How is my team really doing?”",
+  "“¿Por qué se fue, si estaba todo bien?”": "“Why did they quit? I thought everything was fine.”",
+  "Armé Retain para eso.": "That's why I built Retain.",
+  "Pymes y startups.": "Built for startups.",
+  "Si no tenés área de Recursos Humanos": "No HR yet?",
+  "Cuidamos el clima y el compromiso de tu equipo, sin que tengas que armar un área.": "We keep a close eye on engagement and morale, so you don't have to build an HR function.",
+  "Si ya tenés a alguien de Recursos Humanos": "HR team of one?",
+  "Somos el refuerzo que necesita: sumamos tiempo, método y una mirada externa.": "We're the backup they need: more time, a clear method, and an outside perspective.",
+  "Un equipo que está bien empuja tu negocio. Una salida lo frena.": "A team that's doing well moves your business forward. One departure can stall it.",
+  "Cuando tu equipo está bien": "When your team is doing well",
+  "Trabaja mejor y propone ideas.": "They do better work and bring ideas.",
+  "Se pone la camiseta.": "They take ownership.",
+  "Contagia al resto.": "It rubs off on everyone else.",
+  "Crece adentro, y no tenés que salir a buscar afuera.": "They grow into new roles, so you don't have to hire from outside.",
+  "Cuando alguien se va": "When someone quits",
+  "Se pierde tiempo y plata.": "You lose time and money.",
+  "Se va un compañero, no solo un puesto.": "You lose a teammate, not just a role.",
+  "El resto carga con su trabajo.": "Everyone else picks up the slack.",
+  "Lo que hacía se deja de hacer o se frena.": "Their work stalls or gets dropped.",
+  "Muchas veces se podía ver venir. Pero nadie lo dijo.": "Most of the time, you could have seen it coming. No one said anything.",
+  "¿Qué hacemos?": "What we do",
+  "Escuchamos a cada persona de tu equipo y miramos cinco cosas:": "We talk to everyone on your team and look at five things:",
+  "Motivación": "Motivation",
+  "Relación con el equipo": "Team relationships",
+  "Liderazgo": "Leadership",
+  "Satisfacción con la empresa": "Company satisfaction",
+  "Sentido de pertenencia": "Sense of belonging",
+  "Vos, enfocado en el negocio": "You stay focused on the business",
+  "Nos ocupamos de escuchar a tu equipo y te traemos lo que necesitás saber para decidir.": "We listen to your team and bring you what you need to know to make decisions.",
+  "Un equipo que se siente escuchado": "A team that feels heard",
+  "Tu gente tiene un espacio real para decir lo que le pasa. Vos sabés qué hace falta para mejorarlo.": "Your people get a real space to say what's going on. You find out what it'll take to improve it.",
+  "Personas que crecen adentro": "People who grow with you",
+  "Vemos qué necesita cada persona para crecer, desde su motivación hasta su relación con el equipo, el líder y la empresa. Y te ayudamos a dárselo.": "We look at what each person needs to grow, from their motivation to their relationship with the team, their manager and the company. Then we help you give it to them.",
+  "Tus personas clave, cuidadas": "Your key people, looked after",
+  "Hay roles difíciles de reemplazar y personas que valen por lo que aportan. Las seguimos de cerca y, si vemos que algo cambió, te lo decimos.": "Some roles are hard to replace, and some people are worth a lot for what they bring. We keep a close eye on them and tell you if something changes.",
+  "Los nuevos ingresos, acompañados": "New hires, supported",
+  "Los primeros meses son clave. Te ayudamos a ver temprano si algo no está funcionando.": "The first months matter most. We help you spot early if something isn't working.",
+  "Cómo trabajamos.": "How we work.",
+  "Encuestas de clima y pulso": "Engagement & pulse surveys",
+  "Para ver tendencias del equipo.": "To spot trends across the team.",
+  "Check-ins individuales": "1:1 check-ins",
+  "Conversaciones uno a uno con cada persona.": "One-on-one conversations with each person.",
+  "Devolución con vos": "Debrief with you",
+  "Qué está pasando, quién necesita atención y qué hacer.": "What's going on, who needs attention, and what to do.",
+  "Seguimiento cercano": "Close follow-up",
+  "A las personas clave y los roles críticos.": "With key people and critical roles.",
+  "Un informe ejecutivo, claro y accionable.": "A clear, actionable report.",
+  "Por persona o consolidado de toda la empresa o de un área. Pensado para leerse en minutos y decidir.": "Per person, or rolled up for the whole company or a single team. Built to read in minutes and act on.",
+  "Panorama general": "Big picture",
+  "Cómo está el equipo en su conjunto.": "How the team is doing overall.",
+  "Patrones por área": "Patterns by team",
+  "Lo que se repite y dónde.": "What keeps coming up, and where.",
+  "Quién necesita atención": "Who needs attention",
+  "Fichas puntuales, con el porqué.": "Individual snapshots, with the why.",
+  "Y lo repasamos juntos.": "And we walk through it together.",
+  "Un costo mensual mucho menor que sumar a alguien a tu equipo: desde USD 500 por mes, o su equivalente en pesos.": "Far less than a full-time hire: starting at $500/month.",
+  "Experiencia desde el primer día: sabemos qué mirar y cómo hacerlo.": "Experience from day one: we know what to look for and how.",
+  "Una mirada externa: la gente habla con más libertad.": "An outside perspective: people speak more openly to someone outside the company.",
+  "El valor final depende de la cantidad de personas y de lo que necesite tu empresa.": "Final pricing depends on team size and what your company needs.",
+  "Primer paso: una llamada de 20 minutos. Te cuento qué es Retain y vemos juntos si es para tu empresa. Sin compromiso.": "First step: a 20-minute call. I'll walk you through Retain and we'll see if it's a fit. No commitment.",
+  "No alcanza con que se queden. Importa que crezcan, estén motivados y les vaya bien.": "It's not enough for people to stay. What matters is that they grow, stay motivated, and do well.",
+  "Escribime directo": "Reach out directly",
+  "Lo que te resulte más cómodo: agendá una llamada, escribime por mail o WhatsApp.": "Whatever works best for you: book a call, email me, or message me on WhatsApp.",
+  "20 minutos, sin compromiso": "20 minutes, no commitment",
+  "Mandame un mail": "Email me",
+  "Escribime por WhatsApp": "Message me on WhatsApp",
+  "¿Conocés a alguien a quien le pase esto? Reenviale esta página.": "Know a founder dealing with this? Send them this page.",
+  "retain · gestión de personas": "retain · people support for startups"
 };
 const META_EN = {
-  title: 'Retain — People management for SMEs and startups',
-  description: 'People management for SMEs and startups. We help you know how your team is doing and act in time. From USD 500 per month.',
-  ogTitle: 'Retain — Know how your team is doing and act in time'
+  title: 'Retain — People support for startups',
+  description: 'Know how your team is really doing and act in time. 1:1 check-ins, engagement surveys and hands-on guidance for startups. Starting at $500/month.',
+  ogTitle: 'Retain — Know how your team is really doing. Act in time.',
+  image: 'og-retain-precio-en.png'
 };
 const META_ES = {};
 let idiomaActual = 'es';
 const textoOriginal = new WeakMap();
 function t(es) { return (idiomaActual === 'en' && EN[es]) || es; }
+let alianzasNodo = null, alianzasMarca = null;
 function aplicarIdioma(lang) {
   idiomaActual = lang === 'en' ? 'en' : 'es';
   document.documentElement.lang = idiomaActual;
+  // "Alianzas" (Humand) no aplica en la version en ingles: se saca de la pagina (no solo se oculta) y se vuelve a poner en español.
+  if (idiomaActual === 'en') { const a = document.querySelector('.alliances'); if (a) { alianzasMarca = document.createComment('alianzas'); a.replaceWith(alianzasMarca); alianzasNodo = a; } }
+  else if (alianzasNodo && alianzasMarca && alianzasMarca.parentNode) { alianzasMarca.replaceWith(alianzasNodo); alianzasNodo = null; }
   const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => (n.parentElement && /^(SCRIPT|STYLE)$/.test(n.parentElement.tagName)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
   const nodos = []; while (w.nextNode()) nodos.push(w.currentNode);
   nodos.forEach(n => {
@@ -764,6 +823,11 @@ function aplicarIdioma(lang) {
   metas.forEach(([sel, k]) => { const m = document.querySelector(sel); if (!m) return; if (!m.hasAttribute('data-es')) m.setAttribute('data-es', m.content); m.content = idiomaActual === 'en' ? META_EN[k] : m.getAttribute('data-es'); });
   if (!document.documentElement.hasAttribute('data-es-title')) document.documentElement.setAttribute('data-es-title', document.title);
   document.title = idiomaActual === 'en' ? META_EN.title : document.documentElement.getAttribute('data-es-title');
+  // imagen de vista previa y locale (solo ingles; en español no se agrega nada)
+  ['meta[property="og:image"]', 'meta[name="twitter:image"]'].forEach(sel => { const m = document.querySelector(sel); if (!m) return; if (!m.hasAttribute('data-es')) m.setAttribute('data-es', m.content); m.content = idiomaActual === 'en' ? m.getAttribute('data-es').replace(/og-retain-precio-v2\.png$/, META_EN.image) : m.getAttribute('data-es'); });
+  let loc = document.querySelector('meta[property="og:locale"]');
+  if (idiomaActual === 'en') { if (!loc) { loc = document.createElement('meta'); loc.setAttribute('property', 'og:locale'); loc.setAttribute('data-agregado', '1'); document.head.appendChild(loc); } loc.content = 'en_US'; }
+  else if (loc && loc.hasAttribute('data-agregado')) loc.remove();
   document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === idiomaActual)));
 }
 (function idioma() {
