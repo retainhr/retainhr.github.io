@@ -1031,7 +1031,10 @@ function descargarBackupCSV() {
 // ============================================================
 //  MODAL generico
 // ============================================================
+// Los informes para PDF necesitan mas ancho que un formulario: anchoModal(px) lo agranda para esa ventana (openModal lo vuelve a la normalidad).
+function anchoModal(px) { document.getElementById('modal-content').style.maxWidth = px + 'px'; }
 function openModal(html) {
+  document.getElementById('modal-content').style.maxWidth = '';
   document.getElementById('modal-content').innerHTML = html;
   const m = document.getElementById('modal');
   m.classList.remove('hidden'); m.classList.add('flex');
@@ -2566,7 +2569,8 @@ function informesTabHtml(id, empleados, checkins, informes) {
                 <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
           <h3 class="font-medium">📋 Informes (${informes.length})</h3>
           <div class="flex flex-wrap gap-2">
-            <button onclick="abrirArmarInforme('${id}')" class="text-xs px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">＋ Armar informe</button>
+            <button onclick="abrirInformeEmpresa('${id}')" class="text-xs px-3 py-1.5 rounded-full bg-gold-500/15 text-gold-400 hover:bg-gold-500/25">📄 Informe del equipo (PDF)</button>
+            <button onclick="abrirArmarInforme('${id}')" class="text-xs px-3 py-1.5 rounded-lg border border-line btn-secondary">＋ Armar informe</button>
             ${checkins.some(c => String(c.notas_raw||'').trim()) ? `<button onclick="abrirInformeConsolidado('${id}')" class="text-xs text-gold-400 hover:text-gold-300">📋 Informe consolidado →</button>` : ''}
             ${checkins.some(c => c.tipo === 'salida' && String(c.notas_raw||'').trim()) ? `<button onclick="generarInformeSalidas('${id}')" class="text-xs text-gold-400 hover:text-gold-300">📋 Motivos de salida</button>` : ''}
           </div>
@@ -2837,7 +2841,7 @@ function txtEncajeCk(ck) { const g = estructuraDe(ck).gwc; return ENCAJE.filter(
 
 // Estadisticas de un grupo de personas en una ventana (y en la ventana anterior, para comparar).
 function statsGrupo(personas, v) {
-  const filas = personas.map(e => { const todos = realizadosDe(e.id), en = enRango(todos, v), ant = v.antes ? enRango(todos, v.antes) : []; return { e, en, u: en[en.length - 1] || null, up: ant[ant.length - 1] || null }; });
+  const filas = personas.map(e => { const todos = realizadosDe(e.id), en = enRango(todos, v), ant = v.antes ? enRango(todos, v.antes) : []; const ult = lista => lista.slice().reverse().find(c => c.riesgo_salida) || lista[lista.length - 1] || null; return { e, en, u: ult(en), up: ult(ant) }; });
   const con = filas.filter(f => f.u), conAnt = filas.filter(f => f.up);
   const focos = {};
   con.forEach(f => estructuraDe(f.u).temas.forEach(t => { if (t.tendencia === 'foco de atención') focos[t.tema] = (focos[t.tema] || 0) + 1; }));
@@ -3075,6 +3079,265 @@ function camposSatRiesgoHtml(ch) {
         <div><label class="block text-xs text-zinc-400 mb-1">Riesgo de salida</label>
           <select name="riesgo_salida" class="w-full rounded-lg px-3 py-2 text-sm"><option value="">Sin dato</option>${['bajo', 'medio', 'alto'].map(r => `<option value="${r}" ${ch && ch.riesgo_salida === r ? 'selected' : ''}>${r[0].toUpperCase() + r.slice(1)}</option>`).join('')}</select></div>
       </div>`;
+}
+
+// ============================================================
+//  INFORMES VISUALES (para exportar a PDF): por persona (una pagina) y de la empresa
+//  Estilo "tarjetas": datos fijos en grilla + cuadros de Alerta y Recomendacion; panorama, pulso y clima, encaje y plan de accion.
+// ============================================================
+const CSS_INFORME_VISUAL = `<style>
+  .ip-doc{background:#fff;color:#232A22;padding:10mm 9mm;border-radius:8px;font-family:'Inter',system-ui,sans-serif;}
+  .ip-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px;}
+  .ip-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6F8F63;font-weight:700;margin:16px 0 2px;}
+  .ip-title{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:26px;line-height:1.15;margin:0 0 4px;}
+  .ip-sub{margin:0;color:#55604F;font-size:13.5px;}
+  .ip-card{border:1px solid #D9E0D2;border-radius:14px;padding:22px 24px;margin-top:16px;background:#fff;}
+  .ip-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid #E6EBE0;}
+  .ip-head h2{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:24px;margin:0;}
+  .ip-risk{text-align:right;font-size:13px;color:#55604F;}
+  .ip-chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:99px;margin-left:8px;}
+  .ip-sat{margin-top:6px;font-size:12.5px;}
+  .ip-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 22px;margin-top:18px;}
+  .ip-facts h4,.ip-box h4{margin:0 0 5px;font-size:13.5px;font-weight:700;color:#3B4F35;}
+  .ip-facts p,.ip-box p{margin:0;font-size:13.5px;line-height:1.5;color:#55604F;}
+  .ip-boxes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+  .ip-box{border-radius:8px;padding:14px 16px;}
+  .ip-alert{background:#F8E3E0;} .ip-alert h4{color:#8F3A32;} .ip-alert p{color:#6B2E29;}
+  .ip-reco{background:#E3EADA;} .ip-reco p{color:#232A22;}
+  .ip-enc{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;align-items:center;font-size:12px;color:#55604F;}
+  .ip-pill{display:inline-block;font-size:12px;padding:3px 11px;border-radius:99px;font-weight:600;}
+  .ip-ok{background:#E1F0E7;color:#1a7f55;} .ip-mid{background:#F8EBC8;color:#8A5A00;} .ip-bad{background:#F8E3E0;color:#8F3A32;} .ip-neu{background:#EEF0EA;color:#6b7468;}
+  .ip-foot{margin-top:22px;padding-top:12px;border-top:1px solid #EEF1EA;text-align:center;font-size:11.5px;color:#8a9486;}
+  .ip-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:16px;}
+  .ip-kpi{border:1px solid #D9E0D2;border-radius:12px;padding:14px 16px;background:#fff;}
+  .ip-kpi span{display:block;font-size:12.5px;color:#55604F;}
+  .ip-kpi b{display:block;font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;margin-top:4px;}
+  .ip-sec{margin-top:26px;break-inside:avoid;}
+  .ip-sec > h3{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:20px;margin:0 0 10px;}
+  .ip-tabla{width:100%;border-collapse:collapse;font-size:13px;}
+  .ip-tabla th{text-align:left;font-size:11.5px;color:#55604F;font-weight:700;padding:7px 8px;border-bottom:1px solid #D9E0D2;}
+  .ip-tabla td{padding:8px;border-bottom:1px solid #EEF1EA;vertical-align:top;}
+  .ip-notas{margin:12px 0 0;padding-left:18px;font-size:13px;color:#55604F;line-height:1.55;}
+  .ip-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .ip-small{font-size:12px;color:#8a9486;margin:8px 0 0;}
+  .ip-cierre{font-family:'Fraunces',Georgia,serif;font-size:18px;color:#3B4F35;margin:22px 0 0;}
+  .ip-doc,.ip-doc *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @media (max-width:760px){.ip-facts,.ip-boxes,.ip-2col{grid-template-columns:1fr;}.ip-kpis{grid-template-columns:repeat(2,1fr);}}
+  @media print{#modal{background:#fff!important}.ip-doc{padding:2mm 0}.ip-sec,.ip-card{break-inside:avoid}.ip-sec > h3{break-after:avoid}}
+</style>`;
+const COLOR_RIESGO_IP = { alto: 'ip-bad', medio: 'ip-mid', bajo: 'ip-ok' };
+
+// Primera(s) frase(s) de un texto, hasta ~max caracteres.
+function corto(t, max) {
+  t = String(t || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const frases = t.match(/[^.!?]+[.!?]+(\s|$)/g) || [];
+  let out = '';
+  for (const f of frases) { if ((out + f).length > max) break; out += f; }
+  if (out.trim()) return out.trim();
+  return t.slice(0, max).replace(/\s+\S*$/, '') + '…';
+}
+const FICHA_CAMPOS = [['satisfaccion', 'Satisfacción', ['EXPERIENCIA']], ['manager', 'Relación con el manager', ['RELACION CON MANAGER']], ['equipo', 'Relación con el equipo', ['RELACION CON EQUIPO']],
+  ['carga', 'Carga de trabajo', ['CARGA DE TRABAJO']], ['motivacion', 'Motivación', ['MOTIVACION']], ['desarrollo', 'Desarrollo', ['DESARROLLO']]];
+// Lo que se arma solo a partir del informe de 12 secciones (se puede corregir a mano).
+function fichaAutoDe(inf, ck) {
+  const sec = parsearSeccionesInforme(inf.contenido), datos = {};
+  FICHA_CAMPOS.forEach(([k, , claves]) => { datos[k] = corto(parrafoDeSeccion(buscarSeccionInforme(sec, ...claves)), 170); });
+  const riesgo = ck ? ck.riesgo_salida : '';
+  let alerta = extraerAlertaUrgente(inf.contenido);
+  if (!alerta && (riesgo === 'alto' || riesgo === 'medio')) alerta = corto(parrafoDeSeccion(buscarSeccionInforme(sec, 'RETENCION')), 170);
+  const acuerdos = bulletsDeSeccion(buscarSeccionInforme(sec, 'ACUERDOS', 'PROXIMOS PASOS'));
+  let reco = acuerdos.slice(0, 2).join(' ');
+  if (!reco) reco = corto(parrafoDeSeccion(buscarSeccionInforme(sec, 'INSIGHTS')), 190);
+  return { datos, alerta: corto(alerta, 200), reco: corto(reco, 220) };
+}
+function fichaEditadaDe(inf) { try { return JSON.parse(inf.ficha_json || '{}') || {}; } catch (e) { return {}; } }
+function fichaEfectivaDe(inf, ck) {
+  const auto = fichaAutoDe(inf, ck), ed = fichaEditadaDe(inf);
+  const datos = {}; FICHA_CAMPOS.forEach(([k]) => { datos[k] = (ed.datos && ed.datos[k] !== undefined) ? ed.datos[k] : auto.datos[k]; });
+  return { datos, alerta: ed.alerta !== undefined ? ed.alerta : auto.alerta, reco: ed.reco !== undefined ? ed.reco : auto.reco, ocultarAlerta: !!ed.ocultarAlerta, ocultarEncaje: !!ed.ocultarEncaje, editada: !!inf.ficha_json };
+}
+function abrirInformePersona(informeId) {
+  const inf = STATE.data.Retain_Informes.find(x => x.id === informeId); if (!inf) return;
+  const ck = inf.checkin_id ? STATE.data.Retain_Checkins.find(c => c.id === inf.checkin_id) : null;
+  const e = STATE.data.Retain_Empleados.find(x => x.id === inf.empleado_id) || {};
+  const empresa = STATE.data.Retain_Empresas.find(x => x.id === inf.empresa_id) || {};
+  const F = fichaEfectivaDe(inf, ck);
+  const previo = ck ? realizadosDe(e.id).filter(c => fechaCk(c) < fechaCk(ck)).pop() : null;
+  const riesgo = ck && ck.riesgo_salida, sat = ck && ck.satisfaccion;
+  const enc = ck ? estructuraDe(ck).gwc : {};
+  const chipsEnc = (!F.ocultarEncaje && Object.keys(enc).length) ? `<div class="ip-enc"><b style="color:#3B4F35">Encaje con el rol</b>${ENCAJE.map(([k, et]) => enc[k] ? `<span class="ip-pill ${enc[k] === 'si' ? 'ip-ok' : enc[k] === 'parcial' ? 'ip-mid' : 'ip-bad'}">${et}: ${ETQ_ENCAJE[enc[k]]}</span>` : '').join('')}</div>` : '';
+  const hechos = FICHA_CAMPOS.filter(([k]) => F.datos[k]).map(([k, et]) => `<div><h4>${et}</h4><p>${esc(F.datos[k])}</p></div>`).join('');
+  openModal(`${CSS_INFORME_VISUAL}
+    <div id="informe-print"><div class="ip-doc">
+      <div class="ip-top"><span class="retain-wordmark" style="font-size:20px">re<b>tain</b>.</span><span style="font-weight:700;font-size:14px">${esc(empresa.nombre_empresa || '')}</span></div>
+      ${bannerModelo(empresa, 'mb-1')}
+      <p class="ip-kicker">Informe de check-in</p>
+      <div class="ip-card" style="margin-top:6px">
+        <div class="ip-head">
+          <div><h2>${esc(e.nombre_empleado || '')}</h2><p class="ip-sub">${esc([e.puesto, e.area].filter(Boolean).join(' · '))}${ck ? ' · ' + fmtDate(ck.fecha_realizada || ck.fecha_programada) : ''}</p></div>
+          <div class="ip-risk">${riesgo ? `Riesgo de salida <span class="ip-chip ${COLOR_RIESGO_IP[riesgo] || 'ip-neu'}">${esc(riesgo.toUpperCase())}</span>` : ''}${sat ? `<div class="ip-sat">Satisfacción <b>${esc(sat)}/10</b>${previo && previo.satisfaccion ? ' (antes ' + esc(previo.satisfaccion) + ')' : ''}</div>` : ''}</div>
+        </div>
+        ${hechos ? `<div class="ip-facts">${hechos}</div>` : ''}
+        ${((F.alerta && !F.ocultarAlerta) || F.reco) ? `<div class="ip-boxes">${F.alerta && !F.ocultarAlerta ? `<div class="ip-box ip-alert"><h4>Alerta</h4><p>${esc(F.alerta)}</p></div>` : ''}${F.reco ? `<div class="ip-box ip-reco"><h4>Recomendación</h4><p>${esc(F.reco)}</p></div>` : ''}</div>` : ''}
+        ${chipsEnc}
+      </div>
+      <div class="ip-foot">Preparado por Retain · retainpeople@gmail.com</div>
+    </div></div>
+    <div class="flex gap-2 mt-4 no-print">
+      <button onclick="verInforme('${informeId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">← Volver</button>
+      <button onclick="editarInformePersona('${informeId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">✏️ Editar</button>
+      <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
+    </div>
+    ${F.editada ? `<p class="text-[11px] text-zinc-500 mt-3 text-center no-print">Este texto fue editado a mano. <a href="#" onclick="restablecerInformePersona('${informeId}');return false;" class="underline">Volver al texto automático</a></p>` : ''}`);
+  anchoModal(860);
+}
+function editarInformePersona(informeId) {
+  const inf = STATE.data.Retain_Informes.find(x => x.id === informeId); if (!inf) return;
+  const ck = inf.checkin_id ? STATE.data.Retain_Checkins.find(c => c.id === inf.checkin_id) : null;
+  const F = fichaEfectivaDe(inf, ck);
+  openModal(`
+    <h3 class="font-display text-xl mb-1">Editar el informe de una página</h3>
+    <p class="text-xs text-zinc-500 mb-4">Una frase corta por dato. Lo que dejes vacío no aparece.</p>
+    <form id="f-ficha" class="space-y-3">
+      ${FICHA_CAMPOS.map(([k, et]) => `<div><label class="block text-xs text-zinc-400 mb-1">${et}</label><textarea name="d_${k}" rows="2" class="w-full rounded-lg px-3 py-2 text-sm">${esc(F.datos[k])}</textarea></div>`).join('')}
+      <div><label class="block text-xs text-zinc-400 mb-1">Alerta</label><textarea name="alerta" rows="2" class="w-full rounded-lg px-3 py-2 text-sm">${esc(F.alerta)}</textarea></div>
+      <div><label class="block text-xs text-zinc-400 mb-1">Recomendación</label><textarea name="reco" rows="2" class="w-full rounded-lg px-3 py-2 text-sm">${esc(F.reco)}</textarea></div>
+      <label class="flex items-center gap-2 text-sm text-zinc-200"><input type="checkbox" name="ocultarAlerta" ${F.ocultarAlerta ? 'checked' : ''}> No mostrar la alerta en el PDF</label>
+      <label class="flex items-center gap-2 text-sm text-zinc-200"><input type="checkbox" name="ocultarEncaje" ${F.ocultarEncaje ? 'checked' : ''}> No mostrar el encaje con el rol</label>
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="abrirInformePersona('${informeId}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cancelar</button>
+        <button type="submit" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Guardar y ver</button>
+      </div>
+    </form>`);
+  document.getElementById('f-ficha').onsubmit = async (ev) => {
+    ev.preventDefault();
+    const btn = bloquearBoton(ev.target), fd = new FormData(ev.target), datos = {};
+    FICHA_CAMPOS.forEach(([k]) => { datos[k] = String(fd.get('d_' + k) || '').trim(); });
+    const ficha = { datos, alerta: String(fd.get('alerta') || '').trim(), reco: String(fd.get('reco') || '').trim(), ocultarAlerta: fd.get('ocultarAlerta') === 'on', ocultarEncaje: fd.get('ocultarEncaje') === 'on' };
+    const r = await api('editar', { sheet: 'Retain_Informes', id: informeId, patch: { ficha_json: JSON.stringify(ficha) } });
+    if (r.ok) { inf.ficha_json = JSON.stringify(ficha); toast('Guardado'); await refreshAndRender(); abrirInformePersona(informeId); }
+    else { desbloquearBoton(btn); toast(r.message || 'Error', true); }
+  };
+}
+async function restablecerInformePersona(informeId) {
+  const r = await api('editar', { sheet: 'Retain_Informes', id: informeId, patch: { ficha_json: '' } });
+  if (r.ok) { const inf = STATE.data.Retain_Informes.find(x => x.id === informeId); if (inf) inf.ficha_json = ''; toast('Restablecido'); await refreshAndRender(); abrirInformePersona(informeId); }
+  else toast(r.message || 'Error', true);
+}
+
+// ── Informe de la empresa (o de un area) ──
+function climaUltimoDe(empresaId) {
+  return STATE.data.Retain_Pulso_Campanas.filter(c => c.empresa_id === empresaId && c.estado === 'cerrada' && c.eliminado !== 'si').sort((a, b) => (b.fecha_creacion || '').localeCompare(a.fecha_creacion || ''))[0] || null;
+}
+function pulsoPorMes(empresaId, personasIds) {
+  const resp = STATE.data.Retain_Pulso_Mensual_Respuestas.filter(r => r.empresa_id === empresaId && r.modo === 'corto' && (!personasIds || personasIds.has(r.empleado_id)));
+  const meses = [...new Set(resp.map(r => claveMes(r.mes)))].sort().slice(-4);
+  return meses.map(m => { const rs = resp.filter(r => claveMes(r.mes) === m); const o = { mes: m, n: rs.length }; PULSO_CORTO.filter(p => p.tipo === 'score').forEach(p => { const v = valoresPulsoDe(rs, p.id); o[p.id] = v.length >= MIN_RESPUESTAS_ANONIMATO ? promedioPulso(v) : null; }); return o; });
+}
+function abrirInformeEmpresa(empresaId, area, periodo, secciones) {
+  window.__ie = { empresaId, area: area || '', periodo: periodo || 'trimestre', secciones: secciones || { panorama: true, pulso: true, encaje: true, plan: true } };
+  renderInformeEmpresa();
+}
+function ieCambiar() {
+  const ie = window.__ie;
+  ie.area = document.getElementById('ie-area').value; ie.periodo = document.getElementById('ie-periodo').value;
+  document.querySelectorAll('.ie-sec').forEach(c => { ie.secciones[c.dataset.k] = c.checked; });
+  renderInformeEmpresa();
+}
+function renderInformeEmpresa() {
+  const ie = window.__ie, empresa = STATE.data.Retain_Empresas.find(e => e.id === ie.empresaId) || {};
+  const v = ventanaInforme(ie.periodo), todos = empleadosActivosDe(ie.empresaId);
+  const areas = [...new Set(todos.map(e => e.area).filter(Boolean))].sort();
+  const personas = ie.area ? todos.filter(e => e.area === ie.area) : todos;
+  const st = statsGrupo(personas, v);
+  const S = ie.secciones, partes = [];
+  // ---- Panorama
+  if (S.panorama) {
+    const clave = st.con.filter(f => (f.e.key_talent === 'si' || f.e.rol_critico === 'si') && (f.u.riesgo_salida === 'alto' || f.u.riesgo_salida === 'medio')).length;
+    const enRiesgo = st.con.length ? Math.round((st.riesgo.alto + st.riesgo.medio) / st.con.length * 100) : 0;
+    const areasTabla = ie.area ? [ie.area] : areas;
+    const filasArea = areasTabla.map(ar => { const sa = statsGrupo(personas.filter(e => e.area === ar), v); return { ar, n: sa.total, sa }; });
+    const chip = (n, cl) => `<span class="ip-pill ${n ? cl : 'ip-neu'}" style="min-width:22px;text-align:center">${n}</span>`;
+    const notas = filasArea.filter(f => f.sa.con.length).map(f => {
+      const top = Object.keys(f.sa.focos).sort((a, b) => f.sa.focos[b] - f.sa.focos[a])[0];
+      const nr = f.sa.riesgo.alto + f.sa.riesgo.medio;
+      return nr === 0 ? `${f.ar}: sin señales de riesgo.` : ((top && f.sa.focos[top] >= 2) ? `${f.ar}: lo que más aparece es ${top.toLowerCase()} (${f.sa.focos[top]} de ${f.sa.con.length} personas).` : `${f.ar}: ${nr} persona${nr === 1 ? '' : 's'} en riesgo, sin un tema que se repita.`);
+    });
+    partes.push(`<div class="ip-sec"><h3>Panorama del equipo</h3>
+      <div class="ip-kpis">
+        <div class="ip-kpi"><span>● Riesgo alto</span><b style="color:#8F3A32">${st.riesgo.alto}</b></div>
+        <div class="ip-kpi"><span>● Riesgo medio</span><b style="color:#B27A12">${st.riesgo.medio}</b></div>
+        <div class="ip-kpi"><span>● Riesgo bajo</span><b style="color:#1a7f55">${st.riesgo.bajo}</b></div>
+        <div class="ip-kpi"><span>Equipo en riesgo</span><b>${enRiesgo}%</b></div>
+        <div class="ip-kpi"><span>Personas clave en riesgo</span><b>★ ${clave}</b></div>
+      </div>
+      ${st.total - st.con.length ? `<p class="ip-small">${st.total - st.con.length} de ${st.total} personas todavía sin check-in en el período (${esc(rangoTxt(v))}).</p>` : ''}
+      ${areasTabla.length > 1 || ie.area ? `<table class="ip-tabla" style="margin-top:14px"><thead><tr><th>Por área</th><th>Personas</th><th>Alto</th><th>Medio</th><th>Bajo</th></tr></thead><tbody>${filasArea.map(f => `<tr><td>${esc(f.ar)}</td><td>${f.n}</td><td>${chip(f.sa.riesgo.alto, 'ip-bad')}</td><td>${chip(f.sa.riesgo.medio, 'ip-mid')}</td><td>${chip(f.sa.riesgo.bajo, 'ip-ok')}</td></tr>`).join('')}</tbody></table>` : ''}
+      ${notas.length ? `<ul class="ip-notas">${notas.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}</div>`);
+  }
+  // ---- Pulso y clima
+  if (S.pulso) {
+    const ids = ie.area ? new Set(personas.map(e => e.id)) : null;
+    const pm = pulsoModo(ie.empresaId) === 'corto' ? pulsoPorMes(ie.empresaId, ids) : [];
+    const ult = pm[pm.length - 1], pri = pm.length > 1 ? pm[0] : null;
+    let pulsoHtml = '';
+    if (ult) {
+      const ronda = rondasDe(ie.empresaId).find(r => claveMes(r.periodo) === ult.mes), rs = ronda && !ie.area ? resumenRonda(ronda) : null;
+      const filas = PULSO_CORTO.filter(p => p.tipo === 'score' && ult[p.id] != null).map(p => { const a = ult[p.id], b = pri ? pri[p.id] : null; const mesB = pri ? fmtPeriodo(pri.mes).split(' ')[0].toLowerCase() : ''; const fl = (b == null || a === b) ? '' : (a > b ? ` <span style="color:#1a7f55">▲ ${mesB}: ${b}</span>` : ` <span style="color:#8F3A32">▼ ${mesB}: ${b}</span>`); return `<tr><td>${esc(p.corta)}</td><td style="text-align:right"><span class="ip-pill ${a >= 8 ? 'ip-ok' : a >= 7 ? 'ip-mid' : 'ip-bad'}">${String(a).replace('.', ',')}</span>${fl.replace(/(\d+\.\d)/, m => m.replace('.', ','))}</td></tr>`; }).join('');
+      if (filas) pulsoHtml = `<div><p style="font-weight:700;font-size:14px;margin:0 0 4px">Pulso mensual</p><p class="ip-small" style="margin:0 0 8px">${esc(fmtPeriodo(ult.mes))}${rs ? ': respondieron ' + rs.hechos + ' de ' + rs.total : ''}. Promedio de 0 a 10.</p><table class="ip-tabla"><tbody>${filas}</tbody></table></div>`;
+    }
+    const camp = climaUltimoDe(ie.empresaId), rc = camp ? resultadoClimaDe(camp, ie.area ? [ie.area] : null) : null;
+    let climaHtml = '';
+    if (rc) {
+      const dims = rc.resultado.dimensiones.filter(d => d.promedio !== null).slice().sort((a, b) => b.promedio - a.promedio);
+      const fila = d => `<tr><td>${esc(d.dimension)}</td><td style="text-align:right"><span class="ip-pill ${d.promedio >= 8 ? 'ip-ok' : d.promedio >= 7 ? 'ip-mid' : 'ip-bad'}">${d.promedio.toFixed(1).replace('.', ',')}</span></td></tr>`;
+      const inv = Number(camp.invitados) || 0;
+      climaHtml = `<div><p style="font-weight:700;font-size:14px;margin:0 0 4px">Encuesta de clima · ${esc(fmtPeriodo(camp.periodo))}</p><p class="ip-small" style="margin:0 0 8px">${rc.todas.length}${inv && !ie.area ? ' de ' + inv + ' respondieron' : ' respuestas'} · puntaje general ${rc.resultado.general !== null ? rc.resultado.general.toFixed(1).replace('.', ',') : '—'} de 10</p><table class="ip-tabla"><thead><tr><th colspan="2">Lo más alto</th></tr></thead><tbody>${dims.slice(0, 3).map(fila).join('')}</tbody><thead><tr><th colspan="2" style="padding-top:12px">Lo más bajo</th></tr></thead><tbody>${dims.slice(-3).reverse().map(fila).join('')}</tbody></table></div>`;
+    }
+    if (pulsoHtml || climaHtml) partes.push(`<div class="ip-sec"><h3>Pulso y encuesta de clima</h3><div class="ip-2col">${pulsoHtml}${climaHtml}</div></div>`);
+  }
+  // ---- Encaje persona y puesto
+  if (S.encaje && st.con.some(f => Object.keys(estructuraDe(f.u).gwc).length)) {
+    const pill = v2 => v2 ? `<span class="ip-pill ${v2 === 'si' ? 'ip-ok' : v2 === 'parcial' ? 'ip-mid' : 'ip-bad'}">${v2 === 'si' ? 'Sí' : v2 === 'parcial' ? 'En parte' : 'No'}</span>` : '<span class="ip-pill ip-neu">—</span>';
+    const peso = f => { const g = estructuraDe(f.u).gwc; return ENCAJE.reduce((s, [k]) => s + (g[k] === 'no' ? 10 : g[k] === 'parcial' ? 1 : 0), 0); };
+    const mirar = st.mirar.slice().sort((a, b) => peso(b) - peso(a)).slice(0, 8);
+    partes.push(`<div class="ip-sec"><h3>Encaje persona y puesto</h3>${mirar.length ? `<table class="ip-tabla"><thead><tr><th>Persona</th><th>Entiende</th><th>Quiere</th><th>Puede</th></tr></thead><tbody>${mirar.map(f => { const g = estructuraDe(f.u).gwc; return `<tr><td>${esc(f.e.nombre_empleado)} <span style="color:#8a9486">· ${esc(f.e.area || '')}</span></td><td>${pill(g.sabe)}</td><td>${pill(g.quiere)}</td><td>${pill(g.puede)}</td></tr>`; }).join('')}</tbody></table>
+      <ul class="ip-notas">${mirar.map(f => { const fs = faltasEncaje(f.u), p = fs.find(x => x.valor === 'no') || fs[0]; return `<li><b>${esc(f.e.nombre_empleado.split(' ')[0])}:</b> ${fs.map(x => x.k + ' ' + ETQ_ENCAJE[x.valor]).join(', ')}. ${esc(p ? p.que : '')}</li>`; }).join('')}</ul>` : '<p class="ip-small">Nadie con algo para mirar en el encaje con el rol.</p>'}
+      <p class="ip-small">${st.completos} de ${st.con.length} personas con las tres en sí.</p></div>`);
+  }
+  // ---- Plan de accion y seguimiento
+  if (S.plan) {
+    const ids = new Set(personas.map(e => e.id)), filas = [];
+    STATE.data.Retain_Checkins.filter(c => c.empresa_id === ie.empresaId && c.estado === 'realizado' && c.eliminado !== 'si' && ids.has(c.empleado_id)).forEach(c => {
+      const e = personas.find(x => x.id === c.empleado_id), est = estructuraDe(c);
+      const frases = est.temas.filter(t => t.compartir && t.frase).map(t => t.frase), focos = est.temas.filter(t => t.tendencia === 'foco de atención').map(t => t.tema);
+      est.acciones.forEach(a => { if (a.hecha && !(fechaCk(c) >= v.desde)) return; filas.push({ e, a, pasa: frases.length ? corto(frases.join(' '), 90) : (focos.length ? focos.join(', ') : ''), estado: a.hecha ? 'Hecho' : (a.fecha && daysSince(a.fecha) > 0 ? 'Vencida' : 'Pendiente') }); });
+    });
+    const orden = { Vencida: 0, Pendiente: 1, Hecho: 2 }; filas.sort((a, b) => orden[a.estado] - orden[b.estado] || String(a.a.fecha || '').localeCompare(String(b.a.fecha || '')));
+    const cl = { Hecho: 'ip-ok', Vencida: 'ip-bad', Pendiente: 'ip-neu' };
+    if (filas.length) partes.push(`<div class="ip-sec"><h3>Plan de acción y seguimiento</h3><table class="ip-tabla"><thead><tr><th>Persona</th><th>Qué pasa</th><th>Acción acordada</th><th>Responsable</th><th>Revisión</th><th>Estado</th></tr></thead><tbody>${filas.slice(0, 12).map(f => `<tr><td><b>${esc(f.e.nombre_empleado.split(' ')[0] + ' ' + (f.e.nombre_empleado.split(' ')[1] || '').charAt(0) + '.')}</b></td><td>${esc(f.pasa)}</td><td>${esc(f.a.que)}</td><td>${esc(f.a.quien || '')}</td><td>${f.a.fecha ? esc(fmtDate(f.a.fecha)) : ''}</td><td><span class="ip-pill ${cl[f.estado]}">${f.estado}</span></td></tr>`).join('')}</tbody></table>
+      <p class="ip-cierre">Cada decisión es tuya. Nosotros te acompañamos y medimos si funcionó.</p></div>`);
+  }
+  openModal(`${CSS_INFORME_VISUAL}
+    <div class="no-print card rounded-xl p-3.5 mb-4"><div class="flex flex-wrap gap-3 items-center text-xs">
+      <label class="text-zinc-400">Área <select id="ie-area" onchange="ieCambiar()" class="rounded-lg px-2 py-1.5 text-xs ml-1"><option value="">Toda la empresa</option>${areas.map(a => `<option value="${esc(a)}" ${ie.area === a ? 'selected' : ''}>${esc(a)}</option>`).join('')}</select></label>
+      <label class="text-zinc-400">Período <select id="ie-periodo" onchange="ieCambiar()" class="rounded-lg px-2 py-1.5 text-xs ml-1">${Object.keys(PERIODOS_INFORME).map(k => `<option value="${k}" ${ie.periodo === k ? 'selected' : ''}>${PERIODOS_INFORME[k][0]}</option>`).join('')}</select></label>
+      ${[['panorama', 'Panorama'], ['pulso', 'Pulso y clima'], ['encaje', 'Encaje'], ['plan', 'Plan de acción']].map(([k, l]) => `<label class="flex items-center gap-1 text-zinc-300"><input type="checkbox" class="ie-sec" data-k="${k}" ${S[k] ? 'checked' : ''} onchange="ieCambiar()"> ${l}</label>`).join('')}
+    </div></div>
+    <div id="informe-print"><div class="ip-doc">
+      <div class="ip-top"><span class="retain-wordmark" style="font-size:20px">re<b>tain</b>.</span><span style="font-weight:700;font-size:14px">${esc(empresa.nombre_empresa || '')}</span></div>
+      ${bannerModelo(empresa, 'mb-1')}
+      <p class="ip-kicker">Informe del equipo${ie.area ? ' · ' + esc(ie.area) : ''}</p>
+      <h1 class="ip-title">${esc(empresa.nombre_empresa || '')}</h1><p class="ip-sub">${v.clave === 'todo' ? 'Todo el historial' : esc(v.etiqueta) + ' · ' + esc(rangoTxt(v))}</p>
+      ${partes.join('') || '<p class="ip-small" style="margin-top:20px">No hay datos para mostrar con estas opciones.</p>'}
+      <div class="ip-foot">Preparado por Retain · retainpeople@gmail.com</div>
+    </div></div>
+    <div class="flex gap-2 mt-4 no-print">
+      <button onclick="closeModal()" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">Cerrar</button>
+      <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
+    </div>`);
+  anchoModal(960);
 }
 
 // ── Check-ins estructurados: temas con tendencia, que se puede compartir (con frase tuya), acciones ──
@@ -4387,7 +4650,9 @@ function verInforme(id) {
       <button onclick="editarInformeTexto('${id}')" class="flex-1 text-sm py-2.5 rounded-lg border border-line btn-secondary">✏️ Editar</button>
       <button onclick="window.print()" class="flex-1 btn-primary text-white text-sm py-2.5 rounded-lg">Exportar PDF</button>
     </div>
-    ${INFORMES_LIBRES.includes(String(inf.tipo_informe || '').split(':')[0]) ? '' : `<button onclick="abrirInformeCliente('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Exportar PDF para cliente</button>`}
+    ${INFORMES_LIBRES.includes(String(inf.tipo_informe || '').split(':')[0]) ? '' : (String(inf.tipo_informe || '').split(':')[0] === 'individual' && inf.checkin_id
+      ? `<button onclick="abrirInformePersona('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Informe de una página (PDF)</button><button onclick="abrirInformeCliente('${id}')" class="w-full mt-1 text-xs py-1.5 text-zinc-400 hover:text-white no-print">Versión larga</button>`
+      : `<button onclick="abrirInformeCliente('${id}')" class="w-full mt-2 text-sm py-2.5 rounded-lg border border-line btn-secondary no-print">📄 Exportar PDF para cliente</button>`)}
     <button onclick="eliminarInforme('${id}')" class="w-full mt-3 text-xs text-red-400 hover:text-red-300 no-print">Eliminar informe</button>
     ${(inf.checkin_id && !INFORMES_LIBRES.includes(String(inf.tipo_informe || '').split(':')[0])) ? `<p class="text-[11px] text-zinc-500 mt-3 text-center no-print">¿Necesitás otra versión? <a href="#" onclick="generarInforme('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Regenerar con IA</a> · <a href="#" onclick="pegarInformeManual('${inf.checkin_id}');return false;" class="text-zinc-300 hover:text-white underline">Pegar otra versión</a></p>` : ''}
   `);
