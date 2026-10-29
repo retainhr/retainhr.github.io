@@ -3,931 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retain — Gestión de personas para pymes y startups</title>
-<meta name="description" content="Gestión de personas para pymes y startups. Te ayudamos a saber cómo está tu equipo y a actuar a tiempo. Desde USD 500 por mes.">
-<!-- Vista previa al compartir el link (WhatsApp, LinkedIn, etc.) -->
+<title>Retain — Gestión de personas para startups y pymes</title>
+<meta name="description" content="Gestión de personas para startups y pymes. Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa. Desde USD 500 por mes.">
+<link rel="canonical" href="https://retainhr.github.io/">
+<link rel="alternate" hreflang="es" href="https://retainhr.github.io/">
+<link rel="alternate" hreflang="en" href="https://retainhr.github.io/en/">
+<link rel="alternate" hreflang="x-default" href="https://retainhr.github.io/">
 <meta property="og:title" content="Retain — Sabé cómo está tu equipo y actuá a tiempo">
-<meta property="og:description" content="Gestión de personas para pymes y startups. Te ayudamos a saber cómo está tu equipo y a actuar a tiempo. Desde USD 500 por mes.">
-<meta property="og:image" content="https://retainhr.github.io/og-retain-precio-v2.png">
+<meta property="og:description" content="Gestión de personas para startups y pymes. Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa. Desde USD 500 por mes.">
+<meta property="og:image" content="https://retainhr.github.io/og-retain-v3.png">
 <meta property="og:url" content="https://retainhr.github.io/">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Retain — Sabé cómo está tu equipo y actuá a tiempo">
-<meta name="twitter:description" content="Gestión de personas para pymes y startups. Te ayudamos a saber cómo está tu equipo y a actuar a tiempo. Desde USD 500 por mes.">
-<meta name="twitter:image" content="https://retainhr.github.io/og-retain-precio-v2.png">
-<!-- Favicon: "R" en circulo, generado inline (sin archivo aparte) con los colores de marca. -->
+<meta name="twitter:description" content="Gestión de personas para startups y pymes. Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa. Desde USD 500 por mes.">
+<meta name="twitter:image" content="https://retainhr.github.io/og-retain-v3.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%233B4F35'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='36' font-weight='600' fill='%23F5F6F0' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');if(/[?&]lang=en/.test(location.search))location.replace('en/');</script>
 <style>
-  :root{
-    --bg: #F5F6F0;
-    --bg-alt: #EBEEE3;
-    --ink: #232A22;
-    --ink-soft: #55604F;
-    --line: #D9E0D2;
-    --accent: #6F8F63;
-    --accent-deep: #3B4F35;
-    --card: #FFFFFF;
-    --accent-light: #A9C79D;
-  }
+  :root{--bg:#F5F6F0;--alt:#EBEEE3;--ink:#232A22;--soft:#55604F;--line:#D9E0D2;--green:#6F8F63;--deep:#3B4F35;}
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);color:var(--ink);
-    font-family:'Inter',system-ui,sans-serif;line-height:1.55;
-    -webkit-font-smoothing:antialiased;overflow-x:hidden;
-  }
-  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.15;margin:0;letter-spacing:-0.01em;}
-  a{color:inherit;text-decoration:none;}
-  .crm-hidden{color:inherit;opacity:0.3;padding:6px 10px;margin-left:4px;text-decoration:none;}
-  .crm-hidden:hover{opacity:0.9;}
-  .sticky-cluster{position:fixed;bottom:22px;right:22px;z-index:40;display:flex;flex-direction:column;gap:12px;}
-  .sticky-ic{
-    width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    box-shadow:0 10px 20px -6px rgba(35,42,34,0.35);transition:transform .15s ease,box-shadow .15s ease;
-  }
-  .sticky-ic:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 14px 24px -6px rgba(35,42,34,0.4);}
-  .sticky-ic svg{width:24px;height:24px;}
-  .sticky-wa{background:#25D366;}
-  .sticky-wa svg{width:27px;height:27px;}
-  @media (max-width:560px){.sticky-cluster{bottom:16px;right:16px;gap:10px;}.sticky-ic{width:46px;height:46px;}}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 24px;position:relative;}
-
-  /* NAV */
-  nav{padding:26px 0;position:relative;z-index:10;}
-  nav .wrap{display:flex;justify-content:center;align-items:center;}
-  .logo-lockup{display:flex;align-items:baseline;gap:10px;}
-  .logo{font-family:'Fraunces',serif;font-size:22px;font-weight:600;letter-spacing:-0.01em;}
-  .logo span{color:var(--accent);}
-  .logo-tag{
-    font-size:16px;font-weight:500;text-transform:none;letter-spacing:0;
-    font-family:'Fraunces',serif;color:var(--ink-soft);
-    border-left:1px solid var(--line);padding-left:12px;
-  }
-  .nav-cta{
-    background:var(--ink);color:#fff;border:none;padding:10px 20px;border-radius:100px;
-    font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;
-    transition:transform .15s ease, background .15s ease;
-  }
-  .nav-cta:hover{transform:translateY(-1px);background:var(--accent-deep);}
-
-  /* BARRA FIJA + MENU */
+  body{margin:0;padding-top:68px;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  h1,h2,h3,p,ul,ol{margin:0;}
+  ul,ol{list-style:none;padding:0;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:4px;}
   section[id]{scroll-margin-top:68px;}
-  .topbar{
-    position:fixed;top:0;left:0;right:0;z-index:50;height:60px;
-    background:rgba(245,246,240,0.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--line);
-  }
-  .topbar-in{max-width:1000px;height:100%;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:22px;}
-  .topbar-logo{font-family:'Fraunces',serif;font-weight:600;font-size:23px;letter-spacing:-0.02em;margin-right:auto;}
-  .topbar-logo span{color:var(--accent);}
-  .topbar-links{display:flex;gap:22px;}
-  .topbar-links a{font-size:14px;font-weight:500;color:var(--ink-soft);transition:color .15s ease;}
-  .topbar-links a:hover{color:var(--ink);}
-  .topbar .nav-cta{display:inline-block;white-space:nowrap;}
-  .burger{
-    width:44px;height:44px;border:none;background:transparent;cursor:pointer;border-radius:12px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0;
-  }
-  .burger:hover{background:var(--bg-alt);}
-  .burger span{display:block;width:20px;height:2px;border-radius:2px;background:var(--ink);transition:transform .2s ease,opacity .2s ease;}
-  .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-  .burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
-  .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-  .menu{
-    position:absolute;top:calc(100% + 8px);right:20px;width:270px;padding:8px;
-    background:var(--card);border:1px solid var(--line);border-radius:16px;
-    box-shadow:0 18px 40px -14px rgba(35,42,34,0.35);
-  }
-  .menu[hidden]{display:none;}
-  .menu a{display:block;padding:12px 14px;border-radius:10px;font-size:15px;font-weight:500;color:var(--ink);}
-  .menu a:hover{background:var(--bg-alt);}
-  /* Selector de idioma */
-  .lang{display:inline-flex;border:1px solid var(--line);border-radius:100px;padding:2px;background:var(--card);}
-  .lang button{border:none;background:transparent;font:600 12px 'Inter',sans-serif;color:var(--ink-soft);padding:6px 10px;border-radius:100px;cursor:pointer;letter-spacing:0.04em;}
-  .lang button[aria-pressed="true"]{background:var(--accent-deep);color:#fff;}
-  .menu-lang{display:none;padding:10px 14px 6px;}
-  @media (max-width:860px){.topbar-links{display:none;}}
-  @media (max-width:560px){
-    .topbar-in{padding:0 12px 0 16px;gap:8px;}
-    .topbar .nav-cta{padding:9px 14px;font-size:13px;}
-    .topbar-in > .lang{display:none;}
-    .menu-lang{display:block;}
-    .menu{left:12px;right:12px;width:auto;}
-  }
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
+  em{font-style:italic;font-weight:300;color:var(--deep);}
+  .serif{font-family:'Fraunces',Georgia,serif;}
+  p{max-width:65ch;}
 
-  /* HERO */
-  .hero{padding:132px 0 76px;text-align:center;position:relative;overflow:hidden;}
-  .hero::before{
-    content:"";position:absolute;top:-120px;left:50%;transform:translateX(-50%);
-    width:720px;height:480px;background:radial-gradient(closest-side, rgba(111,143,99,0.18), transparent);
-    pointer-events:none;z-index:0;
+  /* barra fija */
+  .bar{position:fixed;top:0;left:0;right:0;z-index:50;height:68px;background:rgba(245,246,240,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .bar .wrap{height:100%;display:flex;align-items:center;gap:26px;}
+  .logo{font-family:'Fraunces',Georgia,serif;font-size:29px;font-weight:600;letter-spacing:-.02em;text-decoration:none;margin-right:auto;color:var(--ink);}
+  .logo span{color:var(--green);}
+  .bar nav{display:flex;gap:28px;font-size:15px;}
+  .bar nav a{text-decoration:none;color:var(--soft);min-height:44px;display:inline-flex;align-items:center;}
+  .bar nav a:hover{color:var(--ink);}
+  .lang{display:inline-flex;font-size:14px;}
+  .lang a{text-decoration:none;color:var(--soft);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
+  .lang a[aria-current="true"]{color:var(--ink);font-weight:600;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 28px;border-radius:999px;font:500 17px 'Inter',sans-serif;text-decoration:none;background:var(--deep);color:var(--bg);transition:background .2s ease,transform .2s ease;}
+  .btn:hover{background:var(--ink);transform:translateY(-1px);}
+  .btn.sm{min-height:44px;padding:10px 22px;font-size:15px;background:var(--ink);}
+  .btn.sm:hover{background:var(--deep);}
+  .btn.claro{background:var(--bg);color:var(--ink);}
+  .btn.claro:hover{background:#fff;}
+
+  /* hero */
+  .hero{padding:80px 0 104px;}
+  .hero-txt{display:flex;flex-direction:column;gap:26px;max-width:980px;}
+  .eyebrow{font-size:15px;color:var(--soft);letter-spacing:.02em;}
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(46px,7vw,92px);line-height:1.0;letter-spacing:-.03em;text-wrap:balance;}
+  .sub{font-size:20px;color:var(--soft);max-width:30em;}
+  .destacado{font-family:'Fraunces',Georgia,serif;font-size:clamp(23px,2.4vw,28px);line-height:1.3;border-top:1px solid var(--line);padding-top:24px;max-width:22em;}
+  .cta-fila{display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px;}
+  .cta-fila p{font-size:15px;color:var(--soft);max-width:21em;}
+  .cta-fila strong{color:var(--ink);font-weight:600;}
+  .quien{display:flex;flex-wrap:wrap;align-items:center;gap:22px 28px;}
+  .quien img{width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:50% 20%;border:3px solid rgba(245,246,240,.25);display:block;flex:none;}
+  .quien small{display:block;font-size:13px;color:var(--line);text-transform:uppercase;letter-spacing:.08em;}
+  .quien h3{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;margin-top:4px;color:var(--bg);}
+  .quien p{color:var(--line);font-size:16px;margin-top:4px;}
+  .quien .btn{margin-left:auto;}
+  .sep{height:1px;background:rgba(245,246,240,.25);max-width:100%;}
+
+  /* lo que escucho */
+  .escucho{background:var(--deep);color:var(--bg);}
+  .escucho .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:40px;}
+  .escucho .t{font-size:15px;color:var(--line);letter-spacing:.02em;}
+  .q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(32px,4.4vw,58px);line-height:1.1;letter-spacing:-.02em;max-width:19em;}
+  .q + .q{margin-top:22px;}
+  .q2{padding-left:8%;} .q3{padding-left:16%;}
+  .escucho .c{font-size:20px;}
+
+  /* por que importa */
+  .importa .wrap{padding-top:104px;padding-bottom:104px;}
+  h2{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(34px,4.3vw,56px);line-height:1.06;letter-spacing:-.025em;text-wrap:balance;}
+  .importa h2{max-width:16em;}
+  .listas{display:grid;grid-template-columns:1fr 1fr;gap:28px 80px;margin-top:48px;}
+  .lista h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;font-family:'Inter',sans-serif;}
+  .lista.bien h3{color:var(--deep);} .lista.mal h3{color:var(--soft);}
+  .lista li{padding:14px 0;border-top:1px solid var(--line);}
+  .lista.mal li{color:var(--soft);}
+  .importa-c{margin-top:56px;font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;max-width:20em;}
+
+  /* mas que retener */
+  .fit{background:var(--alt);}
+  .fit .wrap{padding-top:104px;padding-bottom:104px;}
+  .fit-top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px 80px;align-items:end;}
+  .fit-top p{color:var(--soft);}
+  .fit-cols{display:grid;grid-template-columns:repeat(3,1fr);margin-top:56px;border-top:1px solid var(--ink);}
+  .fit-col{padding:28px 32px 8px 0;}
+  .fit-col + .fit-col{padding-left:32px;border-left:1px solid var(--line);}
+  .fit-q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(30px,3.2vw,40px);line-height:1.1;}
+  .fit-d{margin-top:12px;font-size:17px;}
+  .fit-n{margin-top:8px;color:var(--soft);font-size:16px;}
+  .fit-n strong{color:var(--deep);font-weight:600;}
+  .fit-c{margin-top:56px;font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;max-width:24em;}
+
+  /* como trabajamos */
+  .como .wrap{padding-top:104px;padding-bottom:104px;}
+  .como-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px 80px;align-items:end;}
+  .como-top p{color:var(--soft);}
+  .pasos{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;}
+  .paso{border-top:1px solid var(--ink);padding:22px 28px 8px 0;}
+  .paso h3{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;}
+  .paso p{margin-top:10px;color:var(--soft);font-size:16px;}
+
+  /* cierre */
+  .cierre{background:var(--ink);color:var(--bg);}
+  .cierre .wrap{padding-top:104px;padding-bottom:40px;}
+  .cierre-top{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:48px 80px;}
+  .cierre h2{font-size:clamp(38px,4.8vw,64px);line-height:1.03;letter-spacing:-.03em;}
+  .cierre h2 em{color:var(--line);}
+  .cierre-p{margin-top:22px;color:var(--line);max-width:28em;}
+  .cierre .cta-fila{margin-top:34px;}
+  .cierre .cta-fila p{color:var(--line);}
+  .cierre .cta-fila strong{color:var(--bg);}
+  .porque h3{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--line);padding-bottom:10px;}
+  .porque li{padding:15px 0;border-top:1px solid rgba(245,246,240,.2);font-size:17px;}
+  .porque li span{color:var(--line);}
+  .canales{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(245,246,240,.25);}
+  .canal{display:flex;flex-direction:column;gap:2px;padding:26px 24px 26px 0;text-decoration:none;min-height:44px;}
+  .canal-l{font-size:13px;color:var(--line);text-transform:uppercase;letter-spacing:.08em;}
+  .canal-v{font-family:'Fraunces',Georgia,serif;font-size:23px;overflow-wrap:anywhere;}
+  .canal:hover .canal-v{text-decoration:underline;text-underline-offset:4px;}
+  .compartir{margin-top:30px;color:var(--line);font-size:16px;}
+  footer{border-top:1px solid rgba(245,246,240,.15);}
+  footer .wrap{padding-top:28px;padding-bottom:36px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:var(--line);}
+  footer .logo{font-size:23px;color:var(--bg);margin:0;}
+  footer .logo span{color:#A9BFA0;}
+  .crm-hidden{color:inherit;opacity:.3;padding:6px 10px;margin-left:4px;text-decoration:none;}
+  .crm-hidden:hover{opacity:.9;}
+
+  /* WhatsApp flotante */
+  .wa{position:fixed;bottom:22px;right:22px;z-index:40;width:52px;height:52px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 20px -6px rgba(35,42,34,.35);transition:transform .15s ease;}
+  .wa:hover{transform:translateY(-2px) scale(1.05);}
+  .wa svg{width:27px;height:27px;}
+
+  /* aparicion suave (solo con JS; se apaga con "reducir movimiento") */
+  .js .reveal{opacity:0;transform:translateY(16px);transition:opacity .8s ease,transform .8s ease;}
+  .js .reveal.in{opacity:1;transform:none;}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}.js .reveal{opacity:1;transform:none;transition:none;}.btn,.wa{transition:none;}}
+
+  @media (max-width:980px){
+    .fit-top,.como-top,.cierre-top{grid-template-columns:1fr;}
+    .quien .btn{margin-left:0;}
+    .pasos{grid-template-columns:1fr 1fr;}
   }
-  .hero .wrap{z-index:1;}
-  .hero h1{font-size:46px;max-width:780px;margin:0 auto;text-wrap:balance;}
-  .eyebrow{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-deep);margin:0 0 16px;}
-  .hero-sub{font-size:19px;color:var(--ink-soft);margin:20px auto 0;max-width:620px;text-wrap:balance;}
-  .hero-highlight{
-    font-family:'Fraunces',serif;font-size:23px;font-weight:600;color:var(--accent-deep);
-    max-width:640px;margin:20px auto 0;line-height:1.3;text-wrap:balance;
+  @media (max-width:860px){
+    .bar nav{display:none;}
+    .fit-cols{grid-template-columns:1fr;}
+    .fit-col,.fit-col + .fit-col{padding:24px 0 12px;border-left:0;border-bottom:1px solid var(--line);}
+    .fit-col:last-child{border-bottom:0;}
+    .listas{grid-template-columns:1fr;}
+    .canales{grid-template-columns:1fr;}
+    .canal{border-bottom:1px solid rgba(245,246,240,.15);}
   }
-  .hero-actions{display:flex;gap:14px;margin-top:0;flex-wrap:wrap;justify-content:center;}
-  .btn-primary{
-    background:linear-gradient(135deg, var(--accent), var(--accent-deep));color:#fff;border:none;padding:17px 32px;border-radius:100px;
-    font-size:15.5px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:0.01em;
-    box-shadow:0 10px 22px -8px rgba(59,79,53,0.5);
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 28px -10px rgba(59,79,53,0.6);}
-  .btn-primary:disabled{opacity:.6;cursor:default;transform:none;box-shadow:none;}
-  .btn-secondary{
-    background:transparent;color:var(--ink);border:1px solid var(--line);padding:16px 30px;border-radius:100px;
-    font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;
-    transition:background .15s ease, transform .15s ease;
-  }
-  .btn-secondary:hover{background:var(--card);transform:translateY(-2px);}
-
-  /* PARA QUE SIRVE */
-  .section-head{text-align:center;max-width:560px;margin:0 auto;}
-  .kicker{
-    display:inline-block;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;
-    color:var(--accent-deep);background:var(--card);border:1px solid var(--line);
-    padding:7px 16px;border-radius:100px;
-  }
-  .section-head h2{font-size:30px;margin-top:14px;}
-  .value-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:48px;max-width:760px;margin-left:auto;margin-right:auto;}
-  .value-card.key{grid-column:1 / -1;background:var(--accent-deep);border-color:var(--accent-deep);color:#fff;padding:30px 34px;}
-  .value-card.key .ic{background:rgba(255,255,255,0.12);color:var(--accent-light);}
-  .value-card.key h3{font-size:20px;}
-  .value-card.key p{color:#E6EDE1;font-size:15.5px;}
-  .value-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;}
-  .value-card .ic{
-    width:42px;height:42px;border-radius:12px;background:var(--bg-alt);
-    display:flex;align-items:center;justify-content:center;margin-bottom:16px;
-    color:var(--accent-deep);
-  }
-  .value-card .ic svg{width:21px;height:21px;}
-  .value-card h3{font-size:17px;margin-bottom:10px;}
-  .value-card p{margin:0;color:var(--ink-soft);font-size:14.5px;}
-
-  /* PARA QUIEN ES (nueva) */
-  .who{padding:76px 0;border-top:1px solid var(--line);background:var(--bg-alt);}
-  .who-grid{
-    display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
-    margin-top:44px;max-width:760px;margin-left:auto;margin-right:auto;
-  }
-  @media (max-width:760px){.who-grid{grid-template-columns:1fr;}}
-
-  /* VIDEO (oculto hasta que VIDEO_URL tenga un link) */
-  .video{padding:72px 0;background:var(--bg-alt);border-top:1px solid var(--line);}
-  .video[hidden]{display:none;}
-  .video-inner{max-width:860px;margin:0 auto;text-align:center;}
-  .video h2{font-size:30px;}
-  .video-frame{
-    position:relative;aspect-ratio:16 / 9;margin-top:28px;border-radius:16px;overflow:hidden;
-    background:#2C3B28;box-shadow:0 18px 40px -18px rgba(0,0,0,0.5);
-  }
-  .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
-
-  /* LO QUE ESCUCHO (nueva) */
-  .heard{padding:84px 0;background:var(--accent-deep);text-align:center;}
-  .heard h2{font-size:21px;font-weight:500;color:var(--accent-light);}
-  .heard-q{font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:30px;line-height:1.3;color:#fff;max-width:720px;margin:26px auto 0;text-wrap:balance;}
-  .heard-person{display:flex;flex-direction:column;align-items:center;}
-  .heard .trust-photo{width:104px;height:104px;border:3px solid rgba(255,255,255,0.25);}
-  .heard-person h3{font-size:26px;color:#fff;}
-  .heard-person p{margin:8px 0 22px;color:#D6E0CC;font-size:16px;}
-  .heard .linkedin-btn{background:#fff;color:var(--ink);}
-  .heard .linkedin-btn svg{fill:var(--ink);}
-  .heard .linkedin-btn:hover{background:var(--accent-light);}
-  .heard-sep{width:64px;height:1px;background:rgba(255,255,255,0.28);margin:48px auto 40px;}
-  .heard h2 + .heard-q{margin-top:26px;}
-  .heard-close{font-size:18px;font-weight:600;color:#E6EDE1;margin:40px 0 0;}
-
-  /* LO QUE ESTA EN JUEGO (reemplaza "El problema") */
-  .stake{padding:84px 0;border-top:1px solid var(--line);}
-  .stake .section-head{max-width:720px;}
-  .stake-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:900px;margin:40px auto 0;}
-  .stake-col{border-radius:20px;padding:32px 34px;}
-  .stake-col h3{font-size:22px;margin-bottom:18px;}
-  .stake-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
-  .stake-col li{position:relative;padding-left:22px;font-size:16px;}
-  .stake-col li::before{content:"";position:absolute;left:0;top:0.6em;width:8px;height:8px;border-radius:50%;}
-  .stake-good{background:var(--accent-deep);color:#fff;}
-  .stake-good li{color:#E6EDE1;}
-  .stake-good li::before{background:var(--accent-light);}
-  .stake-bad{background:var(--card);border:1px solid var(--line);}
-  .stake-bad li{color:var(--ink);}
-  .stake-bad li::before{background:#A7B29F;}
-  .stake-foot{text-align:center;font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--ink-soft);margin:44px 0 0;}
-
-  /* MOMENTOS */
-
-  /* METRICS */
-  .metrics{background:var(--bg-alt);padding:80px 0;border-top:1px solid var(--line);}
-  .metrics-inner{max-width:640px;margin:0 auto;text-align:center;}
-  .metrics h2{font-size:26px;}
-  .metrics p{color:var(--ink-soft);font-size:15.5px;margin-top:16px;}
-  .dim-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:28px;}
-  .dim-chips span{
-    font-size:13px;font-weight:600;color:var(--accent-deep);
-    background:var(--card);border:1px solid var(--line);
-    padding:8px 16px;border-radius:100px;
-  }
-
-  /* POR QUE RETAIN (antes "El punto medio") */
-  .middle{padding:84px 0;border-top:1px solid var(--line);}
-  .middle-card{max-width:640px;margin:36px auto 0;background:var(--accent-deep);color:#fff;border-radius:20px;padding:30px 34px;}
-  .middle-card ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;}
-  .middle-card li{position:relative;padding-left:22px;font-size:16px;color:#E6EDE1;}
-  .middle-card li::before{content:"";position:absolute;left:0;top:0.6em;width:8px;height:8px;border-radius:50%;background:var(--accent-light);}
-  .middle-note{max-width:640px;margin:14px auto 0;text-align:center;font-size:13.5px;color:var(--ink-soft);}
-  .middle-call{max-width:560px;margin:30px auto 0;text-align:center;font-size:16px;color:var(--ink);text-wrap:balance;}
-  .middle-cta{text-align:center;margin-top:20px;}
-
-  /* QUE RECIBIS (nueva) */
-  .deliverable{padding:80px 0;border-top:1px solid var(--line);background:var(--bg-alt);}
-  .deliverable-list{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px;}
-  .deliverable-fine{text-align:center;color:var(--ink-soft);font-size:13.5px;margin-top:28px;}
-  @media (max-width:760px){.deliverable-list{grid-template-columns:1fr;}}
-
-  /* FUNDADOR (dentro de "Lo que escucho") */
-  .trust-photo{
-    width:100px;height:100px;border-radius:50%;background:linear-gradient(145deg, var(--accent), var(--accent-deep));
-    display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Fraunces',serif;font-size:32px;font-weight:600;
-    overflow:hidden;
-  }
-  .trust-photo img{width:100%;height:100%;object-fit:cover;}
-  .trust-kicker{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-light);margin:20px 0 8px;display:block;}
-  .linkedin-btn{
-    display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:100px;
-    padding:12px 20px;font-size:14px;font-weight:600;white-space:nowrap;
-    transition:background .15s ease, transform .15s ease;
-  }
-  .linkedin-btn:hover{background:var(--accent-deep);transform:translateY(-2px);}
-  .linkedin-btn svg{width:16px;height:16px;fill:#fff;}
-
-  /* ALIANZAS -- bloque discreto de contexto, mas chico que las secciones principales */
-  .alliances{padding:48px 0;border-top:1px solid var(--line);background:var(--bg-alt);}
-  .alliances-inner{max-width:560px;margin:0 auto;text-align:center;}
-  .alliance-logo{margin-top:16px;}
-  .alliance-logo img{display:block;width:40px;height:40px;margin:0 auto;border-radius:10px;}
-  .alliances p{color:var(--ink-soft);font-size:14.5px;margin:14px 0 0;text-wrap:balance;}
-
-  /* PERSONAS CORRECTAS (Mas que retener) */
-  .fit{padding:84px 0;border-top:1px solid var(--line);}
-  .fit .section-head{max-width:660px;}
-  .fit .section-head p{color:var(--ink-soft);font-size:16.5px;margin:16px 0 0;text-wrap:balance;}
-  .fit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px;}
-  .fit-grid .value-card{display:flex;flex-direction:column;}
-  .fit-grid .value-card p:not(.fit-if){flex:1;}
-  .fit-grid .fit-if{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line);color:var(--accent-deep);font-size:14.5px;line-height:1.5;min-height:calc(3 * 1.5em + 17px);}   /* reserva 3 lineas: las divisorias quedan a la misma altura en las tres tarjetas */
-  .fit-grid .fit-if strong{font-weight:700;}
-  .fit-line{max-width:680px;margin:34px auto 0;text-align:center;color:var(--ink-soft);font-size:16.5px;text-wrap:balance;}
-  .fit-close{max-width:680px;margin:30px auto 0;text-align:center;font-family:'Fraunces',serif;font-size:26px;font-weight:600;line-height:1.3;color:var(--accent-deep);text-wrap:balance;}
-  @media (max-width:760px){.fit-grid{grid-template-columns:1fr;}.fit-grid .fit-if{min-height:0;}.fit{padding:64px 0;}.fit-close{font-size:22px;}}
-
-  /* FRASE DE CIERRE (manifiesto) */
-  .manifesto{padding:72px 0;background:var(--accent-deep);text-align:center;}
-  .manifesto p{font-family:'Fraunces',serif;font-weight:500;font-size:30px;line-height:1.3;color:#fff;max-width:760px;margin:0 auto;text-wrap:balance;}
-
-  /* CONTACT */
-  .contact{padding:88px 0;border-top:1px solid var(--line);}
-  .contact-grid{max-width:560px;margin:0 auto;text-align:center;}
-  .contact-head h2{font-size:30px;margin-top:14px;}
-  .contact-head p{color:var(--ink-soft);font-size:15.5px;margin-top:14px;}
-  .direct-contact{margin-top:28px;display:flex;flex-direction:column;gap:10px;text-align:left;}
-  .direct-contact a{
-    display:flex;align-items:center;gap:12px;font-size:15px;font-weight:500;color:var(--ink);
-    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;
-    transition:border-color .15s,transform .15s;
-  }
-  .direct-contact a:hover{border-color:var(--accent);transform:translateX(2px);}
-  .direct-contact .ic{
-    width:34px;height:34px;border-radius:50%;background:var(--bg-alt);border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;
-    color:var(--accent-deep);
-  }
-  .direct-contact .ic svg{width:16px;height:16px;}
-  .direct-contact .label{display:flex;flex-direction:column;line-height:1.35;flex:1;}
-  .direct-contact .label small{font-weight:400;color:var(--ink-soft);font-size:13px;}
-  .direct-contact .go{color:var(--accent);font-size:17px;flex-shrink:0;}
-
-  .share-line{margin:26px 0 0;font-size:13.5px;color:var(--ink-soft);}
-
-  footer{background:var(--accent-deep);color:#D6E0CC;padding:32px 0;text-align:center;font-size:13px;}
-
-  /* COMO TRABAJAMOS (reemplaza "Cada equipo necesita algo distinto") */
-  .how{padding:88px 0 80px;text-align:center;border-top:1px solid var(--line);}
-  .how h2{font-size:30px;}
-  .adapt-grid{
-    display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
-    max-width:720px;margin:44px auto 0;text-align:left;
-  }
-  .adapt-grid .value-card{padding:26px;}
-  .ic-num{font-family:'Fraunces',serif;font-size:16px;font-weight:600;}
-  .scroll-cue{
-    display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);
-    font-size:14px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:2px;
-  }
-  .scroll-cue:hover{color:var(--ink);}
-  .scroll-cue[hidden]{display:none;}
-  .hero-actions .scroll-cue{margin-top:32px;}
-
-  @media (max-width:760px){
-    .logo-lockup{flex-wrap:wrap;justify-content:center;row-gap:4px;}
-    .logo-tag{font-size:13px;}
-    .hero h1{font-size:33px;}
-    .hero-sub{font-size:16.5px;}
-    .hero-highlight{font-size:19px;}
-    .value-grid{grid-template-columns:1fr;}
-    .adapt-grid{grid-template-columns:1fr;}
-    .section-head h2{font-size:26px;}
-    .how h2{font-size:26px;}
-    .stake-grid{grid-template-columns:1fr;}
-    .stake,.middle{padding:64px 0;}
-    .video{padding:56px 0;}
-    .video h2{font-size:26px;}
-    .heard{padding:64px 0;}
-    .heard-q{font-size:24px;}
-    .manifesto{padding:56px 0;}
-    .manifesto p{font-size:24px;}
-    .stake-col,.middle-card,.value-card.key{padding:26px;}
-    .stake-foot{font-size:20px;}
+  @media (max-width:600px){
+    body{font-size:17px;}
+    .wrap{padding:0 20px;}
+    .bar .wrap{gap:6px;}
+    .logo{font-size:25px;}
+    .btn.sm{padding:10px 16px;font-size:14px;}
+    .hero{padding:44px 0 72px;}
+    .escucho .wrap,.importa .wrap,.fit .wrap,.como .wrap{padding-top:68px;padding-bottom:68px;}
+    .cierre .wrap{padding-top:72px;}
+    .q2,.q3{padding-left:0;}
+    .pasos{grid-template-columns:1fr;}
+    .wa{width:46px;height:46px;bottom:16px;right:16px;}
   }
 </style>
 </head>
 <body>
 
-<!-- Boton flotante: solo WhatsApp. -->
-<div class="sticky-cluster">
-  <a href="https://wa.me/5491162782243" target="_blank" rel="noopener" class="sticky-ic sticky-wa" aria-label="WhatsApp">
-    <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.2.2-.3.2-.5.1-.2-.1-1-.4-2-1.2-.7-.6-1.2-1.4-1.4-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.2 0-.3 0-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
-  </a>
-</div>
+<a class="wa" href="https://wa.me/5491162782243" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8.9-.2.2-.3.2-.5.1-.2-.1-1-.4-2-1.2-.7-.6-1.2-1.4-1.4-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.2 0-.3 0-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg></a>
 
-<header class="topbar" id="topbar">
-  <div class="topbar-in">
-    <a href="#" class="topbar-logo" aria-label="Retain, volver arriba">re<span>tain</span>.</a>
-    <nav class="topbar-links" aria-label="Secciones principales">
-      <a href="#hacemos">Qué hacemos</a>
-      <a href="#como">Cómo trabajamos</a>
-      <a href="#por-que-retain">Por qué Retain</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-    <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
-    <a href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener" class="nav-cta">Agendá una llamada</a>
-    <button type="button" class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
-  </div>
-  <div class="menu" id="menu" hidden>
-    <a href="#quien-soy">Quién soy</a>
-    <a href="#para-quien">Para quién es</a>
-    <a href="#importa">Por qué importa</a>
-    <a href="#equipo-adecuado">Más que retener</a>
-    <a href="#hacemos">Qué hacemos</a>
-    <a href="#como">Cómo trabajamos</a>
-    <a href="#recibis">Qué recibís</a>
-    <a href="#por-que-retain">Por qué Retain</a>
-    <a href="#contacto">Contacto</a>
-    <div class="menu-lang"><div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div></div>
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="#inicio" aria-label="Retain, volver arriba">re<span>tain.</span></a>
+    <nav aria-label="Principal"><a href="#importa">Por qué importa</a><a href="#como">Cómo trabajamos</a><a href="#contacto">Contacto</a></nav>
+    <span class="lang" role="group" aria-label="Idioma"><a href="#" aria-current="true" lang="es" hreflang="es">ES</a><a href="en/"  lang="en" hreflang="en">EN</a></span>
+    <a class="btn sm" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada</a>
   </div>
 </header>
 
+<main>
 <section class="hero" id="inicio">
   <div class="wrap">
-    <p class="eyebrow">Gestión de personas para pymes y startups.</p>
-    <h1>Sabé cómo está tu equipo y actuá a tiempo.</h1>
-    <p class="hero-sub">Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa.</p>
-    <p class="hero-highlight">Sumar a alguien de Recursos Humanos cuesta mucho más. Retain, desde USD 500 por mes.</p>
-    <div class="hero-actions">
-      <a href="#video" class="scroll-cue" id="hero-video-link" hidden>Ver video de presentación ↓</a>
-    </div>
-  </div>
-</section>
-
-<section class="video" id="video" hidden>
-  <div class="wrap">
-    <div class="video-inner">
-      <h2>Mirá en 2 minutos qué es Retain.</h2>
-      <div class="video-frame">
-        <iframe id="retain-video" title="Mirá en 2 minutos qué es Retain" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <div class="hero-txt reveal">
+      <p class="eyebrow">Gestión de personas para startups y pymes.</p>
+      <h1>Sabé cómo está tu equipo y <em>actuá a tiempo.</em></h1>
+      <p class="sub">Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa.</p>
+      <p class="destacado">Vos, enfocado en tu negocio. <em>Nosotros, en tu equipo.</em></p>
+      <div class="cta-fila">
+        <a class="btn" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada de 20 minutos</a>
+        <p>Pensado para el presupuesto de una startup o una pyme. <strong>Desde USD 500 por mes.</strong></p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="heard" id="quien-soy">
+<section class="escucho">
   <div class="wrap">
-    <div class="heard-person">
-      <div class="trust-photo"><img src="founder-joaquin.jpg" alt="Joaquín González Benegas"></div>
-      <span class="trust-kicker">Con quién vas a hablar</span>
-      <h3>Joaquín González Benegas</h3>
-      <p>Fundador de Retain. Trabajo en Recursos Humanos hace 10 años.</p>
-      <a href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener" class="linkedin-btn">
-        <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
-        Ver LinkedIn
-      </a>
+    <div class="quien reveal">
+      <img src="founder-joaquin.jpg" width="500" height="500" alt="Joaquín González Benegas">
+      <div>
+        <small>Con quién vas a hablar</small>
+        <h3>Joaquín González Benegas</h3>
+        <p>Fundador de Retain. Trabajo en Recursos Humanos hace 10 años.</p>
+      </div>
+      <a class="btn sm claro" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener">Ver LinkedIn →</a>
     </div>
-    <div class="heard-sep"></div>
-    <h2>Lo que escucho de dueños y líderes.</h2>
-    <p class="heard-q">“Ya no estoy en el día a día de mi gente.”</p>
-    <p class="heard-q">“¿Cómo está mi gente, de verdad?”</p>
-    <p class="heard-q">“¿Por qué se fue, si estaba todo bien?”</p>
-    <p class="heard-close">Armé Retain para eso.</p>
+    <div class="sep"></div>
+    <p class="t reveal">Lo que escucho de dueños y líderes.</p>
+    <div><p class="q q1 reveal">“Ya no estoy en el día a día de mi equipo.”</p><p class="q q2 reveal">“¿Cómo está mi equipo, de verdad?”</p><p class="q q3 reveal">“¿Por qué se fue, si estaba todo bien?”</p></div>
+    <p class="c reveal">Armé Retain para eso.</p>
   </div>
 </section>
 
-<section class="who" id="para-quien">
+<section class="importa" id="importa">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Para quién es</span>
-      <h2>Pymes y startups.</h2>
+    <h2 class="reveal">Un equipo que está bien empuja tu negocio. <em>Una salida lo frena.</em></h2>
+    <div class="listas">
+      <div class="lista bien reveal"><h3>Cuando tu equipo está bien</h3><ul><li>Trabaja mejor y propone ideas.</li><li>Se pone la camiseta.</li><li>Contagia al resto.</li><li>Crece adentro, y no tenés que salir a buscar afuera.</li></ul></div>
+      <div class="lista mal reveal"><h3>Cuando alguien se va</h3><ul><li>Se pierde tiempo y plata.</li><li>Se va un compañero, no solo un puesto.</li><li>El resto carga con su trabajo.</li><li>Lo que hacía se deja de hacer o se frena.</li></ul></div>
     </div>
-    <div class="who-grid">
-      <div class="value-card">
-        <h3>Si no tenés área de Recursos Humanos</h3>
-        <p>Cuidamos el clima y el compromiso de tu equipo, sin que tengas que armar un área.</p>
-      </div>
-      <div class="value-card">
-        <h3>Si ya tenés a alguien de Recursos Humanos</h3>
-        <p>Somos el refuerzo que necesita: sumamos tiempo, método y una mirada externa.</p>
-      </div>
-    </div>
+    <p class="importa-c reveal">Muchas veces se podía ver venir. <em>Pero nadie lo dijo.</em></p>
   </div>
 </section>
 
-<section class="stake" id="importa">
+<section class="fit" id="equipo">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Por qué importa</span>
-      <h2>Un equipo que está bien empuja tu negocio. Una salida lo frena.</h2>
+    <div class="fit-top reveal">
+      <h2>Las personas correctas, <em>en el lugar correcto.</em></h2>
+      <p>No se trata de sumar gente. Se trata de que cada persona esté donde mejor aporta.</p>
     </div>
-    <div class="stake-grid">
-      <div class="stake-col stake-good">
-        <h3>Cuando tu equipo está bien</h3>
-        <ul>
-          <li>Trabaja mejor y propone ideas.</li>
-          <li>Se pone la camiseta.</li>
-          <li>Contagia al resto.</li>
-          <li>Crece adentro, y no tenés que salir a buscar afuera.</li>
-        </ul>
-      </div>
-      <div class="stake-col stake-bad">
-        <h3>Cuando alguien se va</h3>
-        <ul>
-          <li>Se pierde tiempo y plata.</li>
-          <li>Se va un compañero, no solo un puesto.</li>
-          <li>El resto carga con su trabajo.</li>
-          <li>Lo que hacía se deja de hacer o se frena.</li>
-        </ul>
-      </div>
-    </div>
-    <p class="stake-foot">Muchas veces se podía ver venir. Pero nadie lo dijo.</p>
+    <div class="fit-cols"><div class="fit-col reveal"><p class="fit-q">¿Lo entiende?</p><p class="fit-d">Tiene claro qué se espera de su puesto y para qué existe.</p><p class="fit-n"><strong>Si no:</strong> falta claridad del rol o del líder.</p></div><div class="fit-col reveal"><p class="fit-q">¿Lo quiere?</p><p class="fit-d">Le gusta lo que hace y quiere hacerlo.</p><p class="fit-n"><strong>Si no:</strong> puede que su lugar sea otro, no necesariamente afuera.</p></div><div class="fit-col reveal"><p class="fit-q">¿Puede?</p><p class="fit-d">Tiene el conocimiento, el tiempo y los recursos para hacerlo bien.</p><p class="fit-n"><strong>Si no:</strong> capacitación, carga de trabajo o herramientas.</p></div></div>
+    <p class="fit-c reveal">Retener es la consecuencia. <em>El objetivo es un equipo que funcione, con gente que quiera ser parte.</em></p>
   </div>
 </section>
 
-<section class="fit" id="equipo-adecuado">
+<section class="como" id="como">
   <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Más que retener</span>
-      <h2>Las personas correctas, en el lugar correcto.</h2>
-      <p>No se trata de sumar gente. Se trata de que cada persona esté donde mejor aporta: que sepa qué tiene que hacer, tenga ganas de hacerlo y pueda hacerlo. Cuando algo no funciona, te ayudamos a ver dónde está el problema.</p>
+    <div class="como-top reveal">
+      <h2>Cómo <em>trabajamos.</em></h2>
+      <p>Escuchamos a cada persona y miramos cinco cosas: motivación, relación con el equipo, liderazgo, satisfacción con la empresa y sentido de pertenencia.</p>
     </div>
-    <div class="fit-grid">
-      <div class="value-card">
-        <div class="ic ic-num">01</div>
-        <h3>¿Lo entiende?</h3>
-        <p>Tiene claro qué se espera de su puesto y para qué existe.</p>
-        <p class="fit-if"><strong>Si no:</strong> falta claridad del rol o del líder.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic ic-num">02</div>
-        <h3>¿Lo quiere?</h3>
-        <p>Le gusta lo que hace y quiere hacerlo.</p>
-        <p class="fit-if"><strong>Si no:</strong> puede que su lugar sea otro, no necesariamente afuera.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic ic-num">03</div>
-        <h3>¿Puede?</h3>
-        <p>Tiene el conocimiento, el tiempo y los recursos para hacerlo bien.</p>
-        <p class="fit-if"><strong>Si no:</strong> capacitación, carga de trabajo o herramientas.</p>
-      </div>
-    </div>
-    <p class="fit-line">A veces la respuesta no es contratar a alguien más. Es aclarar un rol, reacomodar a alguien o darle lo que le falta a quien ya está.</p>
-    <p class="fit-close">Retener es la consecuencia. El objetivo es un equipo que funcione.</p>
+    <ol class="pasos"><li class="paso reveal"><h3>Encuestas de clima y pulso</h3><p>Para ver tendencias del equipo.</p></li><li class="paso reveal"><h3>Check-ins individuales</h3><p>Conversaciones uno a uno con cada persona.</p></li><li class="paso reveal"><h3>Devolución con vos</h3><p>Un informe claro: qué está pasando, quién necesita atención y qué hacer. Y lo repasamos juntos.</p></li><li class="paso reveal"><h3>Seguimiento cercano</h3><p>A las personas clave, los roles críticos y los nuevos ingresos.</p></li></ol>
   </div>
 </section>
 
-<section class="metrics" id="hacemos">
+<section class="cierre" id="contacto">
   <div class="wrap">
-    <div class="metrics-inner">
-      <span class="kicker" style="margin-bottom:16px;">¿Qué hacemos?</span>
-      <p style="font-size:18px;">Escuchamos a cada persona de tu equipo y miramos cinco cosas:</p>
-      <div class="dim-chips">
-        <span>Motivación</span>
-        <span>Relación con el equipo</span>
-        <span>Liderazgo</span>
-        <span>Satisfacción con la empresa</span>
-        <span>Sentido de pertenencia</span>
-      </div>
-    </div>
-    <div class="value-grid">
-      <div class="value-card key">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></div>
-        <h3>Vos, enfocado en el negocio</h3>
-        <p>Nos ocupamos de escuchar a tu equipo y te traemos lo que necesitás saber para decidir.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg></div>
-        <h3>Un equipo que se siente escuchado</h3>
-        <p>Tu gente tiene un espacio real para decir lo que le pasa. Vos sabés qué hace falta para mejorarlo.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V10"/><path d="M12 10c0-3-2-5-5-5 0 3 2 5 5 5z"/><path d="M12 10c0-3 2-5 5-5 0 3-2 5-5 5z"/></svg></div>
-        <h3>Personas que crecen adentro</h3>
-        <p>Vemos qué necesita cada persona para crecer, desde su motivación hasta su relación con el equipo, el líder y la empresa. Y te ayudamos a dárselo.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.3"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg></div>
-        <h3>Tus personas clave, cuidadas</h3>
-        <p>Hay roles difíciles de reemplazar y personas que valen por lo que aportan. Las seguimos de cerca y, si vemos que algo cambió, te lo decimos.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.4"/><path d="M3 20c0-3.8 2.9-6.2 6.5-6.2s6.5 2.4 6.5 6.2"/><path d="M19 6v6"/><path d="M16 9h6"/></svg></div>
-        <h3>Los nuevos ingresos, acompañados</h3>
-        <p>Los primeros meses son clave. Te ayudamos a ver temprano si algo no está funcionando.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="how" id="como">
-  <div class="wrap">
-    <h2>Cómo trabajamos.</h2>
-    <div class="adapt-grid">
-      <div class="value-card">
-        <div class="ic ic-num">01</div>
-        <h3>Encuestas de clima y pulso</h3>
-        <p>Para ver tendencias del equipo.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic ic-num">02</div>
-        <h3>Check-ins individuales</h3>
-        <p>Conversaciones uno a uno con cada persona.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic ic-num">03</div>
-        <h3>Devolución con vos</h3>
-        <p>Qué está pasando, quién necesita atención y qué hacer.</p>
-      </div>
-      <div class="value-card">
-        <div class="ic ic-num">04</div>
-        <h3>Seguimiento cercano</h3>
-        <p>A las personas clave y los roles críticos.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="deliverable" id="recibis">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Qué recibís</span>
-      <h2>Un informe ejecutivo, claro y accionable.</h2>
-      <p>Por persona o consolidado de toda la empresa o de un área. Pensado para leerse en minutos y decidir.</p>
-    </div>
-    <div class="deliverable-list">
-      <div class="value-card">
-        <h3>Panorama general</h3>
-        <p>Cómo está el equipo en su conjunto.</p>
-      </div>
-      <div class="value-card">
-        <h3>Patrones por área</h3>
-        <p>Lo que se repite y dónde.</p>
-      </div>
-      <div class="value-card">
-        <h3>Quién necesita atención</h3>
-        <p>Fichas puntuales, con el porqué.</p>
-      </div>
-    </div>
-    <p class="deliverable-fine">Y lo repasamos juntos.</p>
-  </div>
-</section>
-
-<section class="middle" id="por-que-retain">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="kicker">Por qué Retain</span>
-    </div>
-    <div class="middle-card">
-      <ul>
-        <li>Un costo mensual mucho menor que sumar a alguien a tu equipo: desde USD 500 por mes, o su equivalente en pesos.</li>
-        <li>Experiencia desde el primer día: sabemos qué mirar y cómo hacerlo.</li>
-        <li>Una mirada externa: la gente habla con más libertad.</li>
-        <li>Un aliado para decidir sobre tu equipo, no para sumar gente por sumar.</li>
-      </ul>
-    </div>
-    <p class="middle-note">El valor final depende de la cantidad de personas y de lo que necesite tu empresa.</p>
-    <p class="middle-call">Primer paso: una llamada de 20 minutos. Te cuento qué es Retain y vemos juntos si es para tu empresa. Sin compromiso.</p>
-    <div class="middle-cta">
-      <a href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener"><button class="btn-primary">Agendá una llamada</button></a>
-    </div>
-  </div>
-</section>
-
-<section class="alliances" aria-label="Alianzas">
-  <div class="wrap">
-    <div class="alliances-inner">
-      <span class="kicker">Alianzas</span>
-      <div class="alliance-logo"><img src="humand-logo.jpg" alt="Humand" width="40" height="40" loading="lazy" decoding="async"></div>
-      <p>Retain es partner de Humand. Si además de acompañar a tu equipo necesitás una plataforma para la comunicación interna y los procesos de Recursos Humanos, no solo te conectamos: también nos encargamos de la parte administrativa.</p>
-    </div>
-  </div>
-</section>
-
-<section class="manifesto">
-  <div class="wrap">
-    <p>No alcanza con que se queden. Importa que crezcan, estén motivados y les vaya bien.</p>
-  </div>
-</section>
-
-<section class="contact" id="contacto">
-  <div class="wrap">
-    <div class="contact-grid">
-      <div class="contact-head">
-        <span class="kicker">Contacto</span>
-        <h2>Escribime directo</h2>
-        <p>Lo que te resulte más cómodo: agendá una llamada, escribime por mail o WhatsApp.</p>
-        <!-- Mail, telefono y LinkedIn son los reales de Palomo (confirmados). -->
-        <div class="direct-contact">
-          <a href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">
-            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><line x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="3" x2="8" y2="6.5"/><line x1="16" y1="3" x2="16" y2="6.5"/></svg></span>
-            <span class="label">Agendá una llamada<small>20 minutos, sin compromiso</small></span>
-            <span class="go">→</span>
-          </a>
-          <a href="mailto:retainpeople@gmail.com">
-            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 6.5l8 6.5 8-6.5"/></svg></span>
-            <span class="label">Mandame un mail<small>retainpeople@gmail.com</small></span>
-            <span class="go">→</span>
-          </a>
-          <a href="https://wa.me/5491162782243" target="_blank" rel="noopener">
-            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>
-            <span class="label">Escribime por WhatsApp<small>+54 11 6278-2243</small></span>
-            <span class="go">→</span>
-          </a>
-          <a href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener">
-            <span class="ic">in</span>
-            <span class="label">LinkedIn<small>linkedin.com/in/joaquingbenegas</small></span>
-            <span class="go">→</span>
-          </a>
+    <div class="cierre-top">
+      <div class="reveal">
+        <h2>Primer paso: <em>una llamada de 20 minutos.</em></h2>
+        <p class="cierre-p">Te cuento qué es Retain y vemos juntos si es para tu empresa. Sin compromiso.</p>
+        <div class="cta-fila">
+          <a class="btn claro" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada</a>
+          <p><strong>Desde USD 500 por mes</strong>, o su equivalente en pesos. El valor final depende de la cantidad de personas y de lo que necesite tu empresa.</p>
         </div>
-        <p class="share-line">¿Conocés a alguien a quien le pase esto? Reenviale esta página.</p>
       </div>
+      <div class="porque reveal"><h3>Por qué Retain</h3><ul><li><strong>Experiencia desde el primer día.</strong> <span>Sabemos qué mirar y cómo hacerlo.</span></li><li><strong>Una mirada externa.</strong> <span>La gente habla con más libertad.</span></li><li><strong>Un aliado para decidir sobre tu equipo,</strong> <span>no para sumar gente por sumar.</span></li><li><strong>¿Ya tenés a alguien de Recursos Humanos?</strong> <span>Somos su refuerzo, no su reemplazo.</span></li></ul></div>
     </div>
+    <div class="canales reveal"><a class="canal" href="mailto:retainpeople@gmail.com"><span class="canal-l">Mail</span><span class="canal-v">retainpeople@gmail.com →</span></a><a class="canal" href="https://wa.me/5491162782243" target="_blank" rel="noopener"><span class="canal-l">WhatsApp</span><span class="canal-v">+54 11 6278-2243 →</span></a><a class="canal" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener"><span class="canal-l">LinkedIn</span><span class="canal-v">joaquingbenegas →</span></a></div>
+    <p class="compartir">¿Conocés a alguien a quien le pase esto? Reenviale esta página.</p>
   </div>
+  <footer>
+    <div class="wrap">
+      <span class="logo">re<span>tain.</span></span>
+      <span>Gestión de personas para startups y pymes. <a href="panel.html?login=1" class="crm-hidden" aria-label="Acceso interno">•</a></span>
+    </div>
+  </footer>
 </section>
-
-<footer>
-  retain · gestión de personas <a href="panel.html?login=1" class="crm-hidden" aria-label="Acceso interno">•</a>
-</footer>
+</main>
 
 <script>
-// ---- VIDEO -----------------------------------------------------------------
-// Pegá acá el link del video (YouTube, Vimeo o Loom; sirve el link normal para compartir).
-// Si queda vacío, la sección "Mirá en 2 minutos qué es Retain." no se muestra.
-const VIDEO_URL = '';
-
-(function mostrarVideo() {
-  if (!VIDEO_URL.trim()) return;
-  const sec = document.getElementById('video');
-  const frame = document.getElementById('retain-video');
-  if (!sec || !frame) return;
-  function aEmbed(u) {
-    try {
-      const x = new URL(u.trim());
-      const h = x.hostname.replace(/^www\./, '');
-      let id = null;
-      if (h === 'youtu.be') id = x.pathname.slice(1);
-      else if (h.endsWith('youtube.com') || h.endsWith('youtube-nocookie.com')) {
-        if (x.pathname === '/watch') id = x.searchParams.get('v');
-        else { const m = x.pathname.match(/^\/(?:embed|shorts|live)\/([\w-]+)/); id = m && m[1]; }
-      }
-      if (id) return 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0';
-      if (h === 'vimeo.com') {
-        const m = x.pathname.match(/^\/(\d+)(?:\/(\w+))?/);
-        if (m) return 'https://player.vimeo.com/video/' + m[1] + (m[2] ? '?h=' + m[2] : '');
-      }
-      if (h === 'loom.com') {
-        const m = x.pathname.match(/^\/(?:share|embed)\/(\w+)/);
-        if (m) return 'https://www.loom.com/embed/' + m[1];
-      }
-    } catch (e) { /* si no es una URL valida, se usa tal cual */ }
-    return u.trim();
-  }
-  frame.src = aEmbed(VIDEO_URL);   // sin autoplay
-  sec.hidden = false;
-  const cue = document.getElementById('hero-video-link');
-  if (cue) cue.hidden = false;
-})();
-
-
-// ---- IDIOMA (ES / EN) --------------------------------------------------------
-// El HTML queda en español. Para ver la pagina en ingles se reemplazan los textos por su traduccion (clave = texto exacto en español).
-// Se elige con los botones ES/EN, con ?lang=en en el link, y se recuerda en el navegador.
-const EN = {
-  "Retain, volver arriba": "Retain, back to top",
-  "Secciones principales": "Main sections",
-  "Idioma": "Language",
-  "Abrir menú": "Open menu",
-  "Cerrar menú": "Close menu",
-  "Alianzas": "Partners",
-  "Acceso interno": "Internal access",
-  "Qué hacemos": "What we do",
-  "Cómo trabajamos": "How we work",
-  "Por qué Retain": "Why Retain",
-  "Contacto": "Contact",
-  "Agendá una llamada": "Book a call",
-  "Quién soy": "Who you'll talk to",
-  "Para quién es": "Who it's for",
-  "Por qué importa": "Why it matters",
-  "Qué recibís": "What you get",
-  "Gestión de personas para pymes y startups.": "People support for startups.",
-  "Sabé cómo está tu equipo y actuá a tiempo.": "Know how your team is really doing. Act in time.",
-  "Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa.": "We talk to your team and tell you what to do next, so your people stay engaged and grow with your company.",
-  "Sumar a alguien de Recursos Humanos cuesta mucho más. Retain, desde USD 500 por mes.": "A full-time HR hire costs far more. Retain starts at $500/month.",
-  "Ver video de presentación ↓": "Watch the intro video ↓",
-  "Mirá en 2 minutos qué es Retain.": "See in 2 minutes what Retain is.",
-  "Mirá en 2 minutos qué es Retain": "See in 2 minutes what Retain is",
-  "Con quién vas a hablar": "Who you'll talk to",
-  "Fundador de Retain. Trabajo en Recursos Humanos hace 10 años.": "Founder of Retain. I've been working in HR for 10 years.",
-  "Ver LinkedIn": "View LinkedIn",
-  "Lo que escucho de dueños y líderes.": "What I hear from founders and managers.",
-  "“Ya no estoy en el día a día de mi gente.”": "“I'm not in the day-to-day with my team anymore.”",
-  "“¿Cómo está mi gente, de verdad?”": "“How is my team really doing?”",
-  "“¿Por qué se fue, si estaba todo bien?”": "“Why did they quit? I thought everything was fine.”",
-  "Armé Retain para eso.": "That's why I built Retain.",
-  "Pymes y startups.": "Built for startups.",
-  "Si no tenés área de Recursos Humanos": "No HR yet?",
-  "Cuidamos el clima y el compromiso de tu equipo, sin que tengas que armar un área.": "We keep a close eye on engagement and morale, so you don't have to build an HR function.",
-  "Si ya tenés a alguien de Recursos Humanos": "HR team of one?",
-  "Somos el refuerzo que necesita: sumamos tiempo, método y una mirada externa.": "We're the backup they need: more time, a clear method, and an outside perspective.",
-  "Un equipo que está bien empuja tu negocio. Una salida lo frena.": "A team that's doing well moves your business forward. One departure can stall it.",
-  "Cuando tu equipo está bien": "When your team is doing well",
-  "Trabaja mejor y propone ideas.": "They do better work and bring ideas.",
-  "Se pone la camiseta.": "They take ownership.",
-  "Contagia al resto.": "It rubs off on everyone else.",
-  "Crece adentro, y no tenés que salir a buscar afuera.": "They grow into new roles, so you don't have to hire from outside.",
-  "Cuando alguien se va": "When someone quits",
-  "Se pierde tiempo y plata.": "You lose time and money.",
-  "Se va un compañero, no solo un puesto.": "You lose a teammate, not just a role.",
-  "El resto carga con su trabajo.": "Everyone else picks up the slack.",
-  "Lo que hacía se deja de hacer o se frena.": "Their work stalls or gets dropped.",
-  "Muchas veces se podía ver venir. Pero nadie lo dijo.": "Most of the time, you could have seen it coming. No one said anything.",
-  "¿Qué hacemos?": "What we do",
-  "Escuchamos a cada persona de tu equipo y miramos cinco cosas:": "We talk to everyone on your team and look at five things:",
-  "Motivación": "Motivation",
-  "Relación con el equipo": "Team relationships",
-  "Liderazgo": "Leadership",
-  "Satisfacción con la empresa": "Company satisfaction",
-  "Sentido de pertenencia": "Sense of belonging",
-  "Vos, enfocado en el negocio": "You stay focused on the business",
-  "Nos ocupamos de escuchar a tu equipo y te traemos lo que necesitás saber para decidir.": "We listen to your team and bring you what you need to know to make decisions.",
-  "Un equipo que se siente escuchado": "A team that feels heard",
-  "Tu gente tiene un espacio real para decir lo que le pasa. Vos sabés qué hace falta para mejorarlo.": "Your people get a real space to say what's going on. You find out what it'll take to improve it.",
-  "Personas que crecen adentro": "People who grow with you",
-  "Vemos qué necesita cada persona para crecer, desde su motivación hasta su relación con el equipo, el líder y la empresa. Y te ayudamos a dárselo.": "We look at what each person needs to grow, from their motivation to their relationship with the team, their manager and the company. Then we help you give it to them.",
-  "Tus personas clave, cuidadas": "Your key people, looked after",
-  "Hay roles difíciles de reemplazar y personas que valen por lo que aportan. Las seguimos de cerca y, si vemos que algo cambió, te lo decimos.": "Some roles are hard to replace, and some people are worth a lot for what they bring. We keep a close eye on them and tell you if something changes.",
-  "Los nuevos ingresos, acompañados": "New hires, supported",
-  "Los primeros meses son clave. Te ayudamos a ver temprano si algo no está funcionando.": "The first months matter most. We help you spot early if something isn't working.",
-  "Cómo trabajamos.": "How we work.",
-  "Encuestas de clima y pulso": "Engagement & pulse surveys",
-  "Para ver tendencias del equipo.": "To spot trends across the team.",
-  "Check-ins individuales": "1:1 check-ins",
-  "Conversaciones uno a uno con cada persona.": "One-on-one conversations with each person.",
-  "Devolución con vos": "Debrief with you",
-  "Qué está pasando, quién necesita atención y qué hacer.": "What's going on, who needs attention, and what to do.",
-  "Seguimiento cercano": "Close follow-up",
-  "A las personas clave y los roles críticos.": "With key people and critical roles.",
-  "Un informe ejecutivo, claro y accionable.": "A clear, actionable report.",
-  "Por persona o consolidado de toda la empresa o de un área. Pensado para leerse en minutos y decidir.": "Per person, or rolled up for the whole company or a single team. Built to read in minutes and act on.",
-  "Panorama general": "Big picture",
-  "Cómo está el equipo en su conjunto.": "How the team is doing overall.",
-  "Patrones por área": "Patterns by team",
-  "Lo que se repite y dónde.": "What keeps coming up, and where.",
-  "Quién necesita atención": "Who needs attention",
-  "Fichas puntuales, con el porqué.": "Individual snapshots, with the why.",
-  "Y lo repasamos juntos.": "And we walk through it together.",
-  "Un costo mensual mucho menor que sumar a alguien a tu equipo: desde USD 500 por mes, o su equivalente en pesos.": "Far less than a full-time hire: starting at $500/month.",
-  "Experiencia desde el primer día: sabemos qué mirar y cómo hacerlo.": "Experience from day one: we know what to look for and how.",
-  "Una mirada externa: la gente habla con más libertad.": "An outside perspective: people speak more openly to someone outside the company.",
-  "El valor final depende de la cantidad de personas y de lo que necesite tu empresa.": "Final pricing depends on team size and what your company needs.",
-  "Primer paso: una llamada de 20 minutos. Te cuento qué es Retain y vemos juntos si es para tu empresa. Sin compromiso.": "First step: a 20-minute call. I'll walk you through Retain and we'll see if it's a fit. No commitment.",
-  "No alcanza con que se queden. Importa que crezcan, estén motivados y les vaya bien.": "It's not enough for people to stay. What matters is that they grow, stay motivated, and do well.",
-  "Escribime directo": "Reach out directly",
-  "Lo que te resulte más cómodo: agendá una llamada, escribime por mail o WhatsApp.": "Whatever works best for you: book a call, email me, or message me on WhatsApp.",
-  "20 minutos, sin compromiso": "20 minutes, no commitment",
-  "Mandame un mail": "Email me",
-  "Escribime por WhatsApp": "Message me on WhatsApp",
-  "¿Conocés a alguien a quien le pase esto? Reenviale esta página.": "Know a founder dealing with this? Send them this page.",
-  "retain · gestión de personas": "retain · people support for startups",
-  "Más que retener": "Beyond retention",
-  "Las personas correctas, en el lugar correcto.": "The right people in the right seats.",
-  "No se trata de sumar gente. Se trata de que cada persona esté donde mejor aporta: que sepa qué tiene que hacer, tenga ganas de hacerlo y pueda hacerlo. Cuando algo no funciona, te ayudamos a ver dónde está el problema.": "It's not about adding headcount. It's about everyone being where they add the most: knowing what's expected, wanting to do it, and being able to do it. When something isn't working, we help you find where the problem is.",
-  "¿Lo entiende?": "Do they get it?",
-  "Tiene claro qué se espera de su puesto y para qué existe.": "They're clear on what their role is for and what's expected of them.",
-  "Si no:": "If not:",
-  "falta claridad del rol o del líder.": "the role or their manager hasn't made it clear.",
-  "¿Lo quiere?": "Do they want it?",
-  "Le gusta lo que hace y quiere hacerlo.": "They like the work and want to do it.",
-  "puede que su lugar sea otro, no necesariamente afuera.": "they may belong in a different seat, not necessarily out the door.",
-  "¿Puede?": "Can they do it?",
-  "Tiene el conocimiento, el tiempo y los recursos para hacerlo bien.": "They have the skills, time, and resources to do it well.",
-  "capacitación, carga de trabajo o herramientas.": "training, workload, or tools.",
-  "A veces la respuesta no es contratar a alguien más. Es aclarar un rol, reacomodar a alguien o darle lo que le falta a quien ya está.": "Sometimes the answer isn't another hire. It's clarifying a role, moving someone, or giving the people you already have what they're missing.",
-  "Retener es la consecuencia. El objetivo es un equipo que funcione.": "Retention is the result. The goal is a team that works.",
-  "Un aliado para decidir sobre tu equipo, no para sumar gente por sumar.": "A partner on decisions about your team, not someone pushing you to add headcount."
-};
-const META_EN = {
-  title: 'Retain — People support for startups',
-  description: 'Know how your team is really doing and act in time. 1:1 check-ins, engagement surveys and hands-on guidance for startups. Starting at $500/month.',
-  ogTitle: 'Retain — Know how your team is really doing. Act in time.',
-  image: 'og-retain-precio-en.png'
-};
-const META_ES = {};
-let idiomaActual = 'es';
-const textoOriginal = new WeakMap();
-function t(es) { return (idiomaActual === 'en' && EN[es]) || es; }
-let alianzasNodo = null, alianzasMarca = null;
-function aplicarIdioma(lang) {
-  idiomaActual = lang === 'en' ? 'en' : 'es';
-  document.documentElement.lang = idiomaActual;
-  // "Alianzas" (Humand) no aplica en la version en ingles: se saca de la pagina (no solo se oculta) y se vuelve a poner en español.
-  if (idiomaActual === 'en') { const a = document.querySelector('.alliances'); if (a) { alianzasMarca = document.createComment('alianzas'); a.replaceWith(alianzasMarca); alianzasNodo = a; } }
-  else if (alianzasNodo && alianzasMarca && alianzasMarca.parentNode) { alianzasMarca.replaceWith(alianzasNodo); alianzasNodo = null; }
-  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => (n.parentElement && /^(SCRIPT|STYLE)$/.test(n.parentElement.tagName)) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
-  const nodos = []; while (w.nextNode()) nodos.push(w.currentNode);
-  nodos.forEach(n => {
-    if (!textoOriginal.has(n)) textoOriginal.set(n, n.nodeValue);
-    const orig = textoOriginal.get(n), clave = orig.trim();
-    if (!clave) return;
-    n.nodeValue = (idiomaActual === 'en' && EN[clave]) ? orig.replace(clave, EN[clave]) : orig;
-  });
-  document.querySelectorAll('[aria-label],[alt],[title]').forEach(el => ['aria-label', 'alt', 'title'].forEach(a => {
-    if (!el.hasAttribute(a)) return;
-    const k = 'data-es-' + a; if (!el.hasAttribute(k)) el.setAttribute(k, el.getAttribute(a));
-    const es = el.getAttribute(k); el.setAttribute(a, (idiomaActual === 'en' && EN[es]) || es);
-  }));
-  // titulo y vistas previas
-  const metas = [['meta[name="description"]', 'description'], ['meta[property="og:description"]', 'description'], ['meta[name="twitter:description"]', 'description'], ['meta[property="og:title"]', 'ogTitle'], ['meta[name="twitter:title"]', 'ogTitle']];
-  metas.forEach(([sel, k]) => { const m = document.querySelector(sel); if (!m) return; if (!m.hasAttribute('data-es')) m.setAttribute('data-es', m.content); m.content = idiomaActual === 'en' ? META_EN[k] : m.getAttribute('data-es'); });
-  if (!document.documentElement.hasAttribute('data-es-title')) document.documentElement.setAttribute('data-es-title', document.title);
-  document.title = idiomaActual === 'en' ? META_EN.title : document.documentElement.getAttribute('data-es-title');
-  // imagen de vista previa y locale (solo ingles; en español no se agrega nada)
-  ['meta[property="og:image"]', 'meta[name="twitter:image"]'].forEach(sel => { const m = document.querySelector(sel); if (!m) return; if (!m.hasAttribute('data-es')) m.setAttribute('data-es', m.content); m.content = idiomaActual === 'en' ? m.getAttribute('data-es').replace(/og-retain-precio-v2\.png$/, META_EN.image) : m.getAttribute('data-es'); });
-  let loc = document.querySelector('meta[property="og:locale"]');
-  if (idiomaActual === 'en') { if (!loc) { loc = document.createElement('meta'); loc.setAttribute('property', 'og:locale'); loc.setAttribute('data-agregado', '1'); document.head.appendChild(loc); } loc.content = 'en_US'; }
-  else if (loc && loc.hasAttribute('data-agregado')) loc.remove();
-  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === idiomaActual)));
-}
-(function idioma() {
-  function elegido() {
-    try { const q = new URLSearchParams(location.search).get('lang'); if (q === 'en' || q === 'es') return q; } catch (e) { /* sin parametro */ }
-    try { const g = localStorage.getItem('retain_lang'); if (g === 'en' || g === 'es') return g; } catch (e) { /* sin almacenamiento */ }
-    return 'es';
-  }
-  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', function () {
-    const l = b.dataset.lang;
-    aplicarIdioma(l);
-    try { localStorage.setItem('retain_lang', l); } catch (e) { /* no pasa nada */ }
-    try { const u = new URL(location.href); if (l === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang'); history.replaceState(null, '', u.toString()); } catch (e) { /* abierto como archivo */ }
-  }));
-  const l = elegido();
-  if (l === 'en') aplicarIdioma('en');
-})();
-
-// ---- BARRA FIJA Y MENU ------------------------------------------------------
-(function barra() {
-  const bar = document.getElementById('topbar');
-  const btn = document.getElementById('burger');
-  const menu = document.getElementById('menu');
-  if (!bar || !btn || !menu) return;
-  function cerrar() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', t('Abrir menú')); }
-  btn.addEventListener('click', function () {
-    const abrir = menu.hidden;
-    menu.hidden = !abrir;
-    btn.setAttribute('aria-expanded', String(abrir));
-    btn.setAttribute('aria-label', abrir ? t('Cerrar menú') : t('Abrir menú'));
-  });
-  menu.addEventListener('click', function (e) { if (e.target.closest('a')) cerrar(); });
-  document.addEventListener('click', function (e) { if (!bar.contains(e.target)) cerrar(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrar(); });
-  window.addEventListener('scroll', cerrar, { passive: true });
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(function(x){x.classList.add('in');});return;}
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:0.12,rootMargin:'0px 0px -6% 0px'});
+  els.forEach(function(x){io.observe(x);});
 })();
 </script>
-
 </body>
 </html>
