@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-v="3">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retain &#8212; People support for startups</title>
-<meta name="description" content="Know how your team is really doing and act in time. 1:1 check-ins, engagement surveys and hands-on guidance for startups. Starting at $500/month.">
+<title>Retain &#8212; Talent acquisition and retention for startups</title>
+<meta name="description" content="Talent acquisition and retention for startups. We run your searches end to end, 100% success-based, and support each new hire after they join. Team support starting at $500/month.">
 <link rel="canonical" href="https://retainhr.github.io/en/">
 <link rel="alternate" hreflang="es" href="https://retainhr.github.io/">
 <link rel="alternate" hreflang="en" href="https://retainhr.github.io/en/">
 <link rel="alternate" hreflang="x-default" href="https://retainhr.github.io/">
-<meta property="og:title" content="Retain &#8212; Know how your team is really doing. Act in time.">
-<meta property="og:description" content="Know how your team is really doing and act in time. 1:1 check-ins, engagement surveys and hands-on guidance for startups. Starting at $500/month.">
-<meta property="og:image" content="https://retainhr.github.io/og-retain-v3-en.png">
+<meta property="og:title" content="Retain &#8212; We help you hire the right people and take care of your team">
+<meta property="og:description" content="Talent acquisition and retention for startups. We run your searches end to end, 100% success-based, and support each new hire after they join. Team support starting at $500/month.">
+<meta property="og:image" content="https://retainhr.github.io/og-retain-v4-en.png">
 <meta property="og:url" content="https://retainhr.github.io/en/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Retain &#8212; Know how your team is really doing. Act in time.">
-<meta name="twitter:description" content="Know how your team is really doing and act in time. 1:1 check-ins, engagement surveys and hands-on guidance for startups. Starting at $500/month.">
-<meta name="twitter:image" content="https://retainhr.github.io/og-retain-v3-en.png">
+<meta name="twitter:title" content="Retain &#8212; We help you hire the right people and take care of your team">
+<meta name="twitter:description" content="Talent acquisition and retention for startups. We run your searches end to end, 100% success-based, and support each new hire after they join. Team support starting at $500/month.">
+<meta name="twitter:image" content="https://retainhr.github.io/og-retain-v4-en.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%233B4F35'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='36' font-weight='600' fill='%23F5F6F0' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,23 +33,24 @@
   ul,ol{list-style:none;padding:0;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:4px;}
-  section[id]{scroll-margin-top:68px;}
+  section[id],div[id]{scroll-margin-top:84px;}
   .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
   em{font-style:italic;font-weight:300;color:var(--deep);}
-  .serif{font-family:'Fraunces',Georgia,serif;}
   p{max-width:65ch;}
 
   /* barra fija */
   .bar{position:fixed;top:0;left:0;right:0;z-index:50;height:68px;background:rgba(245,246,240,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
-  .bar .wrap{height:100%;display:flex;align-items:center;gap:26px;}
+  .bar .wrap{height:100%;display:flex;align-items:center;gap:22px;}
   .logo{font-family:'Fraunces',Georgia,serif;font-size:29px;font-weight:600;letter-spacing:-.02em;text-decoration:none;margin-right:auto;color:var(--ink);}
   .logo span{color:var(--green);}
-  .bar nav{display:flex;gap:28px;font-size:15px;}
+  .bar nav{display:flex;gap:26px;font-size:15px;}
   .bar nav a{text-decoration:none;color:var(--soft);min-height:44px;display:inline-flex;align-items:center;}
   .bar nav a:hover{color:var(--ink);}
-  .lang{display:inline-flex;font-size:14px;}
-  .lang a{text-decoration:none;color:var(--soft);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
-  .lang a[aria-current="true"]{color:var(--ink);font-weight:600;}
+  .lang{display:inline-flex;gap:2px;font-size:14px;}
+  .lang a{text-decoration:none;color:var(--soft);min-height:44px;padding:0 10px;display:inline-flex;align-items:center;gap:8px;border-radius:999px;}
+  .lang a:hover{color:var(--ink);}
+  .lang a[aria-current="true"]{color:var(--ink);font-weight:600;background:var(--alt);}
+  .flag{width:22px;height:15px;border-radius:2px;box-shadow:0 0 0 1px rgba(35,42,34,.18);flex:none;display:block;}
   .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 28px;border-radius:999px;font:500 17px 'Inter',sans-serif;text-decoration:none;background:var(--deep);color:var(--bg);transition:background .2s ease,transform .2s ease;}
   .btn:hover{background:var(--ink);transform:translateY(-1px);}
   .btn.sm{min-height:44px;padding:10px 22px;font-size:15px;background:var(--ink);}
@@ -58,45 +59,47 @@
   .btn.claro:hover{background:#fff;}
 
   /* hero */
-  .hero{padding:80px 0 104px;}
-  .hero-txt{display:flex;flex-direction:column;gap:26px;max-width:980px;}
+  .hero{padding:88px 0 104px;}
+  .hero-txt{display:flex;flex-direction:column;gap:28px;max-width:1000px;}
   .eyebrow{font-size:15px;color:var(--soft);letter-spacing:.02em;}
-  h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(46px,7vw,92px);line-height:1.0;letter-spacing:-.03em;text-wrap:balance;}
-  .sub{font-size:20px;color:var(--soft);max-width:30em;}
-  .destacado{font-family:'Fraunces',Georgia,serif;font-size:clamp(23px,2.4vw,28px);line-height:1.3;border-top:1px solid var(--line);padding-top:24px;max-width:22em;}
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(40px,6.2vw,80px);line-height:1.03;letter-spacing:-.03em;text-wrap:balance;}
+  .sub{font-size:20px;color:var(--soft);max-width:34em;}
   .cta-fila{display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px;}
-  .cta-fila p{font-size:15px;color:var(--soft);max-width:21em;}
-  .cta-fila strong{color:var(--ink);font-weight:600;}
+
+  /* fundador + lo que escucho */
   .quien{display:flex;flex-wrap:wrap;align-items:center;gap:22px 28px;}
   .quien img{width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:50% 20%;border:3px solid rgba(245,246,240,.25);display:block;flex:none;}
   .quien small{display:block;font-size:13px;color:var(--line);text-transform:uppercase;letter-spacing:.08em;}
   .quien h3{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;margin-top:4px;color:var(--bg);}
-  .quien p{color:var(--line);font-size:16px;margin-top:4px;}
+  .quien p{color:var(--line);font-size:16px;margin-top:4px;max-width:34em;}
   .quien .btn{margin-left:auto;}
-  .sep{height:1px;background:rgba(245,246,240,.25);max-width:100%;}
-
-  /* lo que escucho */
+  .sep{height:1px;background:rgba(245,246,240,.25);}
   .escucho{background:var(--deep);color:var(--bg);}
   .escucho .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:40px;}
   .escucho .t{font-size:15px;color:var(--line);letter-spacing:.02em;}
-  .q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(32px,4.4vw,58px);line-height:1.1;letter-spacing:-.02em;max-width:19em;}
+  .q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(30px,4.2vw,54px);line-height:1.12;letter-spacing:-.02em;max-width:19em;}
   .q + .q{margin-top:22px;}
   .q2{padding-left:8%;} .q3{padding-left:16%;}
   .escucho .c{font-size:20px;}
 
   /* por que importa */
-  .importa .wrap{padding-top:104px;padding-bottom:104px;}
   h2{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(34px,4.3vw,56px);line-height:1.06;letter-spacing:-.025em;text-wrap:balance;}
-  .importa h2{max-width:16em;}
-  .listas{display:grid;grid-template-columns:1fr 1fr;gap:28px 80px;margin-top:48px;}
-  .lista h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;font-family:'Inter',sans-serif;}
-  .lista.bien h3{color:var(--deep);} .lista.mal h3{color:var(--soft);}
-  .lista li{padding:14px 0;border-top:1px solid var(--line);}
-  .lista.mal li{color:var(--soft);}
-  .importa-c{margin-top:56px;font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;max-width:20em;}
+  .importa .wrap{padding-top:112px;padding-bottom:112px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px 80px;align-items:end;}
+  .importa-p{color:var(--soft);font-size:19px;}
 
-  /* mas que retener */
-  .fit{background:var(--alt);}
+  /* que hacemos */
+  .hacemos{background:var(--alt);}
+  .hacemos .wrap{padding-top:104px;padding-bottom:104px;}
+  .srvs{margin-top:56px;border-bottom:1px solid var(--ink);}
+  .srv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:16px 64px;border-top:1px solid var(--ink);padding:34px 0 38px;}
+  .srv h3{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(25px,2.6vw,32px);line-height:1.18;letter-spacing:-.01em;}
+  .srv-b p{font-size:18px;}
+  .srv-l{margin-top:22px;}
+  .srv-l li{padding:13px 0;border-top:1px solid var(--line);font-size:17px;}
+  .srv-l strong{color:var(--deep);font-weight:600;}
+  .srv-n{margin-top:14px;font-weight:600;color:var(--deep);font-size:16px;}
+
+  /* equipo correcto */
   .fit .wrap{padding-top:104px;padding-bottom:104px;}
   .fit-top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px 80px;align-items:end;}
   .fit-top p{color:var(--soft);}
@@ -110,15 +113,6 @@
   .fit-n strong{color:var(--deep);font-weight:600;}
   .fit-c{margin-top:56px;font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;max-width:24em;}
 
-  /* como trabajamos */
-  .como .wrap{padding-top:104px;padding-bottom:104px;}
-  .como-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px 80px;align-items:end;}
-  .como-top p{color:var(--soft);}
-  .pasos{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;}
-  .paso{border-top:1px solid var(--ink);padding:22px 28px 8px 0;}
-  .paso h3{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;}
-  .paso p{margin-top:10px;color:var(--soft);font-size:16px;}
-
   /* cierre */
   .cierre{background:var(--ink);color:var(--bg);}
   .cierre .wrap{padding-top:104px;padding-bottom:40px;}
@@ -127,11 +121,10 @@
   .cierre h2 em{color:var(--line);}
   .cierre-p{margin-top:22px;color:var(--line);max-width:28em;}
   .cierre .cta-fila{margin-top:34px;}
-  .cierre .cta-fila p{color:var(--line);}
-  .cierre .cta-fila strong{color:var(--bg);}
+  .precios{margin-top:28px;display:flex;flex-direction:column;gap:6px;font-size:16px;color:var(--line);max-width:30em;}
+  .precios strong{color:var(--bg);font-weight:600;}
   .porque h3{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--line);padding-bottom:10px;}
   .porque li{padding:15px 0;border-top:1px solid rgba(245,246,240,.2);font-size:17px;}
-  .porque li span{color:var(--line);}
   .canales{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(245,246,240,.25);}
   .canal{display:flex;flex-direction:column;gap:2px;padding:26px 24px 26px 0;text-decoration:none;min-height:44px;}
   .canal-l{font-size:13px;color:var(--line);text-transform:uppercase;letter-spacing:.08em;}
@@ -156,30 +149,31 @@
   @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}.js .reveal{opacity:1;transform:none;transition:none;}.btn,.wa{transition:none;}}
 
   @media (max-width:980px){
-    .fit-top,.como-top,.cierre-top{grid-template-columns:1fr;}
+    .importa .wrap,.fit-top,.cierre-top{grid-template-columns:1fr;}
+    .srv{grid-template-columns:1fr;gap:14px;}
     .quien .btn{margin-left:0;}
-    .pasos{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:860px){
     .bar nav{display:none;}
     .fit-cols{grid-template-columns:1fr;}
     .fit-col,.fit-col + .fit-col{padding:24px 0 12px;border-left:0;border-bottom:1px solid var(--line);}
     .fit-col:last-child{border-bottom:0;}
-    .listas{grid-template-columns:1fr;}
     .canales{grid-template-columns:1fr;}
     .canal{border-bottom:1px solid rgba(245,246,240,.15);}
   }
   @media (max-width:600px){
     body{font-size:17px;}
     .wrap{padding:0 20px;}
-    .bar .wrap{gap:6px;}
+    .bar .wrap{gap:4px;}
     .logo{font-size:25px;}
+    .lang a{padding:0 8px;}
+    .lang .ln{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
     .btn.sm{padding:10px 16px;font-size:14px;}
     .hero{padding:44px 0 72px;}
-    .escucho .wrap,.importa .wrap,.fit .wrap,.como .wrap{padding-top:68px;padding-bottom:68px;}
+    .escucho .wrap,.importa .wrap,.hacemos .wrap,.fit .wrap{padding-top:68px;padding-bottom:68px;}
     .cierre .wrap{padding-top:72px;}
     .q2,.q3{padding-left:0;}
-    .pasos{grid-template-columns:1fr;}
+    .srv{padding:26px 0 30px;}
     .wa{width:46px;height:46px;bottom:16px;right:16px;}
   }
 </style>
@@ -191,8 +185,8 @@
 <header class="bar">
   <div class="wrap">
     <a class="logo" href="#inicio" aria-label="Retain, back to top">re<span>tain.</span></a>
-    <nav aria-label="Main"><a href="#importa">Why it matters</a><a href="#como">How we work</a><a href="#contacto">Contact</a></nav>
-    <span class="lang" role="group" aria-label="Language"><a href="../"  lang="es" hreflang="es">ES</a><a href="#" aria-current="true" lang="en" hreflang="en">EN</a></span>
+    <nav aria-label="Main"><a href="#hacemos">What we do</a><a href="#porque">Why Retain</a><a href="#contacto">Contact</a></nav>
+    <span class="lang" role="group" aria-label="Language"><a href="../"  lang="es" hreflang="es"><svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false"><rect width="24" height="16" fill="#74ACDF"/><rect y="5.33" width="24" height="5.34" fill="#fff"/><circle cx="12" cy="8" r="1.7" fill="#F6B40E"/></svg><span class="ln">Espa&#241;ol</span></a><a href="#" aria-current="true" lang="en" hreflang="en"><svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false"><rect width="24" height="16" fill="#fff"/><g fill="#B22234"><rect y="0" width="24" height="1.23"/><rect y="2.46" width="24" height="1.23"/><rect y="4.92" width="24" height="1.23"/><rect y="7.38" width="24" height="1.23"/><rect y="9.85" width="24" height="1.23"/><rect y="12.31" width="24" height="1.23"/><rect y="14.77" width="24" height="1.23"/></g><rect width="10.5" height="8.6" fill="#3C3B6E"/><g fill="#fff"><circle cx="2" cy="1.8" r=".5"/><circle cx="5.2" cy="1.8" r=".5"/><circle cx="8.4" cy="1.8" r=".5"/><circle cx="3.6" cy="4.3" r=".5"/><circle cx="6.8" cy="4.3" r=".5"/><circle cx="2" cy="6.8" r=".5"/><circle cx="5.2" cy="6.8" r=".5"/><circle cx="8.4" cy="6.8" r=".5"/></g></svg><span class="ln">English</span></a></span>
     <a class="btn sm" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Book a call</a>
   </div>
 </header>
@@ -201,14 +195,10 @@
 <section class="hero" id="inicio">
   <div class="wrap">
     <div class="hero-txt reveal">
-      <p class="eyebrow">People support for startups.</p>
-      <h1>Know how your team is really doing. <em>Act in time.</em></h1>
-      <p class="sub">We talk to your team and tell you what to do next, so your people stay engaged and grow with your company.</p>
-      <p class="destacado">You focus on your business. <em>We focus on your team.</em></p>
-      <div class="cta-fila">
-        <a class="btn" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Book a 20-minute call</a>
-        <p>Built for a startup's budget. <strong>Starting at $500/month.</strong></p>
-      </div>
+      <p class="eyebrow">Talent acquisition and retention for startups.</p>
+      <h1>We help you hire <em>the right people</em> and take care of your team.</h1>
+      <p class="sub">We run your searches end to end and support each person after they join. You stay focused on the business; we focus on your team.</p>
+      <div class="cta-fila"><a class="btn" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Book a 20-minute call</a></div>
     </div>
   </div>
 </section>
@@ -220,25 +210,28 @@
       <div>
         <small>Who you&#x27;ll talk to</small>
         <h3>Joaqu&#237;n Gonz&#225;lez Benegas</h3>
-        <p>Founder of Retain. I&#x27;ve been working in HR for 10 years.</p>
+        <p>Founder. 10 years in HR, leading recruiting teams and supporting leaders as an HR business partner.</p>
       </div>
       <a class="btn sm claro" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener">View LinkedIn &#8594;</a>
     </div>
     <div class="sep"></div>
     <p class="t reveal">What I hear from founders and managers.</p>
-    <div><p class="q q1 reveal">&#8220;I&#x27;m not in the day-to-day with my team anymore.&#8221;</p><p class="q q2 reveal">&#8220;How is my team really doing?&#8221;</p><p class="q q3 reveal">&#8220;Why did they quit? I thought everything was fine.&#8221;</p></div>
+    <div><p class="q q1 reveal">&#8220;I need to fill this role and I don&#x27;t have time to screen candidates.&#8221;</p><p class="q q2 reveal">&#8220;We hired someone and three months in it wasn&#x27;t working.&#8221;</p><p class="q q3 reveal">&#8220;How is my team really doing?&#8221;</p></div>
     <p class="c reveal">That&#x27;s why I built Retain.</p>
   </div>
 </section>
 
 <section class="importa" id="importa">
   <div class="wrap">
-    <h2 class="reveal">A team that's doing well moves your business forward. <em>One departure can stall it.</em></h2>
-    <div class="listas">
-      <div class="lista bien reveal"><h3>When your team is doing well</h3><ul><li>They do better work and bring ideas.</li><li>They take ownership.</li><li>It rubs off on everyone else.</li><li>They grow into new roles, so you don&#x27;t have to hire from outside.</li></ul></div>
-      <div class="lista mal reveal"><h3>When someone quits</h3><ul><li>You lose time and money.</li><li>You lose a teammate, not just a role.</li><li>Everyone else picks up the slack.</li><li>Their work stalls or gets dropped.</li></ul></div>
-    </div>
-    <p class="importa-c reveal">Most of the time, you could have seen it coming. <em>No one said anything.</em></p>
+    <h2 class="reveal">Hiring well <em>is half the job.</em></h2>
+    <p class="importa-p reveal">A bad hire costs time, money, and wear on the team. And a good one can still be lost if no one supports them when they join. That&#x27;s why we don&#x27;t treat them as two separate things.</p>
+  </div>
+</section>
+
+<section class="hacemos" id="hacemos">
+  <div class="wrap">
+    <h2 class="reveal">What we <em>do.</em></h2>
+    <div class="srvs"><div class="srv reveal"><h3>Your search, end to end</h3><div class="srv-b"><p>We learn what you need: the role, the team, and the culture. We source, screen, and bring you a few candidates, but the right ones. We stay with you until the person starts.</p><ul class="srv-l"><li><strong>100% success-based:</strong> if you don&#x27;t hire, you don&#x27;t pay.</li><li><strong>3-month guarantee:</strong> if the hire doesn&#x27;t work out or leaves, we repeat the search.</li></ul></div></div><div class="srv reveal"><h3>A new hire&#x27;s first months</h3><div class="srv-b"><p>We don&#x27;t disappear when they sign. We meet with the new hire during their first months: how they&#x27;re settling in, whether they&#x27;re clear on what&#x27;s expected, and how things are with their manager. We tell you what to adjust before it becomes a problem.</p><p class="srv-n">Included with the search.</p></div></div><div class="srv reveal"><h3>Your team, person by person</h3><div class="srv-b"><p>We listen to your team through 1:1 check-ins, pulse surveys, and engagement surveys. We bring you how each person is doing, who needs attention, and what to do, and we go over it together.</p></div></div></div>
   </div>
 </section>
 
@@ -253,36 +246,26 @@
   </div>
 </section>
 
-<section class="como" id="como">
-  <div class="wrap">
-    <div class="como-top reveal">
-      <h2>How we <em>work.</em></h2>
-      <p>We talk to everyone on your team and look at five things: motivation, team relationships, leadership, satisfaction with the company and sense of belonging.</p>
-    </div>
-    <ol class="pasos"><li class="paso reveal"><h3>Engagement &amp; pulse surveys</h3><p>To spot trends across the team.</p></li><li class="paso reveal"><h3>1:1 check-ins</h3><p>One-on-one conversations with each person.</p></li><li class="paso reveal"><h3>Readout with you</h3><p>A clear report: what&#x27;s going on, who needs attention, and what to do. And we walk through it together.</p></li><li class="paso reveal"><h3>Ongoing follow-up</h3><p>With key talent, critical roles and new hires.</p></li></ol>
-  </div>
-</section>
-
 <section class="cierre" id="contacto">
   <div class="wrap">
     <div class="cierre-top">
       <div class="reveal">
         <h2>First step: <em>a 20-minute call.</em></h2>
-        <p class="cierre-p">I&#x27;ll walk you through Retain and we&#x27;ll see if it&#x27;s a fit. No commitment.</p>
+        <p class="cierre-p">No commitment, to talk through your search or your team and see if Retain is what you need.</p>
         <div class="cta-fila">
           <a class="btn claro" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Book a call</a>
-          <p><strong>Starting at $500/month.</strong> Final pricing depends on team size and what your company needs.</p>
         </div>
+        <div class="precios"><p><strong>Searches:</strong> 100% success-based.</p><p><strong>Team support:</strong> starting at $500/month, depending on team size.</p></div>
       </div>
-      <div class="porque reveal"><h3>Why Retain</h3><ul><li><strong>Experience from day one.</strong> <span>We know what to look for and how.</span></li><li><strong>An outside perspective.</strong> <span>People speak more openly to someone outside the company.</span></li><li><strong>A partner on decisions about your team,</strong> <span>not someone pushing you to add headcount.</span></li><li><strong>Already have someone in HR?</strong> <span>We&#x27;re their backup, not their replacement.</span></li></ul></div>
+      <div class="porque reveal" id="porque"><h3>Why Retain</h3><ul><li>Experience from day one.</li><li>Direct access: you always talk to the same person.</li><li>An outside perspective: people speak more openly to someone outside the company.</li><li>A backup for HR, not a replacement.</li><li>Built for a startup&#x27;s budget.</li></ul></div>
     </div>
-    <div class="canales reveal"><a class="canal" href="mailto:retainpeople@gmail.com"><span class="canal-l">Email</span><span class="canal-v">retainpeople@gmail.com &#8594;</span></a><a class="canal" href="https://wa.me/5491162782243" target="_blank" rel="noopener"><span class="canal-l">WhatsApp</span><span class="canal-v">+54 11 6278-2243 &#8594;</span></a><a class="canal" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener"><span class="canal-l">LinkedIn</span><span class="canal-v">joaquingbenegas &#8594;</span></a></div>
+    <div class="canales reveal"><a class="canal" href="mailto:retainpeople@gmail.com"><span class="canal-l">Email</span> <span class="canal-v">retainpeople@gmail.com &#8594;</span></a><a class="canal" href="https://wa.me/5491162782243" target="_blank" rel="noopener"><span class="canal-l">WhatsApp</span> <span class="canal-v">+54 11 6278-2243 &#8594;</span></a><a class="canal" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener"><span class="canal-l">LinkedIn</span> <span class="canal-v">joaquingbenegas &#8594;</span></a></div>
     <p class="compartir">Know a founder dealing with this? Send them this page.</p>
   </div>
   <footer>
     <div class="wrap">
       <span class="logo">re<span>tain.</span></span>
-      <span>People support for startups. <a href="../panel.html?login=1" class="crm-hidden" aria-label="Internal access">&#8226;</a></span>
+      <span>Talent acquisition and retention for startups. <a href="../panel.html?login=1" class="crm-hidden" aria-label="Internal access">&#8226;</a></span>
     </div>
   </footer>
 </section>
