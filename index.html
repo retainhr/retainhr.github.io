@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-v="3">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retain — Gestión de personas para startups y pymes</title>
-<meta name="description" content="Gestión de personas para startups y pymes. Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa. Desde USD 500 por mes.">
+<title>Retain — Consultora de atracción y retención de talento</title>
+<meta name="description" content="Consultora de atracción y retención de talento para pymes y startups. Hacemos tus búsquedas de principio a fin, 100% a éxito, y acompañamos a cada persona después de que entra. Acompañamiento del equipo desde USD 500 por mes.">
 <link rel="canonical" href="https://retainhr.github.io/">
 <link rel="alternate" hreflang="es" href="https://retainhr.github.io/">
 <link rel="alternate" hreflang="en" href="https://retainhr.github.io/en/">
 <link rel="alternate" hreflang="x-default" href="https://retainhr.github.io/">
-<meta property="og:title" content="Retain — Sabé cómo está tu equipo y actuá a tiempo">
-<meta property="og:description" content="Gestión de personas para startups y pymes. Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa. Desde USD 500 por mes.">
-<meta property="og:image" content="https://retainhr.github.io/og-retain-v3.png">
+<meta property="og:title" content="Retain — Te ayudamos a sumar a las personas correctas y a cuidar a tu equipo">
+<meta property="og:description" content="Consultora de atracción y retención de talento para pymes y startups. Hacemos tus búsquedas de principio a fin, 100% a éxito, y acompañamos a cada persona después de que entra. Acompañamiento del equipo desde USD 500 por mes.">
+<meta property="og:image" content="https://retainhr.github.io/og-retain-v4.png">
 <meta property="og:url" content="https://retainhr.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Retain — Sabé cómo está tu equipo y actuá a tiempo">
-<meta name="twitter:description" content="Gestión de personas para startups y pymes. Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa. Desde USD 500 por mes.">
-<meta name="twitter:image" content="https://retainhr.github.io/og-retain-v3.png">
+<meta name="twitter:title" content="Retain — Te ayudamos a sumar a las personas correctas y a cuidar a tu equipo">
+<meta name="twitter:description" content="Consultora de atracción y retención de talento para pymes y startups. Hacemos tus búsquedas de principio a fin, 100% a éxito, y acompañamos a cada persona después de que entra. Acompañamiento del equipo desde USD 500 por mes.">
+<meta name="twitter:image" content="https://retainhr.github.io/og-retain-v4.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%233B4F35'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='36' font-weight='600' fill='%23F5F6F0' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,23 +33,24 @@
   ul,ol{list-style:none;padding:0;}
   a{color:inherit;}
   :focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:4px;}
-  section[id]{scroll-margin-top:68px;}
+  section[id],div[id]{scroll-margin-top:84px;}
   .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
   em{font-style:italic;font-weight:300;color:var(--deep);}
-  .serif{font-family:'Fraunces',Georgia,serif;}
   p{max-width:65ch;}
 
   /* barra fija */
   .bar{position:fixed;top:0;left:0;right:0;z-index:50;height:68px;background:rgba(245,246,240,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
-  .bar .wrap{height:100%;display:flex;align-items:center;gap:26px;}
+  .bar .wrap{height:100%;display:flex;align-items:center;gap:22px;}
   .logo{font-family:'Fraunces',Georgia,serif;font-size:29px;font-weight:600;letter-spacing:-.02em;text-decoration:none;margin-right:auto;color:var(--ink);}
   .logo span{color:var(--green);}
-  .bar nav{display:flex;gap:28px;font-size:15px;}
+  .bar nav{display:flex;gap:26px;font-size:15px;}
   .bar nav a{text-decoration:none;color:var(--soft);min-height:44px;display:inline-flex;align-items:center;}
   .bar nav a:hover{color:var(--ink);}
-  .lang{display:inline-flex;font-size:14px;}
-  .lang a{text-decoration:none;color:var(--soft);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
-  .lang a[aria-current="true"]{color:var(--ink);font-weight:600;}
+  .lang{display:inline-flex;gap:2px;font-size:14px;}
+  .lang a{text-decoration:none;color:var(--soft);min-height:44px;padding:0 10px;display:inline-flex;align-items:center;gap:8px;border-radius:999px;}
+  .lang a:hover{color:var(--ink);}
+  .lang a[aria-current="true"]{color:var(--ink);font-weight:600;background:var(--alt);}
+  .flag{width:22px;height:15px;border-radius:2px;box-shadow:0 0 0 1px rgba(35,42,34,.18);flex:none;display:block;}
   .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 28px;border-radius:999px;font:500 17px 'Inter',sans-serif;text-decoration:none;background:var(--deep);color:var(--bg);transition:background .2s ease,transform .2s ease;}
   .btn:hover{background:var(--ink);transform:translateY(-1px);}
   .btn.sm{min-height:44px;padding:10px 22px;font-size:15px;background:var(--ink);}
@@ -58,65 +59,59 @@
   .btn.claro:hover{background:#fff;}
 
   /* hero */
-  .hero{padding:80px 0 104px;}
-  .hero-txt{display:flex;flex-direction:column;gap:26px;max-width:980px;}
+  .hero{padding:88px 0 104px;}
+  .hero-txt{display:flex;flex-direction:column;gap:28px;max-width:1000px;}
   .eyebrow{font-size:15px;color:var(--soft);letter-spacing:.02em;}
-  h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(46px,7vw,92px);line-height:1.0;letter-spacing:-.03em;text-wrap:balance;}
-  .sub{font-size:20px;color:var(--soft);max-width:30em;}
-  .destacado{font-family:'Fraunces',Georgia,serif;font-size:clamp(23px,2.4vw,28px);line-height:1.3;border-top:1px solid var(--line);padding-top:24px;max-width:22em;}
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(40px,6.2vw,80px);line-height:1.03;letter-spacing:-.03em;text-wrap:balance;}
+  .sub{font-size:20px;color:var(--soft);max-width:34em;}
   .cta-fila{display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px;}
-  .cta-fila p{font-size:15px;color:var(--soft);max-width:21em;}
-  .cta-fila strong{color:var(--ink);font-weight:600;}
+
+  /* fundador + lo que escucho */
   .quien{display:flex;flex-wrap:wrap;align-items:center;gap:22px 28px;}
   .quien img{width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:50% 20%;border:3px solid rgba(245,246,240,.25);display:block;flex:none;}
   .quien small{display:block;font-size:13px;color:var(--line);text-transform:uppercase;letter-spacing:.08em;}
   .quien h3{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:28px;line-height:1.2;margin-top:4px;color:var(--bg);}
-  .quien p{color:var(--line);font-size:16px;margin-top:4px;}
+  .quien p{color:var(--line);font-size:16px;margin-top:4px;max-width:34em;}
   .quien .btn{margin-left:auto;}
-  .sep{height:1px;background:rgba(245,246,240,.25);max-width:100%;}
-
-  /* lo que escucho */
+  .sep{height:1px;background:rgba(245,246,240,.25);}
   .escucho{background:var(--deep);color:var(--bg);}
   .escucho .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:40px;}
   .escucho .t{font-size:15px;color:var(--line);letter-spacing:.02em;}
-  .q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(32px,4.4vw,58px);line-height:1.1;letter-spacing:-.02em;max-width:19em;}
+  .q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(30px,4.2vw,54px);line-height:1.12;letter-spacing:-.02em;max-width:19em;}
   .q + .q{margin-top:22px;}
   .q2{padding-left:8%;} .q3{padding-left:16%;}
   .escucho .c{font-size:20px;}
 
   /* por que importa */
-  .importa .wrap{padding-top:104px;padding-bottom:104px;}
   h2{font-family:'Fraunces',Georgia,serif;font-weight:400;font-size:clamp(34px,4.3vw,56px);line-height:1.06;letter-spacing:-.025em;text-wrap:balance;}
-  .importa h2{max-width:16em;}
-  .listas{display:grid;grid-template-columns:1fr 1fr;gap:28px 80px;margin-top:48px;}
-  .lista h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;font-family:'Inter',sans-serif;}
-  .lista.bien h3{color:var(--deep);} .lista.mal h3{color:var(--soft);}
-  .lista li{padding:14px 0;border-top:1px solid var(--line);}
-  .lista.mal li{color:var(--soft);}
-  .importa-c{margin-top:56px;font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;max-width:20em;}
+  .importa .wrap{padding-top:112px;padding-bottom:112px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px 80px;align-items:end;}
+  .importa-p{color:var(--soft);font-size:19px;}
 
-  /* mas que retener */
-  .fit{background:var(--alt);}
+  /* que hacemos */
+  .hacemos{background:var(--alt);}
+  .hacemos .wrap{padding-top:104px;padding-bottom:104px;}
+  .srvs{margin-top:56px;border-bottom:1px solid var(--ink);}
+  .srv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:16px 64px;border-top:1px solid var(--ink);padding:34px 0 38px;}
+  .srv h3{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(25px,2.6vw,32px);line-height:1.18;letter-spacing:-.01em;}
+  .srv-b p{font-size:18px;}
+  .srv-l{margin-top:22px;}
+  .srv-l li{padding:13px 0;border-top:1px solid var(--line);font-size:17px;}
+  .srv-l strong{color:var(--deep);font-weight:600;}
+  .srv-n{margin-top:14px;font-weight:600;color:var(--deep);font-size:16px;}
+
+  /* equipo correcto */
   .fit .wrap{padding-top:104px;padding-bottom:104px;}
   .fit-top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px 80px;align-items:end;}
   .fit-top p{color:var(--soft);}
   .fit-cols{display:grid;grid-template-columns:repeat(3,1fr);margin-top:56px;border-top:1px solid var(--ink);}
   .fit-col{padding:28px 32px 8px 0;}
   .fit-col + .fit-col{padding-left:32px;border-left:1px solid var(--line);}
+  .fit-tag{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--deep);margin-bottom:6px;}
   .fit-q{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:clamp(30px,3.2vw,40px);line-height:1.1;}
   .fit-d{margin-top:12px;font-size:17px;}
   .fit-n{margin-top:8px;color:var(--soft);font-size:16px;}
   .fit-n strong{color:var(--deep);font-weight:600;}
   .fit-c{margin-top:56px;font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,3vw,38px);line-height:1.2;max-width:24em;}
-
-  /* como trabajamos */
-  .como .wrap{padding-top:104px;padding-bottom:104px;}
-  .como-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px 80px;align-items:end;}
-  .como-top p{color:var(--soft);}
-  .pasos{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;}
-  .paso{border-top:1px solid var(--ink);padding:22px 28px 8px 0;}
-  .paso h3{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;line-height:1.25;}
-  .paso p{margin-top:10px;color:var(--soft);font-size:16px;}
 
   /* cierre */
   .cierre{background:var(--ink);color:var(--bg);}
@@ -126,11 +121,10 @@
   .cierre h2 em{color:var(--line);}
   .cierre-p{margin-top:22px;color:var(--line);max-width:28em;}
   .cierre .cta-fila{margin-top:34px;}
-  .cierre .cta-fila p{color:var(--line);}
-  .cierre .cta-fila strong{color:var(--bg);}
+  .precios{margin-top:28px;display:flex;flex-direction:column;gap:6px;font-size:16px;color:var(--line);max-width:30em;}
+  .precios strong{color:var(--bg);font-weight:600;}
   .porque h3{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--line);padding-bottom:10px;}
   .porque li{padding:15px 0;border-top:1px solid rgba(245,246,240,.2);font-size:17px;}
-  .porque li span{color:var(--line);}
   .canales{margin-top:72px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(245,246,240,.25);}
   .canal{display:flex;flex-direction:column;gap:2px;padding:26px 24px 26px 0;text-decoration:none;min-height:44px;}
   .canal-l{font-size:13px;color:var(--line);text-transform:uppercase;letter-spacing:.08em;}
@@ -155,30 +149,31 @@
   @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}.js .reveal{opacity:1;transform:none;transition:none;}.btn,.wa{transition:none;}}
 
   @media (max-width:980px){
-    .fit-top,.como-top,.cierre-top{grid-template-columns:1fr;}
+    .importa .wrap,.fit-top,.cierre-top{grid-template-columns:1fr;}
+    .srv{grid-template-columns:1fr;gap:14px;}
     .quien .btn{margin-left:0;}
-    .pasos{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:860px){
     .bar nav{display:none;}
     .fit-cols{grid-template-columns:1fr;}
     .fit-col,.fit-col + .fit-col{padding:24px 0 12px;border-left:0;border-bottom:1px solid var(--line);}
     .fit-col:last-child{border-bottom:0;}
-    .listas{grid-template-columns:1fr;}
     .canales{grid-template-columns:1fr;}
     .canal{border-bottom:1px solid rgba(245,246,240,.15);}
   }
   @media (max-width:600px){
     body{font-size:17px;}
     .wrap{padding:0 20px;}
-    .bar .wrap{gap:6px;}
+    .bar .wrap{gap:4px;}
     .logo{font-size:25px;}
+    .lang a{padding:0 8px;}
+    .lang .ln{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
     .btn.sm{padding:10px 16px;font-size:14px;}
     .hero{padding:44px 0 72px;}
-    .escucho .wrap,.importa .wrap,.fit .wrap,.como .wrap{padding-top:68px;padding-bottom:68px;}
+    .escucho .wrap,.importa .wrap,.hacemos .wrap,.fit .wrap{padding-top:68px;padding-bottom:68px;}
     .cierre .wrap{padding-top:72px;}
     .q2,.q3{padding-left:0;}
-    .pasos{grid-template-columns:1fr;}
+    .srv{padding:26px 0 30px;}
     .wa{width:46px;height:46px;bottom:16px;right:16px;}
   }
 </style>
@@ -190,8 +185,8 @@
 <header class="bar">
   <div class="wrap">
     <a class="logo" href="#inicio" aria-label="Retain, volver arriba">re<span>tain.</span></a>
-    <nav aria-label="Principal"><a href="#importa">Por qué importa</a><a href="#como">Cómo trabajamos</a><a href="#contacto">Contacto</a></nav>
-    <span class="lang" role="group" aria-label="Idioma"><a href="#" aria-current="true" lang="es" hreflang="es">ES</a><a href="en/"  lang="en" hreflang="en">EN</a></span>
+    <nav aria-label="Principal"><a href="#hacemos">Qué hacemos</a><a href="#porque">Por qué Retain</a><a href="#contacto">Contacto</a></nav>
+    <span class="lang" role="group" aria-label="Idioma"><a href="#" aria-current="true" lang="es" hreflang="es"><svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false"><rect width="24" height="16" fill="#74ACDF"/><rect y="5.33" width="24" height="5.34" fill="#fff"/><circle cx="12" cy="8" r="1.7" fill="#F6B40E"/></svg><span class="ln">Español</span></a><a href="en/"  lang="en" hreflang="en"><svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false"><rect width="24" height="16" fill="#fff"/><g fill="#B22234"><rect y="0" width="24" height="1.23"/><rect y="2.46" width="24" height="1.23"/><rect y="4.92" width="24" height="1.23"/><rect y="7.38" width="24" height="1.23"/><rect y="9.85" width="24" height="1.23"/><rect y="12.31" width="24" height="1.23"/><rect y="14.77" width="24" height="1.23"/></g><rect width="10.5" height="8.6" fill="#3C3B6E"/><g fill="#fff"><circle cx="2" cy="1.8" r=".5"/><circle cx="5.2" cy="1.8" r=".5"/><circle cx="8.4" cy="1.8" r=".5"/><circle cx="3.6" cy="4.3" r=".5"/><circle cx="6.8" cy="4.3" r=".5"/><circle cx="2" cy="6.8" r=".5"/><circle cx="5.2" cy="6.8" r=".5"/><circle cx="8.4" cy="6.8" r=".5"/></g></svg><span class="ln">English</span></a></span>
     <a class="btn sm" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada</a>
   </div>
 </header>
@@ -200,14 +195,10 @@
 <section class="hero" id="inicio">
   <div class="wrap">
     <div class="hero-txt reveal">
-      <p class="eyebrow">Gestión de personas para startups y pymes.</p>
-      <h1>Sabé cómo está tu equipo y <em>actuá a tiempo.</em></h1>
-      <p class="sub">Escuchamos a tu equipo y te decimos qué hacer, para que tu gente esté bien y crezca en tu empresa.</p>
-      <p class="destacado">Vos, enfocado en tu negocio. <em>Nosotros, en tu equipo.</em></p>
-      <div class="cta-fila">
-        <a class="btn" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada de 20 minutos</a>
-        <p>Pensado para el presupuesto de una startup o una pyme. <strong>Desde USD 500 por mes.</strong></p>
-      </div>
+      <p class="eyebrow">Consultora de atracción y retención de talento</p>
+      <h1>Te ayudamos a sumar a <em>las personas correctas</em> y a cuidar a tu equipo.</h1>
+      <p class="sub">Hacemos tus búsquedas de principio a fin y acompañamos a cada persona después de que entra. Vos te enfocás en el negocio; nosotros, en tu equipo.</p>
+      <div class="cta-fila"><a class="btn" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada de 20 minutos</a></div>
     </div>
   </div>
 </section>
@@ -219,25 +210,28 @@
       <div>
         <small>Con quién vas a hablar</small>
         <h3>Joaquín González Benegas</h3>
-        <p>Fundador de Retain. Trabajo en Recursos Humanos hace 10 años.</p>
+        <p>Fundador. 10 años en Recursos Humanos, liderando equipos de reclutamiento y acompañando a líderes como HRBP.</p>
       </div>
       <a class="btn sm claro" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener">Ver LinkedIn →</a>
     </div>
     <div class="sep"></div>
     <p class="t reveal">Lo que escucho de dueños y líderes.</p>
-    <div><p class="q q1 reveal">“Ya no estoy en el día a día de mi equipo.”</p><p class="q q2 reveal">“¿Cómo está mi equipo, de verdad?”</p><p class="q q3 reveal">“¿Por qué se fue, si estaba todo bien?”</p></div>
+    <div><p class="q q1 reveal">“Necesito cubrir este puesto y no tengo tiempo de filtrar candidatos.”</p><p class="q q2 reveal">“Contratamos a alguien y a los tres meses no funcionó.”</p><p class="q q3 reveal">“¿Cómo está realmente mi equipo?”</p></div>
     <p class="c reveal">Armé Retain para eso.</p>
   </div>
 </section>
 
 <section class="importa" id="importa">
   <div class="wrap">
-    <h2 class="reveal">Un equipo que está bien empuja tu negocio. <em>Una salida lo frena.</em></h2>
-    <div class="listas">
-      <div class="lista bien reveal"><h3>Cuando tu equipo está bien</h3><ul><li>Trabaja mejor y propone ideas.</li><li>Se pone la camiseta.</li><li>Contagia al resto.</li><li>Crece adentro, y no tenés que salir a buscar afuera.</li></ul></div>
-      <div class="lista mal reveal"><h3>Cuando alguien se va</h3><ul><li>Se pierde tiempo y plata.</li><li>Se va un compañero, no solo un puesto.</li><li>El resto carga con su trabajo.</li><li>Lo que hacía se deja de hacer o se frena.</li></ul></div>
-    </div>
-    <p class="importa-c reveal">Muchas veces se podía ver venir. <em>Pero nadie lo dijo.</em></p>
+    <h2 class="reveal">Contratar bien <em>es la mitad.</em></h2>
+    <p class="importa-p reveal">Una mala contratación cuesta tiempo, plata y desgaste en el equipo. Y una buena también se pierde si nadie acompaña a la persona cuando entra. Por eso no separamos las dos cosas.</p>
+  </div>
+</section>
+
+<section class="hacemos" id="hacemos">
+  <div class="wrap">
+    <h2 class="reveal">Qué <em>hacemos.</em></h2>
+    <div class="srvs"><div class="srv reveal"><h3>Tu búsqueda, de principio a fin</h3><div class="srv-b"><p>Entendemos qué necesitás: el puesto, el equipo y la cultura. Buscamos, filtramos y te presentamos pocos candidatos, pero los indicados. Te acompañamos hasta que la persona entra.</p><ul class="srv-l"><li><strong>100% a éxito:</strong> si no contratás, no pagás.</li><li><strong>Garantía de 3 meses:</strong> si la persona no funciona o se va, repetimos la búsqueda.</li></ul></div></div><div class="srv reveal"><h3>Los primeros meses de la persona</h3><div class="srv-b"><p>No desaparecemos cuando firma. Nos juntamos con quien entró en sus primeros meses: cómo se está adaptando, si tiene claro qué se espera de ella y cómo es la relación con su líder. Te contamos qué conviene ajustar antes de que sea un problema.</p><p class="srv-n">Incluido en la búsqueda.</p></div></div><div class="srv reveal"><h3>Tu equipo, persona a persona</h3><div class="srv-b"><p>Escuchamos a tu equipo con check-ins individuales, pulsos y encuestas de clima. Te traemos cómo está cada persona, quién necesita atención y qué hacer, y lo revisamos juntos.</p></div></div></div>
   </div>
 </section>
 
@@ -252,36 +246,26 @@
   </div>
 </section>
 
-<section class="como" id="como">
-  <div class="wrap">
-    <div class="como-top reveal">
-      <h2>Cómo <em>trabajamos.</em></h2>
-      <p>Escuchamos a cada persona y miramos cinco cosas: motivación, relación con el equipo, liderazgo, satisfacción con la empresa y sentido de pertenencia.</p>
-    </div>
-    <ol class="pasos"><li class="paso reveal"><h3>Encuestas de clima y pulso</h3><p>Para ver tendencias del equipo.</p></li><li class="paso reveal"><h3>Check-ins individuales</h3><p>Conversaciones uno a uno con cada persona.</p></li><li class="paso reveal"><h3>Devolución con vos</h3><p>Un informe claro: qué está pasando, quién necesita atención y qué hacer. Y lo repasamos juntos.</p></li><li class="paso reveal"><h3>Seguimiento cercano</h3><p>A las personas clave, los roles críticos y los nuevos ingresos.</p></li></ol>
-  </div>
-</section>
-
 <section class="cierre" id="contacto">
   <div class="wrap">
     <div class="cierre-top">
       <div class="reveal">
         <h2>Primer paso: <em>una llamada de 20 minutos.</em></h2>
-        <p class="cierre-p">Te cuento qué es Retain y vemos juntos si es para tu empresa. Sin compromiso.</p>
+        <p class="cierre-p">Sin compromiso, para ver tu búsqueda o tu equipo y si Retain es lo que necesitás.</p>
         <div class="cta-fila">
           <a class="btn claro" href="https://calendar.app.google/AjbuNKxpmXSvo8Z79" target="_blank" rel="noopener">Agendá una llamada</a>
-          <p><strong>Desde USD 500 por mes</strong>, o su equivalente en pesos. El valor final depende de la cantidad de personas y de lo que necesite tu empresa.</p>
         </div>
+        <div class="precios"><p><strong>Búsquedas:</strong> 100% a éxito.</p><p><strong>Acompañamiento del equipo:</strong> desde USD 500 por mes o su equivalente en pesos, según la cantidad de personas.</p></div>
       </div>
-      <div class="porque reveal"><h3>Por qué Retain</h3><ul><li><strong>Experiencia desde el primer día.</strong> <span>Sabemos qué mirar y cómo hacerlo.</span></li><li><strong>Una mirada externa.</strong> <span>La gente habla con más libertad.</span></li><li><strong>Un aliado para decidir sobre tu equipo,</strong> <span>no para sumar gente por sumar.</span></li><li><strong>¿Ya tenés a alguien de Recursos Humanos?</strong> <span>Somos su refuerzo, no su reemplazo.</span></li></ul></div>
+      <div class="porque reveal" id="porque"><h3>Por qué Retain</h3><ul><li>Experiencia desde el primer día.</li><li>Trato directo: hablás siempre con la misma persona.</li><li>Una mirada de afuera: la gente habla con más libertad.</li><li>Refuerzo para Recursos Humanos, no reemplazo.</li><li>Pensado para el presupuesto de una pyme o una startup.</li></ul></div>
     </div>
-    <div class="canales reveal"><a class="canal" href="mailto:retainpeople@gmail.com"><span class="canal-l">Mail</span><span class="canal-v">retainpeople@gmail.com →</span></a><a class="canal" href="https://wa.me/5491162782243" target="_blank" rel="noopener"><span class="canal-l">WhatsApp</span><span class="canal-v">+54 11 6278-2243 →</span></a><a class="canal" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener"><span class="canal-l">LinkedIn</span><span class="canal-v">joaquingbenegas →</span></a></div>
+    <div class="canales reveal"><a class="canal" href="mailto:retainpeople@gmail.com"><span class="canal-l">Mail</span> <span class="canal-v">retainpeople@gmail.com →</span></a><a class="canal" href="https://wa.me/5491162782243" target="_blank" rel="noopener"><span class="canal-l">WhatsApp</span> <span class="canal-v">+54 11 6278-2243 →</span></a><a class="canal" href="https://www.linkedin.com/in/joaquingbenegas" target="_blank" rel="noopener"><span class="canal-l">LinkedIn</span> <span class="canal-v">joaquingbenegas →</span></a></div>
     <p class="compartir">¿Conocés a alguien a quien le pase esto? Reenviale esta página.</p>
   </div>
   <footer>
     <div class="wrap">
       <span class="logo">re<span>tain.</span></span>
-      <span>Gestión de personas para startups y pymes. <a href="panel.html?login=1" class="crm-hidden" aria-label="Acceso interno">•</a></span>
+      <span>Consultora de atracción y retención de talento para pymes y startups. <a href="panel.html?login=1" class="crm-hidden" aria-label="Acceso interno">•</a></span>
     </div>
   </footer>
 </section>
